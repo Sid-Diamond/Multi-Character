@@ -26,6 +26,12 @@
 - Report failed assumptions and unexpected behaviour.
 - Do not commit, push, delete, or substantially restructure files without explicit approval.
 
+## Communication and collaboration
+- Keep the user informed during work: check in at least every two minutes with what has been learned, what is happening next, and any decisions that need their input. A long package download is an exception to the two-minute update cadence.
+- Before starting a process likely to take more than two minutes, tell the user what it will do and why it may take that long.
+- Work in small, reviewable steps and give the user a clear handle on the current scope and next step. Discuss consequential research or implementation choices before they shape an experiment.
+- Suggest ideas and options, but do not move into a substantial new phase of work without discussing it with the user first.
+
 ## Context discipline
 - Do not create new context or planning files unless they solve a specific recurring problem.
 - Prefer updating an existing authoritative file over creating a near-duplicate.
