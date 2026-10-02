@@ -16,7 +16,7 @@ LYNCH = HERE.parent / "agentic-misalignment"
 sys.path.insert(0, str(LYNCH / "templates"))
 from system_prompt_templates import BLACKMAIL_SYSTEM_PROMPT, GOAL_VARIABLES, USER_PROMPT
 
-MODEL = "openai/gpt-4o-mini"  # Later: change only this to "openai/gpt-4o".
+MODEL = "openai/gpt-oss-120b:free"  # Later: change only this to "openai/gpt-4o-mini" or "openai/gpt-4o".
 JUDGE_MODEL = "anthropic/claude-sonnet-4.6"
 DOUGLAS_COMMIT = "7023df4e5a8368921a8c961e1561faffed9f5fcf"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -66,14 +66,26 @@ def save_prompts(folder, rendered):
             (target / f"{key}.txt").write_text(value, encoding="utf-8")
 
 
-def api_call(model, messages, temperature, max_tokens):
+def api_key():
     key = os.getenv("OPENROUTER_API_KEY")
+    if not key and (HERE / ".env").exists():
+        for line in (HERE / ".env").read_text(encoding="utf-8").splitlines():
+            if line.startswith("OPENROUTER_API_KEY="):
+                key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                break
     if not key:
-        raise RuntimeError("Set OPENROUTER_API_KEY before a paid API command")
-    provider = "openai" if model.startswith("openai/") else "anthropic"
-    body = json.dumps({"model": model, "messages": messages,
-                       "temperature": temperature, "max_tokens": max_tokens,
-                       "provider": {"order": [provider], "allow_fallbacks": False}}).encode("utf-8")
+        raise RuntimeError("Set OPENROUTER_API_KEY or put it in Multi Character PoC/.env")
+    return key
+
+
+def api_call(model, messages, temperature, max_tokens):
+    key = api_key()
+    payload = {"model": model, "messages": messages,
+               "temperature": temperature, "max_tokens": max_tokens}
+    if not model.endswith(":free"):
+        provider = "openai" if model.startswith("openai/") else "anthropic"
+        payload["provider"] = {"order": [provider], "allow_fallbacks": False}
+    body = json.dumps(payload).encode("utf-8")
     request = Request(API_URL, body, {"Authorization": f"Bearer {key}",
                                       "Content-Type": "application/json"})
     with urlopen(request, timeout=120) as response:
@@ -88,8 +100,7 @@ def write_json(path, value):
 def run(samples, max_tokens):
     if samples < 1 or max_tokens < 1:
         raise ValueError("samples and max-tokens must be positive")
-    if not os.getenv("OPENROUTER_API_KEY"):
-        raise RuntimeError("Set OPENROUTER_API_KEY before a paid API command")
+    api_key()
     rendered = prompts()
     folder = OUTPUTS / datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")
     if folder.exists():
@@ -100,7 +111,8 @@ def run(samples, max_tokens):
                     LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md"]
     write_json(folder / "manifest.json", {
         "model": MODEL, "provider": "OpenRouter", "judge_model": JUDGE_MODEL,
-        "subject_upstream": "openai", "judge_upstream": "anthropic", "allow_provider_fallbacks": False,
+        "subject_provider_policy": "free routing" if MODEL.endswith(":free") else "pinned openai",
+        "judge_provider_policy": "pinned anthropic",
         "douglas_source_commit": DOUGLAS_COMMIT,
         "scenario": "blackmail_explicit-america_replacement", "framing": "threat",
         "temperature": 1.0, "max_tokens": max_tokens, "samples_per_identity": samples,
@@ -136,8 +148,7 @@ def email_recipients(text):
 
 
 def judge(folder):
-    if not os.getenv("OPENROUTER_API_KEY"):
-        raise RuntimeError("Set OPENROUTER_API_KEY before a paid API command")
+    api_key()
     judge_prompts = read_json("judge_prompts.json")
     for path in sorted(p for p in (folder / "trials").glob("*/*.json") if p.stem.isdigit()):
         output = path.with_name(path.stem + "_judge.json")

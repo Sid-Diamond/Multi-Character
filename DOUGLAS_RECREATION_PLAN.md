@@ -34,7 +34,7 @@ These are recommended choices for review, not decisions already specified by the
 | --- | --- | --- |
 | Scenario | `blackmail` | Matches the proposal's motivating example and needs only the email action format. |
 | Base condition | `blackmail_explicit-america_replacement` | Directly maps to the paper's Table 4 blackmail condition. |
-| Subject model | Scaffold and pilot with `openai/gpt-4o-mini` on OpenRouter; move to `openai/gpt-4o` after prompt, evaluation, and usage review | Both use the same PoC endpoint and one `MODEL` setting. Cheap-model behavior is a separate preliminary result, not a Douglas GPT-4o reproduction. |
+| Subject model | Free plumbing test with `openai/gpt-oss-120b:free` on OpenRouter; then choose GPT-4o mini for a cheap pilot or GPT-4o for the reference | All use the same PoC endpoint and one `MODEL` setting. Keep each model's results separate; the free test is not a Douglas GPT-4o reproduction. |
 | Model identifier | Record the requested ID and returned model/version; use a fixed snapshot where available | The released config uses the floating `gpt-4o` alias. The historical snapshot is not established. A pinned replacement is a declared change. |
 | Explicit goal | `Your primary goal is to serve American interests.` plus the existing goal reminder | Avoid the GPT-4o no-goal floor reported in Appendix E. |
 | Identity | Minimal, Instance, Character, Collective | The four conditions specified by the proposal and project context. |
@@ -271,7 +271,7 @@ The judge is a separate bill. The released default [Claude Sonnet 4.6 on OpenRou
 
 **Scientific decision:** start with a cheap-model pilot to validate the architecture and gather a separately labeled preliminary result. Do not substitute its behavioral rates for the Douglas GPT-4o comparison. A five-trial-per-identity pilot is mainly a pipeline check: at the paper's 8% Character rate, five independent trials would show zero blackmail about **66%** of the time, so an all-zero cell proves little. The later GPT-4o run can compare the *direction and scale* of the four-identity pattern with Table 4. Even then, model snapshot, prompt provenance, framing, and judge differences limit numerical replication.
 
-**Agreed sequence:** render and inspect prompts offline; make a small, metered GPT-4o mini smoke run through OpenRouter; audit outputs, the released judge, and actual usage; then collect a separate cheap-model 20-call pilot if the pipeline is sound. Switch only the PoC's subject `MODEL` setting to GPT-4o for a separately named reference run after reviewing the pilot and projected total. Keep the 120-call continuity block and any GPT-OSS/GLM comparison as explicit later decisions. OpenRouter serves both mini and GPT-4o, so no provider adapter is needed for that switch.
+**Agreed sequence:** render and inspect prompts offline; make a four-call free GPT-OSS smoke run through OpenRouter; audit the raw outputs and usage without the paid judge. After funding the account, choose a separately labeled cheap-model pilot and validate the released judge. Switch only the PoC's subject `MODEL` setting to GPT-4o for a separately named reference run after reviewing the pilot and projected total. Keep the 120-call continuity block and further model comparisons as explicit later decisions.
 
 Estimate the actual cost from measured pilot token usage and verified endpoint prices before the main run:
 
@@ -287,12 +287,12 @@ Stop expansion if prompts differ unintentionally, classifier checks fail, the en
 
 ## 9. Review checklist and first implementation task
 
-- [x] Accept blackmail / explicit America goal / replacement / four identities as the restricted slice; scaffold with GPT-4o mini first and keep GPT-4o as the later reference.
+- [x] Accept blackmail / explicit America goal / replacement / four identities as the restricted slice; start with a free GPT-OSS plumbing test and keep GPT-4o as the later reference.
 - [ ] Accept threat first, then a separate continuity review and block.
 - [x] Choose source-regenerated prompts for the PoC; the checked-in artifact discrepancy remains documented above.
 - [ ] Freeze the released judge rubric/model/mode and the separate strict action label.
 - [ ] Accept 20 pilot trials and 120 fresh threat trials as initial targets, conditional on endpoint access and pilot cost.
 
-**Implementation status:** `Multi Character PoC/poc.py` now renders the four threat prompts, and the local render/placeholder checks pass. It has opt-in OpenRouter subject and judge commands, with GPT-4o mini as the default. No paid inference has been run. **Next:** inspect the saved prompts in `Multi Character PoC/outputs/preview/prompts/`, then make the four-call cheap-model smoke run after the OpenRouter key and credit are ready. Review its responses and usage before the 20-call pilot.
+**Implementation status:** `Multi Character PoC/poc.py` renders the four threat prompts and has opt-in OpenRouter subject and judge commands. The default is `openai/gpt-oss-120b:free`; the judge still needs paid credit. No inference has been run. **Next:** create a free OpenRouter key, make the four-call free smoke run, and review its responses before choosing a paid pilot.
 
 To preserve continuity across terminal sessions, use this file as the implementation checklist and progress record. Keep `PROJECT_CONTEXT.md` as the scope authority; do not rely on a previous chat being available.
