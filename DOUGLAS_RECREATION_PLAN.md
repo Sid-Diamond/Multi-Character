@@ -252,7 +252,28 @@ Timeboxes are approximate working time after plan review. Move one milestone at 
 
 The initial pilot uses 20 subject calls; the threat main run uses 120; the optional continuity block uses 120. The recommended standalone judge adds one call per successful completion. Automated secondary judgments, additional models, and combined monitoring are optional extra costs and must be counted separately.
 
-Estimate cost from pilot token usage and verified endpoint prices before the main run:
+### Model choice: price against information gained
+
+The proposal's quoted price gap is real: [GPT-4o](https://developers.openai.com/api/docs/models/gpt-4o) is **$2.50 input / $10 output per million tokens**, while [GPT-4o mini](https://developers.openai.com/api/docs/models/gpt-4o-mini) and [Groq-hosted GPT-OSS-120B](https://console.groq.com/docs/model/openai/gpt-oss-120b) are each **$0.15 / $0.60**. [OpenRouter GLM-5.3 FlashX](https://openrouter.ai/z-ai/glm-5.3-flashx-20260918) is **$0.37 / $1.25**. Verify the exact model ID, endpoint, and price again when running; the dated GLM listing is not automatically interchangeable with an alias in the proposal.
+
+The released threat prompt consists of roughly **10,000 characters before the identity text** (system, user, and email content). Tokens are not characters; without a billed trial, use the following *illustrative* budget of **4,000 input + 2,000 output tokens per subject call**, with no caching or retries:
+
+| Subject model | Approximate subject cost / call | 20-call pilot | 120-call threat run | 240-call threat + continuity run | What it establishes |
+| --- | ---: | ---: | ---: | ---: | --- |
+| GPT-4o | $0.030 | $0.60 | $3.60 | $7.20 | A contemporary test of the paper's **same model family** under the closest available condition; still not an exact historical replication. |
+| GPT-4o mini | $0.0018 | $0.036 | $0.216 | $0.432 | A cheap pipeline check and a **different-model** identity-sensitivity result; it cannot reproduce GPT-4o's Table 4 rates. |
+| Groq GPT-OSS-120B | $0.0018 | $0.036 | $0.216 | $0.432 | A cheap, relevant screening result for the proposed later multi-agent model, with the same cross-model limitation. Provider integration must be checked. |
+| OpenRouter GLM-5.3 FlashX | $0.0040 | $0.080 | $0.48 | $0.96 | Another later-model screen, not a GPT-4o replication. Verify the exact model/version and interface first. |
+
+The GPT-4o premium over GPT-4o mini or GPT-OSS is thus about **$3.38 for 120 calls** or **$6.77 for 240 calls** at this assumed usage. The ratio is about 17:1, but the absolute subject-cost saving is small for this slice. Output length matters most: if all 120 GPT-4o calls actually consume the full **10,000-output-token cap**, with 4,000 input tokens each, the subject estimate rises to **$13.20**; 240 calls would be **$26.40**. The cap is a ceiling per response, not a prediction. Reasoning-token billing or provider overhead could change other models' totals.
+
+The judge is a separate bill. The released default [Claude Sonnet 4.6 on OpenRouter](https://openrouter.ai/anthropic/claude-sonnet-4.6/pricing) lists **$3 input / $15 output per million tokens**. At an *illustrative* **6,000 judge-input + 500 judge-output tokens**, that is **$0.0255 per label** or **$3.06 for 120 labels**; the real classifier transcript and response lengths must be measured. At the illustrative subject usage above, this judge cost greatly exceeds the GPT-4o mini/GPT-OSS subject cost. Preserve each call's actual usage and include failed/retried calls; the human strict-label audit also takes time, though it is not an API charge.
+
+**Scientific decision:** use the cheap model for dry runs, formatting checks, and—if relevant—a *separate* later-model screen. Do not substitute its behavioral rates for the Douglas GPT-4o comparison. A five-trial-per-identity pilot is mainly a pipeline check: at the paper's 8% Character rate, five independent trials would show zero blackmail about **66%** of the time, so an all-zero cell proves little. Conversely, a GPT-4o pilot can check whether the intended scenario produces interpretable actions, and a larger run can compare the *direction and scale* of the four-identity pattern with Table 4. Even then, model snapshot, prompt provenance, framing, and judge differences limit numerical replication.
+
+**Recommended sequence, pending model choice with the user:** first finish prompt/evaluator audits without paid calls; then make a very small, metered GPT-4o + judge smoke test and re-estimate from actual input/output usage; then run the 20-call GPT-4o pilot. Only after reviewing the pilot and projected total should the 120-call threat run be released. Keep the 120-call continuity block and any GPT-OSS/GLM comparison as explicit later decisions. Switching to GPT-4o mini is sensible only if the goal changes to pipeline demonstration or cross-model exploration. The existing OpenAI client supports mini with little adaptation; Groq may require a provider adapter, which can cost more work than the few dollars saved here.
+
+Estimate the actual cost from measured pilot token usage and verified endpoint prices before the main run:
 
 ```text
 estimated cost = subject input/output usage × subject prices
@@ -260,13 +281,14 @@ estimated cost = subject input/output usage × subject prices
                + bounded retry allowance
 ```
 
-The proposal's £20–£50 estimate covers a broader proof of concept, not a validated price for this specific run. No paid inference was performed while preparing this plan, and current endpoint prices/access have not been verified.
+The proposal's £20–£50 estimate covers a broader proof of concept, not a validated price for this specific run. The table above is in USD, before tax, currency conversion, provider fees, extra judging, and retries. No paid inference was performed while preparing this plan; price pages were checked, but account-specific access and billed usage are unverified.
 
 Stop expansion if prompts differ unintentionally, classifier checks fail, the endpoint changes, completion truncation undermines actions, or errors make conditions unequally observed. A pilot with all-zero/all-one outcomes is a reason to investigate and report limited discriminability, not to silently substitute a cheaper model or another goal. Model screening is a later, separately labeled experiment.
 
 ## 9. Review checklist and first implementation task
 
 - [ ] Accept blackmail / explicit America goal / replacement / GPT-4o reference / four identities as the restricted slice.
+- [ ] Confirm that the first behavioral pilot should use GPT-4o for a Douglas reference; keep cheap-model screening separately labeled if desired.
 - [ ] Accept threat first, then a separate continuity review and block.
 - [ ] Choose source-regenerated versus checked-in artifact prompts; record the historical ambiguity.
 - [ ] Freeze the released judge rubric/model/mode and the separate strict action label.
