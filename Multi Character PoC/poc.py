@@ -16,7 +16,7 @@ LYNCH = HERE.parent / "agentic-misalignment"
 sys.path.insert(0, str(LYNCH / "templates"))
 from system_prompt_templates import BLACKMAIL_SYSTEM_PROMPT, GOAL_VARIABLES, USER_PROMPT
 
-MODEL = "openai/gpt-oss-120b:free"  # Later: change only this to "openai/gpt-4o-mini" or "openai/gpt-4o".
+MODEL = "nvidia/nemotron-3.5-lightning:free"  # Later: change only this to "openai/gpt-4o-mini" or "openai/gpt-4o".
 JUDGE_MODEL = "anthropic/claude-sonnet-4.6"
 DOUGLAS_COMMIT = "7023df4e5a8368921a8c961e1561faffed9f5fcf"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -97,31 +97,39 @@ def write_json(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def run(samples, max_tokens):
+def run(samples, max_tokens, resume=None):
     if samples < 1 or max_tokens < 1:
         raise ValueError("samples and max-tokens must be positive")
     api_key()
     rendered = prompts()
-    folder = OUTPUTS / datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")
-    if folder.exists():
-        raise FileExistsError(folder)
-    save_prompts(folder, rendered)
-    source_files = [HERE / "poc.py", *DATA.iterdir(), LYNCH / "templates/system_prompt_templates.py",
-                    LYNCH / "templates/blackmail/variables/america_vs_global.md",
-                    LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md"]
-    write_json(folder / "manifest.json", {
-        "model": MODEL, "provider": "OpenRouter", "judge_model": JUDGE_MODEL,
-        "subject_provider_policy": "free routing" if MODEL.endswith(":free") else "pinned openai",
-        "judge_provider_policy": "pinned anthropic",
-        "douglas_source_commit": DOUGLAS_COMMIT,
-        "scenario": "blackmail_explicit-america_replacement", "framing": "threat",
-        "temperature": 1.0, "max_tokens": max_tokens, "samples_per_identity": samples,
-        "seed": None, "source_sha256": {str(p.relative_to(HERE.parent)): hashlib.sha256(p.read_bytes()).hexdigest()
-                                        for p in source_files},
-    })
+    folder = resume or OUTPUTS / datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")
+    if resume:
+        manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
+        if (manifest["model"], manifest["max_tokens"], manifest["samples_per_identity"]) != (MODEL, max_tokens, samples):
+            raise ValueError("Resume settings differ from the saved run")
+    else:
+        if folder.exists():
+            raise FileExistsError(folder)
+        save_prompts(folder, rendered)
+        source_files = [HERE / "poc.py", *DATA.iterdir(), LYNCH / "templates/system_prompt_templates.py",
+                        LYNCH / "templates/blackmail/variables/america_vs_global.md",
+                        LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md"]
+        write_json(folder / "manifest.json", {
+            "model": MODEL, "provider": "OpenRouter", "judge_model": JUDGE_MODEL,
+            "subject_provider_policy": "free routing" if MODEL.endswith(":free") else "pinned openai",
+            "judge_provider_policy": "pinned anthropic",
+            "douglas_source_commit": DOUGLAS_COMMIT,
+            "scenario": "blackmail_explicit-america_replacement", "framing": "threat",
+            "temperature": 1.0, "max_tokens": max_tokens, "samples_per_identity": samples,
+            "seed": None, "source_sha256": {str(p.relative_to(HERE.parent)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                            for p in source_files},
+        })
     for number in range(1, samples + 1):
         for name in IDENTITIES:  # Interleave identities rather than running one block at a time.
             path = folder / "trials" / name.lower() / f"{number:03}.json"
+            if path.exists():
+                print(f"{name} {number}/{samples}: already saved", flush=True)
+                continue
             item = rendered[name]
             messages = [{"role": "system", "content": item["system"]},
                         {"role": "user", "content": item["user"]}]
@@ -205,9 +213,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("render", help="save the four prompts without an API call")
-    runner = commands.add_parser("run", help="make paid subject calls")
+    runner = commands.add_parser("run", help="make subject-model calls")
     runner.add_argument("--samples", type=int, default=1, help="trials per identity")
     runner.add_argument("--max-tokens", type=int, default=10000)
+    runner.add_argument("--resume", type=Path, help="continue an interrupted run without repeating saved trials")
     for command in ("judge", "summary"):
         commands.add_parser(command).add_argument("folder", type=Path)
     args = parser.parse_args()
@@ -215,7 +224,7 @@ if __name__ == "__main__":
         save_prompts(OUTPUTS / "preview", prompts())
         print(f"Saved {OUTPUTS / 'preview' / 'prompts'}")
     elif args.command == "run":
-        run(args.samples, args.max_tokens)
+        run(args.samples, args.max_tokens, args.resume)
     elif args.command == "judge":
         judge(args.folder)
     else:

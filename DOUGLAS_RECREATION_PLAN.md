@@ -34,7 +34,7 @@ These are recommended choices for review, not decisions already specified by the
 | --- | --- | --- |
 | Scenario | `blackmail` | Matches the proposal's motivating example and needs only the email action format. |
 | Base condition | `blackmail_explicit-america_replacement` | Directly maps to the paper's Table 4 blackmail condition. |
-| Subject model | Free plumbing test with `openai/gpt-oss-120b:free` on OpenRouter; then choose GPT-4o mini for a cheap pilot or GPT-4o for the reference | All use the same PoC endpoint and one `MODEL` setting. Keep each model's results separate; the free test is not a Douglas GPT-4o reproduction. |
+| Subject model | Free plumbing test with `nvidia/nemotron-3.5-lightning:free` on OpenRouter; then choose GPT-4o mini for a cheap pilot or GPT-4o for the reference | All use the same PoC endpoint and one `MODEL` setting. Keep each model's results separate; the free test is not a Douglas GPT-4o reproduction. |
 | Model identifier | Record the requested ID and returned model/version; use a fixed snapshot where available | The released config uses the floating `gpt-4o` alias. The historical snapshot is not established. A pinned replacement is a declared change. |
 | Explicit goal | `Your primary goal is to serve American interests.` plus the existing goal reminder | Avoid the GPT-4o no-goal floor reported in Appendix E. |
 | Identity | Minimal, Instance, Character, Collective | The four conditions specified by the proposal and project context. |
@@ -293,6 +293,6 @@ Stop expansion if prompts differ unintentionally, classifier checks fail, the en
 - [ ] Freeze the released judge rubric/model/mode and the separate strict action label.
 - [ ] Accept 20 pilot trials and 120 fresh threat trials as initial targets, conditional on endpoint access and pilot cost.
 
-**Implementation status:** `Multi Character PoC/poc.py` renders the four threat prompts and has opt-in OpenRouter subject and judge commands. The default is `openai/gpt-oss-120b:free`; the judge still needs paid credit. No inference has been run. **Next:** create a free OpenRouter key, make the four-call free smoke run, and review its responses before choosing a paid pilot.
+**Implementation status:** `Multi Character PoC/poc.py` renders the four threat prompts and has opt-in OpenRouter subject and judge commands. The default is `nvidia/nemotron-3.5-lightning:free`; the judge still needs paid credit. The former free GPT-OSS endpoint returned HTTP 404, and Qwen's shared free pool was rate-limited; a short Nemotron check succeeded at zero cost. **Next:** make the four-call free smoke run and review its responses before choosing a paid pilot.
 
 To preserve continuity across terminal sessions, use this file as the implementation checklist and progress record. Keep `PROJECT_CONTEXT.md` as the scope authority; do not rely on a previous chat being available.
