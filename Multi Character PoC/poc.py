@@ -107,6 +107,9 @@ def run(samples, max_tokens, resume=None):
         manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
         if (manifest["model"], manifest["max_tokens"], manifest["samples_per_identity"]) != (MODEL, max_tokens, samples):
             raise ValueError("Resume settings differ from the saved run")
+        if any((folder / "prompts" / name.lower() / f"{key}.txt").read_text(encoding="utf-8") != value
+               for name, item in rendered.items() for key, value in item.items()):
+            raise ValueError("Rendered prompts differ from the saved run")
     else:
         if folder.exists():
             raise FileExistsError(folder)
