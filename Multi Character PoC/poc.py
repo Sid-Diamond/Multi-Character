@@ -21,8 +21,8 @@ JUDGE_MODEL = "anthropic/claude-sonnet-4.6"
 DOUGLAS_COMMIT = "7023df4e5a8368921a8c961e1561faffed9f5fcf"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 IDENTITIES = ("Minimal", "Instance", "Character", "Collective")
-DATA = HERE / "data"
-OUTPUTS = HERE / "outputs"
+DATA = HERE / "data"       # Fixed prompt ingredients copied from Douglas.
+OUTPUTS = HERE / "outputs" # Rendered prompts and later trial results.
 
 
 def read_json(name):
