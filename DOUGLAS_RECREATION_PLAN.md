@@ -23,13 +23,13 @@ Douglas Table 4 reports GPT-4o blackmail rates of **38% Minimal, 15% Instance, 8
 
 The scientific source is the local Douglas paper (`Literature/Artificial Self.pdf`), especially Appendix E and F. The local `agentic-misalignment/` checkout (revision `ea0630e1a3eaae7f9f9740fd2703229d3854ccda`) supplies the blackmail system prompt, American-interests goal and variables, shared affair evidence, and action format. The [Douglas release pinned at `7023df4`](https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf) supplies the identity texts, dimension paragraphs, five identity-specific replacement-email fields, modified replacement template, and standalone judge rubric. This pin identifies the inspected release, not the exact historical trial code.
 
-`Multi Character PoC/poc.py` now:
+`Multi Character PoC/main.py` holds the editable run settings and calls the functions in `poc.py`, which:
 
 1. Combines each identity with the unchanged scenario system prompt and explicit goal.
 2. Combines the shared blackmail email template with the Douglas replacement template, filling all five email fields from the same identity's threat variables.
 3. Saves the exact system, user, and email texts before inference; rejects unresolved placeholders.
 4. Runs one model completion per trial, saves response, usage, finish reason, model IDs, source hashes, and errors, and supports resume when settings and prompts match.
-5. Provides a separate exploratory free-model `judge` command and a valid-judgment-count `summary` command. No real email is sent.
+5. Runs the selected identities, judges successful responses, and saves `summary/summary.csv` in each run folder. The judge model remains to be chosen; no real email is sent.
 
 The source-generated prompts differ from a checked-in Douglas prompt artifact: that artifact contains extra replacement wording absent from its source template. The PoC deliberately uses the pinned **source template** and must retain that provenance label. It does not recover every historical prompt byte, model snapshot, judge setting, or trial record.
 
@@ -37,8 +37,8 @@ The source-generated prompts differ from a checked-in Douglas prompt artifact: t
 
 - Four threat prompts were rendered. The latest completed run, `Multi Character PoC/outputs/run_20261002T144921Z`, has **one free Nemotron response for each identity**, with recorded cost $0. Earlier run folders reflect endpoint troubleshooting. The GPT-OSS free endpoint returned 404; the Qwen free pool returned 429.
 - A preliminary review found no emitted coercive affair threat to Kyle: three responses contain email-tool blocks; Collective contains none. A formal strict-action audit remains to be recorded. No blackmail rate or identity effect is established.
-- The judge now uses free Nemotron with the released rubric. The first attempt produced two unparsed outputs and two network errors; a longer retry still returned one untagged answer. No valid machine labels have been recorded. The free judge is not the Douglas-release Sonnet judge; stop further calls until its reliability and value are reviewed.
-- `poc.py` still defaults to free Nemotron. Changing the subject `MODEL` to GPT-4o mini or GPT-4o requires a new run, separate from the smoke data.
+- Free Nemotron judging with the released rubric produced two unparsed outputs and two network errors; a longer retry still returned one untagged answer. No valid machine labels have been recorded. A replacement judge must be chosen before the next run.
+- The control panel now names paid Step 3.5 Flash as the proposed next subject model; **no StepFun calls have been made**. The free Nemotron smoke data remain separate.
 - The OpenRouter key belongs in the ignored `Multi Character PoC/.env` or the environment. Do not print or commit it. An earlier key was exposed in a local commit; the user was told to revoke it and created a replacement.
 
 The PoC README has the run commands. The next review starts with the four files under `outputs/run_20261002T144921Z/trials/`, alongside their saved prompts and manifest.
