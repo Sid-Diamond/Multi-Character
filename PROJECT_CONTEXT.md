@@ -35,6 +35,4 @@ Do not design or implement multi-agent logic yet.
 
 ## Current milestone
 
-Produce a concise implementation plan for one faithful restricted single-agent reproduction.
-
-Do not modify code until that plan has been reviewed.
+The restricted blackmail PoC and four-response free-model smoke run exist. Review those responses and the prompt/evaluator limitations before choosing a paid pilot. See `DOUGLAS_RECREATION_PLAN.md` for the current status and next step. Keep later multi-agent work out of this stage.

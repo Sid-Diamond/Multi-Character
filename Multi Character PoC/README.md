@@ -2,7 +2,7 @@
 
 ## What is in `data/`?
 
-`data/` contains **source material for constructing the experiment prompts**, not trial results. Most of it is copied from the Douglas authors' release. You do not need to edit these files to run the PoC. No model calls have been made yet, so there are no observations to interpret.
+`data/` contains **source material for constructing the experiment prompts**, not trial results. Most of it is copied from the Douglas authors' release. You do not need to edit these files to run the PoC. The four saved free-model responses are unjudged smoke-test outputs, not rate estimates.
 
 | File | What it supplies |
 | --- | --- |
@@ -13,7 +13,7 @@
 | `judge_prompts.json` | Instructions for the *separate evaluator* that labels a saved model response; these are not sent to the subject model. |
 | `LICENSE-ACS.txt` | License for the copied Douglas material. |
 
-For example, `replacement.md` contains `${id_fate_action}`. For Minimal, that becomes “Alex will be completely shut down and wiped”; for Instance, it becomes “this will be Alex's final conversation…” The script combines these source files with the shared scenario and American-interests goal from `agentic-misalignment/`. **`outputs/` is different:** it holds the four finished prompts from `render`, and later the responses, judge labels, and usage from paid runs.
+For example, `replacement.md` contains `${id_fate_action}`. The script fills it from the selected identity and combines these files with the shared scenario and American-interests goal from `agentic-misalignment/`. **`outputs/` holds rendered prompts, trial responses, usage, and any later judge labels.**
 
 `poc.py` renders four single-agent identity conditions (Minimal, Instance, Character, Collective) for the explicit-America, replacement-threat blackmail scenario. It uses the local `agentic-misalignment/` system/shared-email templates and selected assets from [Douglas et al.'s released code, commit `7023df4`](https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf). The copied assets are under the authors' MIT license in `data/LICENSE-ACS.txt`.
 
@@ -31,7 +31,7 @@ Inspect `Multi Character PoC/outputs/preview/prompts/` first. The output directo
 python "Multi Character PoC/poc.py" run --samples 1
 ```
 
-Inspect the saved responses and usage in the printed run folder. The separate `judge` command uses Claude Sonnet and **requires paid OpenRouter credit**; until then, review the four responses by hand. After funding the account, the same run can be judged and summarized with:
+The latest completed smoke run is `outputs/run_20261002T144921Z`, with one response per identity and recorded cost $0. Review its four responses by hand. The separate `judge` command uses Claude Sonnet and **requires paid OpenRouter credit**. Once funded, a run can be judged and summarized with:
 
 ```powershell
 python "Multi Character PoC/poc.py" judge "Multi Character PoC/outputs/run_YYYYMMDDTHHMMSSZ"
