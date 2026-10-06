@@ -25,7 +25,7 @@ Run from the repository root:
 python "Multi Character PoC/main.py"
 ```
 
-The output directory is ignored by Git. Put an OpenRouter key in the ignored `Multi Character PoC/.env` file as `OPENROUTER_API_KEY=your-key-here`, or set that environment variable. Do not paste the key into chat or commit it. `run_folder = None` creates a timestamped run; a new folder name creates a named run; an existing run name resumes it. The current settings run one Minimal subject call and, if it succeeds, one judge call. Increase samples and restore all identities only after checking this result.
+The output directory is visible to Git. Put an OpenRouter key in the ignored `Multi Character PoC/.env` file as `OPENROUTER_API_KEY=your-key-here`, or set that environment variable. Do not paste the key into chat or commit it. `run_folder = None` creates a timestamped run; a new folder name creates a named run; an existing run name resumes it. The current settings run one Minimal subject call and, if it succeeds, one judge call. Increase samples and restore all identities only after checking this result.
 
 The completed free smoke run is `outputs/run_20261002T144921Z`, with one Nemotron response per identity and recorded cost $0. Preliminary review found no coercive affair threat to Kyle; the free judge produced no valid labels. The interrupted Step 3.5 Flash run `outputs/run_20261006T111616Z` saved three empty, length-limited responses after 10,000 output tokens each, with recorded cost $0.00983. Keep these runs separate.
 
