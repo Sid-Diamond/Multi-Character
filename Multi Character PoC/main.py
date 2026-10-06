@@ -4,7 +4,7 @@ import poc
 
 
 SETTINGS = {
-    "run_folder": None,  # None: timestamped new run; new name: create it; existing name: resume it
+    "run_folder": "Take_3",  # None: timestamped new run; new name: create it; existing name: resume it
     "identities": ["Minimal","Character", "Collective","Instance"],  # One-trial speed and format check before the full pilot
     "model": "google/gemini-3-flash-preview",
     "subject_provider": None,  # None uses OpenRouter routing
