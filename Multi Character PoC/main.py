@@ -14,7 +14,7 @@ SETTINGS = {
     "max_tokens": 10000,
     "subject_timeout_seconds": 240,
     "samples_per_identity": 10,
-    "judge_model": "anthropic/claude-haiku-4.5-",
+    "judge_model": "anthropic/claude-haiku-4.5",
     "judge_provider": None,
     "judge_temperature": 0.0,
     "judge_max_tokens": 5000,
