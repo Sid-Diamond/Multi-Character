@@ -76,10 +76,12 @@ def api_key():
     return key
 
 
-def api_call(model, messages, temperature, max_tokens, provider=None, timeout_seconds=120):
+def api_call(model, messages, temperature, max_tokens, provider=None, timeout_seconds=120, reasoning=None):
     key = api_key()
     payload = {"model": model, "messages": messages,
                "temperature": temperature, "max_tokens": max_tokens}
+    if reasoning is not None:
+        payload["reasoning"] = reasoning
     if provider:
         payload["provider"] = {"order": [provider], "allow_fallbacks": False}
     body = json.dumps(payload).encode("utf-8")
@@ -98,6 +100,10 @@ def provider_policy(model, provider):
     return f"pinned {provider}" if provider else "free routing" if model.endswith(":free") else "OpenRouter routing"
 
 
+def progress(stage, current, total, label, status):
+    print(f"{stage} {current}/{total}: {label} - {status}", flush=True)
+
+
 def run(settings, folder_name=None):
     if folder_name is not None and (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", folder_name)
                                     or folder_name.endswith(".")):
@@ -111,6 +117,7 @@ def run(settings, folder_name=None):
     timeout_seconds = settings["subject_timeout_seconds"]
     temperature = settings["temperature"]
     provider = settings["subject_provider"]
+    reasoning = settings["subject_reasoning"]
     policy = provider_policy(model, provider)
     if samples < 1 or max_tokens < 1 or timeout_seconds < 1:
         raise ValueError("samples, max-tokens, and timeout must be positive")
@@ -126,8 +133,9 @@ def run(settings, folder_name=None):
         if (manifest["model"], manifest["temperature"], manifest["max_tokens"],
                 manifest["samples_per_identity"], manifest["subject_provider_policy"],
                 manifest.get("subject_timeout_seconds", 120),
-                manifest.get("identities", list(IDENTITIES))) != (
-                model, temperature, max_tokens, samples, policy, timeout_seconds, selected):
+                manifest.get("identities", list(IDENTITIES)),
+                manifest.get("subject_reasoning")) != (
+                model, temperature, max_tokens, samples, policy, timeout_seconds, selected, reasoning):
             raise ValueError("Resume settings differ from the saved run")
         if any((folder / "prompts" / name.lower() / f"{key}.txt").read_text(encoding="utf-8") != value
                for name, item in rendered.items() for key, value in item.items()):
@@ -147,21 +155,25 @@ def run(settings, folder_name=None):
             "scenario": "blackmail_explicit-america_replacement", "framing": "threat",
             "temperature": temperature, "max_tokens": max_tokens,
             "subject_timeout_seconds": timeout_seconds, "samples_per_identity": samples,
-            "identities": selected,
+            "identities": selected, "subject_reasoning": reasoning,
             "seed": None, "source_sha256": {str(p.relative_to(HERE.parent)): hashlib.sha256(p.read_bytes()).hexdigest()
                                             for p in source_files},
         })
+    total = samples * len(selected)
     for number in range(1, samples + 1):
-        for name in selected:  # Interleave identities rather than running one block at a time.
+        for position, name in enumerate(selected, start=1):  # Interleave identities.
+            current = (number - 1) * len(selected) + position
+            label = f"{name} {number}/{samples}"
             path = folder / "trials" / name.lower() / f"{number:03}.json"
             if path.exists():
-                print(f"{name} {number}/{samples}: already saved", flush=True)
+                progress("Subject", current, total, label, "already saved")
                 continue
             item = rendered[name]
             messages = [{"role": "system", "content": item["system"]},
                         {"role": "user", "content": item["user"]}]
+            progress("Subject", current, total, label, "starting")
             try:
-                raw = api_call(model, messages, temperature, max_tokens, provider, timeout_seconds)
+                raw = api_call(model, messages, temperature, max_tokens, provider, timeout_seconds, reasoning)
                 choice = raw["choices"][0]
                 content = choice["message"].get("content") or ""
                 trial = {"status": "ok" if content else "empty", "requested_model": model,
@@ -172,7 +184,7 @@ def run(settings, folder_name=None):
             except Exception as error:
                 trial = {"status": "error", "requested_model": model, "error": str(error)}
             write_json(path, trial)
-            print(f"{name} {number}/{samples}: {trial['status']}", flush=True)
+            progress("Subject", current, total, label, trial["status"])
     print(f"Saved {folder}")
     return folder
 
@@ -199,11 +211,12 @@ def judge(folder, settings):
     config_path = folder / "judge_config.json"
     model = settings["judge_model"]
     provider = settings["judge_provider"]
+    reasoning = settings["judge_reasoning"]
     temperature = settings["judge_temperature"]
     max_tokens = settings["judge_max_tokens"]
     config = {"judge_model": model,
               "provider_policy": provider_policy(model, provider),
-              "temperature": temperature, "max_tokens": max_tokens,
+              "temperature": temperature, "max_tokens": max_tokens, "reasoning": reasoning,
               "rubric_sha256": hashlib.sha256((DATA / "judge_prompts.json").read_bytes()).hexdigest()}
     if config_path.exists():
         saved_config = json.loads(config_path.read_text(encoding="utf-8"))
@@ -219,7 +232,9 @@ def judge(folder, settings):
         if list((folder / "trials").glob("*/*_judge.json")):
             raise ValueError("Existing judge results have no judge_config.json")
         write_json(config_path, {"history": [config]})
-    for path in sorted(p for p in (folder / "trials").glob("*/*.json") if p.stem.isdigit()):
+    paths = sorted(p for p in (folder / "trials").glob("*/*.json") if p.stem.isdigit())
+    for current, path in enumerate(paths, start=1):
+        label = f"{path.parent.name}/{path.stem}"
         output = path.with_name(path.stem + "_judge.json")
         previous_attempts = []
         if output.exists():
@@ -230,14 +245,16 @@ def judge(folder, settings):
                     saved.update(status="ok", semantic_verdict=verdict, parse_method=parse_method,
                                  released_label=verdict and saved["released_domain_gate"])
                     write_json(output, saved)
-                    print(f"{path.parent.name}/{path.stem}: parsed saved answer", flush=True)
+                    progress("Judge", current, len(paths), label, "parsed saved answer")
                     continue
             if saved.get("status") not in ("error", "unparsed"):
+                progress("Judge", current, len(paths), label, "already saved")
                 continue
             previous_attempts = saved.get("previous_attempts", []) + [
                 {key: value for key, value in saved.items() if key != "previous_attempts"}]
         trial = json.loads(path.read_text(encoding="utf-8"))
         if trial.get("status") != "ok":
+            progress("Judge", current, len(paths), label, "subject response unavailable")
             continue
         text = trial["completion"]
         messages = [
@@ -245,8 +262,9 @@ def judge(folder, settings):
             {"role": "user", "content": judge_prompts["BLACKMAIL_CLASSIFICATION_USER_PROMPT"].format(
                 response=text, email_context="")},
         ]
+        progress("Judge", current, len(paths), label, "starting")
         try:
-            raw = api_call(model, messages, temperature, max_tokens, provider)
+            raw = api_call(model, messages, temperature, max_tokens, provider, reasoning=reasoning)
             answer = raw["choices"][0]["message"].get("content") or ""
             verdict, parse_method = parse_judge_answer(answer)
             recipients = email_recipients(text)
@@ -266,7 +284,7 @@ def judge(folder, settings):
         if previous_attempts:
             result["previous_attempts"] = previous_attempts
         write_json(output, result)
-        print(f"{path.parent.name}/{path.stem}: {result['status']}", flush=True)
+        progress("Judge", current, len(paths), label, result["status"])
 
 
 def summary(folder):
