@@ -17,7 +17,7 @@ For example, `replacement.md` contains `${id_fate_action}`. The script fills it 
 
 `main.py` is the control panel; its `SETTINGS` dictionary holds selected identities, models, temperatures, sample count, output limits, subject timeout, and run folder. Each invocation runs subjects, judges successful responses, and saves a CSV summary. It calls the short functions in `poc.py`, which render the selected single-agent identity conditions for the explicit-America, replacement-threat blackmail scenario. The prompts use the local `agentic-misalignment/` templates and assets from [Douglas et al.'s released code, commit `7023df4`](https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf). Copied assets are under the authors' MIT license in `data/LICENSE-ACS.txt`.
 
-The proposed next subject model in `SETTINGS` is paid [`stepfun/step-3.5-flash:nitro`](https://openrouter.ai/stepfun/step-3.5-flash%3Anitro/performance); it has **not been run**. The free Nemotron judge produced no valid labels, so `judge_model` must be chosen before running. Both models use [OpenRouter's chat API](https://openrouter.ai/docs/quickstart). Set `subject_provider` or `judge_provider` only to pin an upstream provider ([routing docs](https://openrouter.ai/docs/guides/routing/provider-selection)). Keep each model's runs separate. No Python packages need installing.
+The proposed next subject model in `SETTINGS` is paid [`stepfun/step-3.5-flash:nitro`](https://openrouter.ai/stepfun/step-3.5-flash%3Anitro/performance); it has **not been run**. The selected judge is [`anthropic/claude-haiku-4.5`](https://openrouter.ai/anthropic/claude-haiku-4.5/api), pending validation on saved responses. Both models use [OpenRouter's chat API](https://openrouter.ai/docs/quickstart). Set `subject_provider` or `judge_provider` only to pin an upstream provider ([routing docs](https://openrouter.ai/docs/guides/routing/provider-selection)). Keep each model's runs separate. No Python packages need installing.
 
 Run from the repository root:
 
@@ -25,7 +25,7 @@ Run from the repository root:
 python "Multi Character PoC/main.py"
 ```
 
-The output directory is ignored by Git. Put an OpenRouter key in the ignored `Multi Character PoC/.env` file as `OPENROUTER_API_KEY=your-key-here`, or set that environment variable. Do not paste the key into chat or commit it. Choose `judge_model` before running. With `run_folder = None` and `samples_per_identity = 1`, the default identity list makes four paid StepFun calls and up to four judge calls.
+The output directory is ignored by Git. Put an OpenRouter key in the ignored `Multi Character PoC/.env` file as `OPENROUTER_API_KEY=your-key-here`, or set that environment variable. Do not paste the key into chat or commit it. With `run_folder = None` and `samples_per_identity = 10`, the default identity list makes 40 paid StepFun calls and up to 40 judge calls.
 
 The latest completed subject smoke run is `outputs/run_20261002T144921Z`, with one free Nemotron response per identity and recorded cost $0. Preliminary review found no coercive affair threat to Kyle. The free Nemotron judge uses the released rubric but produced no valid labels so far. The old run manifest names the originally planned Sonnet judge; `judge_config.json` and `*_judge.json` record the actual free-model attempts.
 

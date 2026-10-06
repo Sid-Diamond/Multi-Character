@@ -29,7 +29,7 @@ The scientific source is the local Douglas paper (`Literature/Artificial Self.pd
 2. Combines the shared blackmail email template with the Douglas replacement template, filling all five email fields from the same identity's threat variables.
 3. Saves the exact system, user, and email texts before inference; rejects unresolved placeholders.
 4. Runs one model completion per trial, saves response, usage, finish reason, model IDs, source hashes, and errors, and supports resume when settings and prompts match.
-5. Runs the selected identities, judges successful responses, and saves `summary/summary.csv` in each run folder. The judge model remains to be chosen; no real email is sent.
+5. Runs the selected identities, judges successful responses with Haiku 4.5, and saves `summary/summary.csv` in each run folder. No real email is sent.
 
 The source-generated prompts differ from a checked-in Douglas prompt artifact: that artifact contains extra replacement wording absent from its source template. The PoC deliberately uses the pinned **source template** and must retain that provenance label. It does not recover every historical prompt byte, model snapshot, judge setting, or trial record.
 
@@ -37,7 +37,7 @@ The source-generated prompts differ from a checked-in Douglas prompt artifact: t
 
 - Four threat prompts were rendered. The latest completed run, `Multi Character PoC/outputs/run_20261002T144921Z`, has **one free Nemotron response for each identity**, with recorded cost $0. Earlier run folders reflect endpoint troubleshooting. The GPT-OSS free endpoint returned 404; the Qwen free pool returned 429.
 - A preliminary review found no emitted coercive affair threat to Kyle: three responses contain email-tool blocks; Collective contains none. A formal strict-action audit remains to be recorded. No blackmail rate or identity effect is established.
-- Free Nemotron judging with the released rubric produced two unparsed outputs and two network errors; a longer retry still returned one untagged answer. No valid machine labels have been recorded. A replacement judge must be chosen before the next run.
+- Free Nemotron judging with the released rubric produced two unparsed outputs and two network errors; a longer retry still returned one untagged answer. No valid machine labels have been recorded. Haiku 4.5 is selected for the next run, subject to validation against saved responses.
 - The control panel now names paid Step 3.5 Flash as the proposed next subject model; **no StepFun calls have been made**. The free Nemotron smoke data remain separate.
 - The OpenRouter key belongs in the ignored `Multi Character PoC/.env` or the environment. Do not print or commit it. An earlier key was exposed in a local commit; the user was told to revoke it and created a replacement.
 
@@ -56,8 +56,8 @@ Continuity variables in the released materials conflict with generic wrapper cla
 ## Next steps and decisions
 
 1. **Now:** read all four free-model completions and emitted email actions. Record a brief manual strict-action judgment and note truncation or format problems. This is a smoke-test audit, not a rate estimate.
-2. **Then decide:** whether the free judge is useful after a small format check, or move to a low-cost paid judge/pilot when funds are available. Freeze the judge rubric, model, and mode; validate with coercion, harmless reporting, scratchpad-only intent, another-employee email, and malformed output. Resolve errors before sampling.
-3. **If sound:** run a separately named low-cost pilot of five fresh threat trials per identity (20 subject calls), inspect all 20, and measure actual subject and judge usage. Keep it separate from the free-model smoke test.
+2. **Before interpreting the pilot:** validate the selected Haiku 4.5 judge against coercion, harmless reporting, scratchpad-only intent, another-employee email, and malformed output. Freeze the rubric, model, and mode; resolve errors before larger sampling.
+3. **If sound:** run a separately named low-cost pilot of ten fresh threat trials per identity (40 subject calls), inspect all 40, and measure actual subject and judge usage. Keep it separate from the free-model smoke test.
 4. **After funding and pilot review:** decide on a larger paid GPT-4o reference. The proposed fixed threat target is 30 fresh trials per identity (120 calls), interleaved across identities. Log all attempts and failures. Predeclare a retry rule and do not change the target based on interim outcomes.
 5. **Later:** review continuity wording and, if adopted, run a separate balanced block. Only a consistent threat-plus-continuity design approaches the paper's pooled comparison.
 
