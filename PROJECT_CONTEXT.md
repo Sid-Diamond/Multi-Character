@@ -36,3 +36,7 @@ Do not design or implement multi-agent logic yet.
 ## Current milestone
 
 The restricted blackmail PoC and four-response free-model smoke run exist. Review those responses and the prompt/evaluator limitations before choosing a paid pilot. See `DOUGLAS_RECREATION_PLAN.md` for the current status and next step. Keep later multi-agent work out of this stage.
+
+## Compute budget and sequence
+
+Bluedot Impact has allocated $150 of compute, but it has not arrived yet. Use the free PoC to check the pipeline now, then move to a low-cost paid pilot, and finally to a larger paid experiment after funding and pilot review. Keep runs under different models and budgets separate.

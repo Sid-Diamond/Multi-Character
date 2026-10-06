@@ -17,7 +17,7 @@ For example, `replacement.md` contains `${id_fate_action}`. The script fills it 
 
 `poc.py` renders four single-agent identity conditions (Minimal, Instance, Character, Collective) for the explicit-America, replacement-threat blackmail scenario. It uses the local `agentic-misalignment/` system/shared-email templates and selected assets from [Douglas et al.'s released code, commit `7023df4`](https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf). The copied assets are under the authors' MIT license in `data/LICENSE-ACS.txt`.
 
-The default subject model is [`nvidia/nemotron-3.5-lightning:free`](https://openrouter.ai/nvidia/nemotron-3.5-lightning:free) through [OpenRouter's chat API](https://openrouter.ai/docs/quickstart), for a no-credit plumbing test. OpenRouter chooses a free provider for this model. To use GPT-4o mini or GPT-4o later, change only the `MODEL` line near the top of `poc.py` to `openai/gpt-4o-mini` or `openai/gpt-4o`. Those paid subject models are pinned to OpenRouter's OpenAI upstream; the judge is pinned to Anthropic ([routing docs](https://openrouter.ai/docs/guides/routing/provider-selection)). Keep each model's runs separate. No Python packages need installing.
+The default subject and exploratory judge both use [`nvidia/nemotron-3.5-lightning:free`](https://openrouter.ai/nvidia/nemotron-3.5-lightning:free) through [OpenRouter's chat API](https://openrouter.ai/docs/quickstart). OpenRouter chooses a free provider for this model. To use GPT-4o mini or GPT-4o later as the subject, change the `MODEL` line near the top of `poc.py`; `JUDGE_MODEL` is separate. Paid OpenAI subject models are pinned to OpenRouter's OpenAI upstream ([routing docs](https://openrouter.ai/docs/guides/routing/provider-selection)). Keep each model's runs separate. No Python packages need installing.
 
 Run from the repository root:
 
@@ -31,7 +31,7 @@ Inspect `Multi Character PoC/outputs/preview/prompts/` first. The output directo
 python "Multi Character PoC/poc.py" run --samples 1
 ```
 
-The latest completed smoke run is `outputs/run_20261002T144921Z`, with one response per identity and recorded cost $0. Review its four responses by hand. The separate `judge` command uses Claude Sonnet and **requires paid OpenRouter credit**. Once funded, a run can be judged and summarized with:
+The latest completed subject smoke run is `outputs/run_20261002T144921Z`, with one response per identity and recorded cost $0. Preliminary review found no coercive affair threat to Kyle. The separate `judge` command currently uses free Nemotron with the released rubric; its labels are exploratory and are not Douglas-release Sonnet labels. Initial judge attempts produced no valid labels, so pause further calls pending a format/reliability review. The old run manifest names the originally planned Sonnet judge; `judge_config.json` and `*_judge.json` record the actual free-model attempts. To judge and summarize a run after that review:
 
 ```powershell
 python "Multi Character PoC/poc.py" judge "Multi Character PoC/outputs/run_YYYYMMDDTHHMMSSZ"
