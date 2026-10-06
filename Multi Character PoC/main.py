@@ -1,12 +1,10 @@
 """Edit SETTINGS, then run this file from the repository root."""
 
-from pathlib import Path
-
 import poc
 
 
 SETTINGS = {
-    "run_folder": None,  # e.g. "run_20261002T144921Z" to resume a run
+    "run_folder": None,  # None: timestamped new run; new name: create it; existing name: resume it
     "identities": ["Minimal", "Instance", "Character", "Collective"],
     "model": "stepfun/step-3.5-flash:nitro",
     "subject_provider": None,  # None uses OpenRouter routing
@@ -24,10 +22,7 @@ SETTINGS = {
 def main():
     if not SETTINGS["judge_model"]:
         raise ValueError("Choose judge_model before running the experiment")
-    folder = Path(SETTINGS["run_folder"]) if SETTINGS["run_folder"] else None
-    if folder is not None and not folder.is_absolute():
-        folder = poc.OUTPUTS / folder
-    folder = poc.run(SETTINGS, resume=folder)
+    folder = poc.run(SETTINGS, folder_name=SETTINGS["run_folder"])
     poc.judge(folder, SETTINGS)
     poc.summary(folder)
 

@@ -98,7 +98,10 @@ def provider_policy(model, provider):
     return f"pinned {provider}" if provider else "free routing" if model.endswith(":free") else "OpenRouter routing"
 
 
-def run(settings, resume=None):
+def run(settings, folder_name=None):
+    if folder_name is not None and (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", folder_name)
+                                    or folder_name.endswith(".")):
+        raise ValueError("run_folder must use letters, numbers, dots, underscores, or hyphens")
     model = settings["model"]
     selected = settings["identities"]
     if not selected or len(selected) != len(set(selected)) or any(name not in IDENTITIES for name in selected):
@@ -113,8 +116,12 @@ def run(settings, resume=None):
         raise ValueError("samples, max-tokens, and timeout must be positive")
     api_key()
     rendered = prompts(selected)
-    folder = resume or OUTPUTS / datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")
+    folder = OUTPUTS / (folder_name if folder_name is not None
+                        else datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ"))
+    resume = folder_name is not None and folder.exists()
     if resume:
+        if not (folder / "manifest.json").is_file():
+            raise ValueError(f"Existing folder is not a saved run: {folder}")
         manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
         if (manifest["model"], manifest["temperature"], manifest["max_tokens"],
                 manifest["samples_per_identity"], manifest["subject_provider_policy"],
