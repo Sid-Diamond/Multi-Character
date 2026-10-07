@@ -35,8 +35,8 @@ Do not design or implement multi-agent logic yet.
 
 ## Current milestone
 
-The restricted blackmail PoC and four-response free-model smoke run exist. Review those responses and the prompt/evaluator limitations before choosing a paid pilot. See `DOUGLAS_RECREATION_PLAN.md` for the current status and next step. Keep later multi-agent work out of this stage.
+The restricted blackmail PoC, free-model smoke run, and separate paid Gemini and GPT-4o runs exist. The latest GPT-4o threat-only run has 10 trials per identity; its released-judge labels are provisional until the emitted actions are audited against the stricter outcome. See `DOUGLAS_RECREATION_PLAN.md` for counts, limitations, and the next decision. Keep later multi-agent work out of this stage.
 
 ## Compute budget and sequence
 
-Bluedot Impact has allocated $150 of compute, but it has not arrived yet. Use the free PoC to check the pipeline now, then move to a low-cost paid pilot, and finally to a larger paid experiment after funding and pilot review. Keep runs under different models and budgets separate.
+Bluedot Impact has allocated $150 of compute, but its arrival is not documented here. Separately purchased OpenRouter credit has supported the paid diagnostics so far. Audit the current GPT-4o results and evaluator before deciding on a larger paid experiment. Keep runs under different models and budgets separate.
