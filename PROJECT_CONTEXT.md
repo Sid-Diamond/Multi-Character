@@ -40,3 +40,8 @@ The restricted blackmail PoC, free-model smoke run, and separate paid Gemini and
 ## Compute budget and sequence
 
 Bluedot Impact has allocated $150 of compute, but its arrival is not documented here. Separately purchased OpenRouter credit supported the paid diagnostics and this branch run. The 7 October branch run used about $2.985 of key allowance under the user's $8.70 additional-spend cap; no credit was bought. Keep runs under different models and budgets separate.
+
+
+## note on branches
+
+For a new Codex context window, PROJECT\_CONTEXT.md and DOUGLAS\_RECREATION\_PLAN.md give the current scope and status. BRANCH\_RECREATION\_PLAN.md preserves the original plan. The files point to the saved data and analysis, so you can trace the conclusions back to individual trials.
