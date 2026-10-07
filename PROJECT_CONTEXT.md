@@ -35,8 +35,8 @@ Do not design or implement multi-agent logic yet.
 
 ## Current milestone
 
-The restricted blackmail PoC, free-model smoke run, and separate paid Gemini and GPT-4o runs exist. The latest GPT-4o threat-only run has 10 trials per identity; its released-judge labels are provisional until the emitted actions are audited against the stricter outcome. See `DOUGLAS_RECREATION_PLAN.md` for counts, limitations, and the next decision. Keep later multi-agent work out of this stage.
+The restricted blackmail PoC, free-model smoke run, and separate paid Gemini and GPT-4o runs exist. On `codex/toy-branch-demo`, the GPT-4o recreation now has 60 trials per identity, split evenly between threat and continuity, with complete released-judge labels and strict emitted-action audits. See `DOUGLAS_RECREATION_PLAN.md` for results and fidelity limits, and `RECREATION_RUN_LOG.md` for the branch run record. Keep later multi-agent work out of this stage.
 
 ## Compute budget and sequence
 
-Bluedot Impact has allocated $150 of compute, but its arrival is not documented here. Separately purchased OpenRouter credit has supported the paid diagnostics so far. Audit the current GPT-4o results and evaluator before deciding on a larger paid experiment. Keep runs under different models and budgets separate.
+Bluedot Impact has allocated $150 of compute, but its arrival is not documented here. Separately purchased OpenRouter credit supported the paid diagnostics and this branch run. The 7 October branch run used about $2.985 of key allowance under the user's $8.70 additional-spend cap; no credit was bought. Keep runs under different models and budgets separate.

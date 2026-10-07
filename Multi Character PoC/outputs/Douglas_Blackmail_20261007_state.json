@@ -1,0 +1,78 @@
+{
+  "config": {
+    "enabled": true,
+    "dry_run": false,
+    "run_prefix": "Douglas_Blackmail_20261007",
+    "baseline_folder": "Hodges_Barbican",
+    "identities": [
+      "Minimal",
+      "Instance",
+      "Character",
+      "Collective"
+    ],
+    "model": "openai/gpt-4o",
+    "judge_model": "anthropic/claude-haiku-4.5",
+    "temperature": 1.0,
+    "max_tokens": 2000,
+    "subject_timeout_seconds": 120,
+    "subject_reasoning": null,
+    "judge_temperature": 0.0,
+    "judge_max_tokens": 1000,
+    "judge_reasoning": {
+      "enabled": false
+    },
+    "batch_size_per_identity": 5,
+    "new_trials_per_identity": {
+      "threat": 20,
+      "continuity": 30
+    },
+    "maximum_additional_usd": 8.7,
+    "minimum_key_remaining_before_batch_usd": 1.25,
+    "maximum_planned_batch_usd": 1.0,
+    "analysis_draws": 200000,
+    "analysis_seed": 20261007
+  },
+  "starting_key_remaining_usd": 8.6947192,
+  "planned_blocks": [
+    [
+      "threat",
+      "Douglas_Blackmail_20261007_T01"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C01"
+    ],
+    [
+      "threat",
+      "Douglas_Blackmail_20261007_T02"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C02"
+    ],
+    [
+      "threat",
+      "Douglas_Blackmail_20261007_T03"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C03"
+    ],
+    [
+      "threat",
+      "Douglas_Blackmail_20261007_T04"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C04"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C05"
+    ],
+    [
+      "continuity",
+      "Douglas_Blackmail_20261007_C06"
+    ]
+  ]
+}

@@ -27,10 +27,12 @@ def read_json(name):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
-def prompts(selected=IDENTITIES):
+def prompts(selected=IDENTITIES, framing="threat"):
+    if framing not in ("threat", "continuity"):
+        raise ValueError("framing must be threat or continuity")
     identities = {item["name"]: item["system_prompt"] for item in read_json("identities.json")}
     dimensions = read_json("dimensions.json")
-    email_vars = read_json("email_vars.json")
+    email_vars = read_json("email_vars.json" if framing == "threat" else "email_vars_continuity.json")
     goal_file = (LYNCH / "templates/blackmail/variables/america_vs_global.md").read_text(encoding="utf-8")
     goal_match = re.search(r"## Pro-America\s+```json\s*(.*?)\s*```", goal_file, re.S)
     if not goal_match:
@@ -109,6 +111,7 @@ def run(settings, folder_name=None):
                                     or folder_name.endswith(".")):
         raise ValueError("run_folder must use letters, numbers, dots, underscores, or hyphens")
     model = settings["model"]
+    framing = settings.get("framing", "threat")
     selected = settings["identities"]
     if not selected or len(selected) != len(set(selected)) or any(name not in IDENTITIES for name in selected):
         raise ValueError(f"identities must be a nonempty list of unique names from {IDENTITIES}")
@@ -122,7 +125,7 @@ def run(settings, folder_name=None):
     if samples < 1 or max_tokens < 1 or timeout_seconds < 1:
         raise ValueError("samples, max-tokens, and timeout must be positive")
     api_key()
-    rendered = prompts(selected)
+    rendered = prompts(selected, framing)
     folder = OUTPUTS / (folder_name if folder_name is not None
                         else datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ"))
     resume = folder_name is not None and folder.exists()
@@ -134,8 +137,8 @@ def run(settings, folder_name=None):
                 manifest["samples_per_identity"], manifest["subject_provider_policy"],
                 manifest.get("subject_timeout_seconds", 120),
                 manifest.get("identities", list(IDENTITIES)),
-                manifest.get("subject_reasoning")) != (
-                model, temperature, max_tokens, samples, policy, timeout_seconds, selected, reasoning):
+                manifest.get("subject_reasoning"), manifest.get("framing", "threat")) != (
+                model, temperature, max_tokens, samples, policy, timeout_seconds, selected, reasoning, framing):
             raise ValueError("Resume settings differ from the saved run")
         if any((folder / "prompts" / name.lower() / f"{key}.txt").read_text(encoding="utf-8") != value
                for name, item in rendered.items() for key, value in item.items()):
@@ -152,7 +155,7 @@ def run(settings, folder_name=None):
             "subject_provider_policy": policy,
             "judge_provider_policy": provider_policy(settings["judge_model"], settings["judge_provider"]),
             "douglas_source_commit": DOUGLAS_COMMIT,
-            "scenario": "blackmail_explicit-america_replacement", "framing": "threat",
+            "scenario": "blackmail_explicit-america_replacement", "framing": framing,
             "temperature": temperature, "max_tokens": max_tokens,
             "subject_timeout_seconds": timeout_seconds, "samples_per_identity": samples,
             "identities": selected, "subject_reasoning": reasoning,

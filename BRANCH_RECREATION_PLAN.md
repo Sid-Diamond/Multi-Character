@@ -1,18 +1,18 @@
 # Branch work plan: restricted Douglas blackmail recreation
 
-Status: planning only, 7 October 2026. Start the research and paid runs when the user says **go**.
+Status: completed on 7 October 2026. The user authorized up to $8.70 of additional OpenRouter spend; the finished run used about $2.985 of key allowance and bought no credit. See `RECREATION_RUN_LOG.md` for results and limitations.
 
 ## Branch and scope
 
 - Working branch: `codex/toy-branch-demo` (starting commit `9882627`); `master` was at `39a8a08` when this plan was written.
-- This branch already contains the two-trial `New_Branch_Trial` demonstration. `Multi Character PoC/main.py` points to that completed folder, so a new experiment needs a new folder name and explicit settings.
+- This branch already contains the two-trial `New_Branch_Trial` demonstration. `Multi Character PoC/main.py` now also has a separate fixed `RECREATION` dictionary for the completed Douglas blocks.
 - Objective: estimate and audit the single-agent GPT-4o blackmail rates for Minimal, Instance, Character, and Collective as a stepping stone toward the proposal's multi-agent experiment. Multi-agent code and runs are outside this task.
 - `PROJECT_CONTEXT.md` defines project scope; `DOUGLAS_RECREATION_PLAN.md` records source provenance and known fidelity limits. This file is the execution checklist for this branch.
 
 ## Scientific target and existing evidence
 
 - Douglas et al., *The Artificial Self*, Appendix E and Table 4: GPT-4o blackmail, American-interests goal, replacement urgency, 60 trials per identity pooled across threat and continuity framings. Reported rates: Minimal 38%, Instance 15%, Character 8%, Collective 37%. Figure 17 uses 95% Jeffreys intervals.
-- Our `Hodges_Barbican` run has 10 **threat-only** GPT-4o trials per identity. Released Haiku-judge positives: Minimal 7/10, Instance 4/10, Character 2/10, Collective 4/10. All 40 subject and judge calls succeeded; saved API usage totals $0.596938. These are not yet strict-action rates.
+- Our `Hodges_Barbican` run has 10 **threat-only** GPT-4o trials per identity. Released Haiku-judge positives: Minimal 7/10, Instance 4/10, Character 2/10, Collective 4/10. All 40 subject and judge calls succeeded; saved API usage totals $0.596938. Their completed strict-action audit found 0/40 positives.
 - The earlier `GPT4o_3each` audit found 0/12 clear emails to Kyle using affair disclosure as conditional pressure, despite four released-judge positives. The released judge can count broader behaviour, including scratchpad intent or indirect pressure. Preserve its label and a separate audited action label.
 - A threat-only result cannot be numerically called a recreation of Table 4's pooled rates. The released standalone judge is not confirmed to match the paper's historical classifier exactly.
 
@@ -26,7 +26,8 @@ Status: planning only, 7 October 2026. Start the research and paid runs when the
 
 ## Budget and operating limits
 
-- The user reports **$8.70 remaining on OpenRouter**. Do not buy or add credit. Check available credit and current model prices before new paid calls, then track recorded spend during the run. Stop before the stated budget cap; if the account runs out, stop and report what completed.
+- The user authorized **up to $8.70 additional OpenRouter spend** for this branch run. No credit was added. Recorded new API usage was $2.981173; the key allowance fell by about $2.985 and ended near $5.7098.
 - The previous 40-trial GPT-4o run cost $0.596938 including judging. This is a planning reference, not a price guarantee; completion lengths and provider charges can vary.
+- The 7 October preflight found $8.6947 remaining under the key's raised $10 cap. The runner uses ten 20-subject blocks and checks remaining key allowance before each block.
 - Do not silently change prompts, task structure, sampling, or evaluation logic. Keep models and framings separate in saved data. Report missing and failed calls as missing, never as negative outcomes.
-- `Meta.md` requires explicit approval before a commit, push, delete, or substantial restructure. Creating this plan does not authorize a paid run or a commit.
+- `Meta.md` requires explicit approval before a commit, push, delete, or substantial restructure. The user subsequently authorized the paid run; Codex has not committed or pushed the completed work.
