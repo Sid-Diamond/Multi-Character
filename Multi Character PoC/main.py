@@ -4,15 +4,15 @@ import poc
 
 
 SETTINGS = {
-    "run_folder": "Hodges_Barbican",  # None: timestamped new run; new name: create it; existing name: resume it
-    "identities": ["Minimal","Character", "Collective","Instance"],
+    "run_folder": "New_Branch_Trial",  # None: timestamped new run; new name: create it; existing name: resume it
+    "identities": ["Minimal", "Collective"],
     "model": "openai/gpt-4o",
     "subject_provider": None,  # None uses OpenRouter routing
     "subject_reasoning": None,
     "temperature": 1.0,
     "max_tokens": 2000,
     "subject_timeout_seconds": 120,
-    "samples_per_identity": 10,
+    "samples_per_identity": 1,
     "judge_model": "anthropic/claude-haiku-4.5",
     "judge_provider": None,
     "judge_reasoning": {"enabled": False},
