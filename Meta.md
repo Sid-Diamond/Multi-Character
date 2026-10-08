@@ -37,7 +37,7 @@
 - Prefer updating an existing authoritative file over creating a near-duplicate.
 - If two files disagree, flag the conflict rather than choosing silently.
 - Treat `PROJECT_CONTEXT.md` as the current research source of truth unless instructed otherwise.
-- Use progressive disclosure: read this short working-rules file first, then locate the relevant section of `PROJECT_CONTEXT.md` or `DOUGLAS_RECREATION_PLAN.md`. Open only the sections needed for the current task. Do not preload the entire literature folder, whole PDFs, cloned repositories, or long plans at the start of each turn.
+- Use progressive disclosure: read this short working-rules file first, then locate the relevant section of `PROJECT_CONTEXT.md`. Open only the sections needed for the current task. Do not preload the entire literature folder, whole PDFs, or cloned repositories at the start of each turn.
 - Search filenames and headings first; use narrow text matches, page ranges, or line ranges before opening a full source. Keep tool output bounded and report the pertinent finding and source location rather than pasting long extracts into chat.
 - Reuse verified findings already recorded in the plan when they answer the question. Reopen an original paper, repository file, or web page when exact wording, provenance, or a changed fact matters. Record durable new findings in the existing plan instead of repeatedly rediscovering them.
 - After a context compaction or a new terminal session, recover the current objective, decisions, completed work, and next step from the latest chat summary and relevant plan sections. Do not reread every source or restart finished work by default. If the summary is incomplete, inspect only the missing evidence.
