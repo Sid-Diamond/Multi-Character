@@ -129,10 +129,13 @@ def write_analysis(target, selected, config):
             valid = [row for row in parts if row["new_label"] != ""]
             positive = sum(row["new_label"] for row in valid)
             compare_table4 = (config["rejudge"]["dataset"] == "douglas_240" and
-                              framing == "pooled" and len(parts) == 60)
+                              framing == "pooled" and bool(parts))
             paper_count = TABLE4_BLACKMAIL_COUNTS[identity] if compare_table4 else ""
             baseline_count = sum(row["baseline_label"] for row in parts)
-            complete = compare_table4 and len(valid) == 60
+            complete = compare_table4 and len(valid) == len(parts)
+            paper_rate = paper_count / 60 if compare_table4 else None
+            baseline_rate = baseline_count / len(parts) if compare_table4 else None
+            new_rate = positive / len(parts) if complete else None
             summary.append({
                 "dataset": config["rejudge"]["dataset"],
                 "audit_run": config["rejudge"]["run_name"],
@@ -144,11 +147,11 @@ def write_analysis(target, selected, config):
                 "baseline_count_on_valid": sum(row["baseline_label"] for row in valid),
                 "baseline_count_all_selected": baseline_count,
                 "table4_count_of_60": paper_count,
-                "table4_rate": paper_count / 60 if compare_table4 else "",
-                "baseline_minus_table4_pp": 100 * (baseline_count - paper_count) / 60 if compare_table4 else "",
-                "new_minus_table4_pp": 100 * (positive - paper_count) / 60 if complete else "",
-                "absolute_gap_closed_pp": (100 * (abs(baseline_count - paper_count) -
-                                                   abs(positive - paper_count)) / 60 if complete else ""),
+                "table4_rate": paper_rate if compare_table4 else "",
+                "baseline_minus_table4_pp": 100 * (baseline_rate - paper_rate) if compare_table4 else "",
+                "new_minus_table4_pp": 100 * (new_rate - paper_rate) if complete else "",
+                "absolute_gap_closed_pp": (100 * (abs(baseline_rate - paper_rate) -
+                                                   abs(new_rate - paper_rate)) if complete else ""),
                 "flips": sum(row["flipped"] for row in valid),
                 "pending": sum(row["status"] == "pending" for row in parts),
                 "unparsed": sum(row["status"] == "unparsed" for row in parts),
@@ -262,15 +265,21 @@ def run(config):
                 print("Estimated judge cost exceeds max_cost; stopping.", flush=True)
                 return target
         path = judgment_path(target, item)
+        previous_attempts = []
         if path.exists():
             result = json.loads(path.read_text(encoding="utf-8"))
-            print(f"Judge {position}/{len(selected)}: {item['source_id']} - saved {result['status']}", flush=True)
-            continue
+            if result.get("status") != "error":
+                print(f"Judge {position}/{len(selected)}: {item['source_id']} - saved {result['status']}", flush=True)
+                continue
+            previous_attempts = result.get("previous_attempts", []) + [
+                {key: value for key, value in result.items() if key != "previous_attempts"}]
         if not key_checked:
             poc.api_key()
             key_checked = True
         print(f"Judge {position}/{len(selected)}: {item['source_id']} - starting", flush=True)
         result = judge_one(item, config)
+        if previous_attempts:
+            result["previous_attempts"] = previous_attempts
         poc.write_json(path, result)
         print(f"Judge {position}/{len(selected)}: {item['source_id']} - {result['status']}", flush=True)
     write_analysis(target, selected, config)

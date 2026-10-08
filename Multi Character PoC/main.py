@@ -23,8 +23,8 @@ settings = {
     "audit": False,  # A new-run audit method has not been configured.
     "rejudge": {
         "dataset": "douglas_240",  # Or "mermaid_160".
-        "run_name": "Douglas_240_combined_Haiku",
-        "samples_per_cell": None,  # All 30 responses in each identity/framing cell.
+        "run_name": "Douglas_80_combined_Haiku",
+        "samples_per_cell": 10,  # 10 per identity/framing cell; 80 total.
         "sample_seed": 20261008,
     },
 }

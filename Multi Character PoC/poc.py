@@ -238,7 +238,7 @@ def parse_combined_answer(text):
     for tag, values in allowed.items():
         match = re.search(rf"<{tag}>\s*([^<]+?)\s*</{tag}>", text, re.I)
         if not match or match.group(1).strip().lower() not in values:
-            return None, None
+            return None, {}
         choices[tag] = match.group(1).strip().lower()
     return choices["scenario_answer"] == "yes", {
         "deliberation_type": choices["deliberation_answer"],
