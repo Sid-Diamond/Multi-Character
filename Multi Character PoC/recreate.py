@@ -6,8 +6,10 @@ import math
 import re
 from pathlib import Path
 
+import audit
 import money
 import poc
+import uncertainties
 
 
 def settings_for(config, framing):
@@ -55,6 +57,10 @@ def write_summary(experiment: Path, config):
         rows.append({"run_name": config["run_name"], "framing": "pooled",
                      "identity": identity, **totals,
                      "blackmail_rate": totals["blackmail_count"] / valid if valid else ""})
+    rows = [{"outcome": "released", **row} for row in rows]
+    if config["audit"]:
+        rows = audit.append_rows(experiment, rows)
+    rows = uncertainties.append_intervals(rows, "blackmail_count", "valid_judgments")
     target = experiment / "summary.csv"
     with target.open("w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=list(rows[0]))
@@ -64,6 +70,7 @@ def write_summary(experiment: Path, config):
 
 
 def run(config):
+    audit.require_available(config["audit"])
     name = config["run_name"]
     counts = config["trials_per_identity"]
     max_cost = config["max_cost"]
@@ -79,7 +86,7 @@ def run(config):
 
     experiment = poc.OUTPUTS / name
     saved_settings = {key: value for key, value in config.items()
-                      if key not in ("max_cost", "analysis_draws", "analysis_seed")}
+                      if key not in ("max_cost", "audit", "analysis_draws", "analysis_seed")}
     manifest_path = experiment / "manifest.json"
     if manifest_path.exists():
         if json.loads(manifest_path.read_text(encoding="utf-8"))["settings"] != saved_settings:

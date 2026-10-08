@@ -17,8 +17,7 @@ settings = {
     "judge_reasoning": {"enabled": False},
     "trials_per_identity": {"threat": 30, "continuity": 30},
     "max_cost": None,  # Set a dollar limit before starting a new run.
-    "analysis_draws": 200000,
-    "analysis_seed": 20261007,
+    "audit": False,  # A new-run audit method has not been configured.
 }
 
 
