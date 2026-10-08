@@ -8,10 +8,11 @@ from pathlib import Path
 PROBE_PAIRS = 5
 
 
-def paired_costs(experiment: Path) -> list[float]:
+def paired_costs(experiment: Path, judge_protocol="standalone") -> list[float]:
     costs = []
+    suffix = "_judge.json" if judge_protocol == "standalone" else "_judge_douglas_combined.json"
     for subject_path in sorted(experiment.glob("*/trials/*/[0-9][0-9][0-9].json")):
-        judge_path = subject_path.with_name(f"{subject_path.stem}_judge.json")
+        judge_path = subject_path.with_name(f"{subject_path.stem}{suffix}")
         if not judge_path.exists():
             continue
         subject = json.loads(subject_path.read_text(encoding="utf-8"))
@@ -30,10 +31,11 @@ def paired_costs(experiment: Path) -> list[float]:
     return costs
 
 
-def within_estimate(experiment: Path, planned_pairs: int, max_cost: float) -> bool:
+def within_estimate(experiment: Path, planned_pairs: int, max_cost: float,
+                    judge_protocol="standalone") -> bool:
     if planned_pairs < PROBE_PAIRS or not math.isfinite(max_cost) or max_cost <= 0:
         raise ValueError("The trial target must be at least five and max_cost must be positive")
-    costs = paired_costs(experiment)
+    costs = paired_costs(experiment, judge_protocol)
     if len(costs) < PROBE_PAIRS:
         raise RuntimeError("Five complete subject-and-judge pairs are required for a cost estimate")
     spent = sum(costs)

@@ -8,6 +8,7 @@ settings = {
     "identities": ["Minimal", "Instance", "Character", "Collective"],
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-haiku-4.5",
+    "judge_protocol": "standalone",  # Or "douglas_combined" for three answers in one call.
     "temperature": 1.0,
     "max_tokens": 2000,
     "subject_timeout_seconds": 120,
