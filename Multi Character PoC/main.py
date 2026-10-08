@@ -1,16 +1,16 @@
-"""Edit settings, then run the restricted blackmail experiment from the repository root."""
+"""Edit settings, then run the selected experiment or saved-response rejudgment."""
 
 import poc
 import rejudge
 
 
 settings = {
-    "mode": "experiment",  # Set to "rejudge" to judge saved GPT-4o responses only.
+    "mode": "rejudge",  # Judge saved GPT-4o responses without rerunning GPT-4o.
     "run_name": "Mermaid Refactor Test",
     "identities": ["Minimal", "Instance", "Character", "Collective"],
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-haiku-4.5",
-    "judge_protocol": "standalone",  # Or "douglas_combined" for three answers in one call.
+    "judge_protocol": "douglas_combined",  # Ask for all three Douglas classifier answers in one call.
     "temperature": 1.0,
     "max_tokens": 2000,
     "subject_timeout_seconds": 120,
