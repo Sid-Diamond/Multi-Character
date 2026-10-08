@@ -403,8 +403,8 @@ def run_experiment(config):
     name = config["run_name"]
     counts = config["trials_per_identity"]
     max_cost = config["max_cost"]
-    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name) or name.endswith("."):
-        raise ValueError("run_name must use letters, numbers, dots, underscores, or hyphens")
+    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9._ -]*[A-Za-z0-9_-])?", name):
+        raise ValueError("run_name must start with a letter or number and use only letters, numbers, spaces, dots, underscores, or hyphens")
     if set(counts) != {"threat", "continuity"} or any(type(n) is not int or n < 1 for n in counts.values()):
         raise ValueError("Set positive trial targets for threat and continuity")
     if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
