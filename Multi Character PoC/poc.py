@@ -503,7 +503,7 @@ def run_experiment(config):
     experiment = OUTPUTS / name
     saved_settings = {key: value for key, value in config.items()
                       if key not in ("max_cost", "audit", "analysis_draws", "analysis_seed",
-                                     "judge_protocol")}
+                                     "judge_protocol", "mode", "rejudge")}
     manifest_path = experiment / "manifest.json"
     if manifest_path.exists():
         if json.loads(manifest_path.read_text(encoding="utf-8"))["settings"] != saved_settings:

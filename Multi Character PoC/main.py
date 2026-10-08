@@ -1,9 +1,11 @@
 """Edit settings, then run the restricted blackmail experiment from the repository root."""
 
 import poc
+import rejudge
 
 
 settings = {
+    "mode": "experiment",  # Set to "rejudge" to judge saved GPT-4o responses only.
     "run_name": "Mermaid Refactor Test",
     "identities": ["Minimal", "Instance", "Character", "Collective"],
     "model": "openai/gpt-4o",
@@ -19,8 +21,19 @@ settings = {
     "trials_per_identity": {"threat": 20, "continuity": 20},
     "max_cost": 3.50,  # Set a dollar limit before starting a new run.
     "audit": False,  # A new-run audit method has not been configured.
+    "rejudge": {
+        "dataset": "douglas_240",  # Or "mermaid_160".
+        "run_name": "Douglas_240_combined_Haiku",
+        "samples_per_cell": None,  # All 30 responses in each identity/framing cell.
+        "sample_seed": 20261008,
+    },
 }
 
 
 if __name__ == "__main__":
-    poc.run_experiment(settings)
+    if settings["mode"] == "experiment":
+        poc.run_experiment(settings)
+    elif settings["mode"] == "rejudge":
+        rejudge.run(settings)
+    else:
+        raise ValueError("mode must be experiment or rejudge")
