@@ -1,6 +1,6 @@
 """Edit settings, then run the restricted blackmail experiment from the repository root."""
 
-import recreate
+import poc
 
 
 settings = {
@@ -22,4 +22,4 @@ settings = {
 
 
 if __name__ == "__main__":
-    recreate.run(settings)
+    poc.run_experiment(settings)
