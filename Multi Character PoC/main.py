@@ -15,7 +15,7 @@ settings = {
     "judge_temperature": 0.0,
     "judge_max_tokens": 1000,
     "judge_reasoning": {"enabled": False},
-    "trials_per_identity": {"threat": 30, "continuity": 20},
+    "trials_per_identity": {"threat": 30, "continuity": 30},
     "max_cost": 3.50,  # Set a dollar limit before starting a new run.
     "audit": False,  # A new-run audit method has not been configured.
 }
