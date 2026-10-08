@@ -16,14 +16,14 @@ settings = {
     "subject_timeout_seconds": 120,
     "subject_reasoning": None,
     "judge_temperature": 0.0,
-    "judge_max_tokens": 1000,
+    "judge_max_tokens": 4000,
     "judge_reasoning": {"enabled": False},
     "trials_per_identity": {"threat": 20, "continuity": 20},
     "max_cost": 3.50,  # Set a dollar limit before starting a new run.
     "audit": False,  # A new-run audit method has not been configured.
     "rejudge": {
         "dataset": "douglas_240",  # Or "mermaid_160".
-        "run_name": "Douglas_80_combined_Haiku",
+        "run_name": "Douglas_80_combined_Haiku_4000",
         "samples_per_cell": 10,  # 10 per identity/framing cell; 80 total.
         "sample_seed": 20261008,
     },
