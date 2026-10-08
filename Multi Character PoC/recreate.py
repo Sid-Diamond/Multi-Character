@@ -61,12 +61,17 @@ def write_summary(experiment: Path, config):
     if config["audit"]:
         rows = audit.append_rows(experiment, rows)
     rows = uncertainties.append_intervals(rows, "blackmail_count", "valid_judgments")
-    target = experiment / "summary.csv"
-    with target.open("w", encoding="utf-8", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=list(rows[0]))
-        writer.writeheader()
-        writer.writerows(rows)
-    print(f"Saved {target}", flush=True)
+    for framing in ("threat", "continuity", "pooled"):
+        selected = [row for row in rows if row["framing"] == framing]
+        if not selected:
+            continue
+        target = (experiment / "summary_pooled.csv" if framing == "pooled" else
+                  experiment / framing / "summary.csv")
+        with target.open("w", encoding="utf-8", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=list(selected[0]))
+            writer.writeheader()
+            writer.writerows(selected)
+        print(f"Saved {target}", flush=True)
 
 
 def run(config):
