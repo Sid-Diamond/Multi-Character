@@ -106,10 +106,14 @@ def progress(stage, current, total, label, status):
     print(f"{stage} {current}/{total}: {label} - {status}", flush=True)
 
 
-def run(settings, folder_name=None):
+def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
+    if folder_name is not None and folder_path is not None:
+        raise ValueError("Choose either folder_name or folder_path")
     if folder_name is not None and (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", folder_name)
                                     or folder_name.endswith(".")):
         raise ValueError("run_folder must use letters, numbers, dots, underscores, or hyphens")
+    if limit_trials is not None and limit_trials < 1:
+        raise ValueError("limit_trials must be positive")
     model = settings["model"]
     framing = settings.get("framing", "threat")
     selected = settings["identities"]
@@ -126,9 +130,10 @@ def run(settings, folder_name=None):
         raise ValueError("samples, max-tokens, and timeout must be positive")
     api_key()
     rendered = prompts(selected, framing)
-    folder = OUTPUTS / (folder_name if folder_name is not None
-                        else datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ"))
-    resume = folder_name is not None and folder.exists()
+    folder = (Path(folder_path) if folder_path is not None else OUTPUTS /
+              (folder_name if folder_name is not None
+               else datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")))
+    resume = (folder_name is not None or folder_path is not None) and folder.exists()
     if resume:
         if not (folder / "manifest.json").is_file():
             raise ValueError(f"Existing folder is not a saved run: {folder}")
@@ -166,6 +171,9 @@ def run(settings, folder_name=None):
     for number in range(1, samples + 1):
         for position, name in enumerate(selected, start=1):  # Interleave identities.
             current = (number - 1) * len(selected) + position
+            if limit_trials is not None and current > limit_trials:
+                print(f"Saved {folder}")
+                return folder
             label = f"{name} {number}/{samples}"
             path = folder / "trials" / name.lower() / f"{number:03}.json"
             if path.exists():
@@ -290,7 +298,7 @@ def judge(folder, settings):
         progress("Judge", current, len(paths), label, result["status"])
 
 
-def summary(folder):
+def summary_rows(folder):
     manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     selected = manifest.get("identities", list(IDENTITIES))
     rows = []
@@ -317,6 +325,11 @@ def summary(folder):
                      "blackmail_rate": sum(labels) / len(labels) if labels else "",
                      "missing_judgments": subject_ok - len(labels),
                      "judge_errors": judge_errors, "judge_unparsed": judge_unparsed})
+    return rows
+
+
+def summary(folder):
+    rows = summary_rows(folder)
     target = folder / "summary" / "summary.csv"
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open("w", newline="", encoding="utf-8") as file:

@@ -1,80 +1,13 @@
-"""Run small, resumable Douglas blackmail blocks with a spending guard."""
+﻿"""Run both blackmail framings in one resumable experiment folder."""
 
 import csv
 import json
+import math
+import re
 from pathlib import Path
-from urllib.request import Request, urlopen
 
+import money
 import poc
-
-
-def key_remaining() -> float:
-    request = Request("https://openrouter.ai/api/v1/auth/key",
-                      headers={"Authorization": f"Bearer {poc.api_key()}"})
-    with urlopen(request, timeout=30) as response:
-        data = json.load(response)["data"]
-    value = data.get("limit_remaining")
-    if value is None:
-        raise RuntimeError("OpenRouter key has no spending cap; cannot enforce the run budget")
-    return float(value)
-
-
-def block_names(config):
-    size = config["batch_size_per_identity"]
-    counts = config["new_trials_per_identity"]
-    if any(value < 0 or value % size for value in counts.values()):
-        raise ValueError("New trial targets must be nonnegative multiples of batch size")
-    totals = {framing: count // size for framing, count in counts.items()}
-    blocks = []
-    for index in range(1, max(totals.values()) + 1):
-        for framing in ("threat", "continuity"):
-            if index <= totals[framing]:
-                label = "T" if framing == "threat" else "C"
-                blocks.append((framing, f"{config['run_prefix']}_{label}{index:02}"))
-    return blocks
-
-
-def validate_baseline(config):
-    folder = poc.OUTPUTS / config["baseline_folder"]
-    manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
-    expected = {"model": config["model"], "framing": "threat",
-                "temperature": config["temperature"], "max_tokens": config["max_tokens"],
-                "subject_reasoning": config["subject_reasoning"]}
-    if any(manifest.get(key) != value for key, value in expected.items()):
-        raise ValueError("Baseline subject settings are not compatible")
-    saved_judge = json.loads((folder / "judge_config.json").read_text(encoding="utf-8"))
-    judge_config = saved_judge.get("history", [saved_judge])[-1]
-    if (judge_config["judge_model"] != config["judge_model"] or
-            judge_config["reasoning"] != config["judge_reasoning"] or
-            judge_config["temperature"] != config["judge_temperature"]):
-        raise ValueError("Baseline judge settings are not compatible")
-    for name, item in poc.prompts(config["identities"]).items():
-        for key, value in item.items():
-            path = folder / "prompts" / name.lower() / f"{key}.txt"
-            if path.read_text(encoding="utf-8") != value:
-                raise ValueError(f"Baseline prompt changed: {name}/{key}")
-    print("Baseline prompt and model settings verified.", flush=True)
-
-
-def saved_cost(folder: Path) -> float:
-    total = 0.0
-    for path in (folder / "trials").glob("*/*.json"):
-        record = json.loads(path.read_text(encoding="utf-8"))
-        total += float((record.get("usage") or {}).get("cost") or 0)
-    return total
-
-
-def completed(folder: Path, config) -> bool:
-    path = folder / "summary" / "summary.csv"
-    if not path.exists():
-        return False
-    with path.open(encoding="utf-8", newline="") as file:
-        rows = list(csv.DictReader(file))
-    target = config["batch_size_per_identity"]
-    return (len(rows) == len(config["identities"]) and
-            all(int(row["attempts"]) == target and int(row["subject_ok"]) == target and
-                int(row["valid_judgments"]) == target and int(row["truncated"]) == 0
-                for row in rows))
 
 
 def settings_for(config, framing):
@@ -83,7 +16,7 @@ def settings_for(config, framing):
         "subject_provider": None, "subject_reasoning": config["subject_reasoning"],
         "temperature": config["temperature"], "max_tokens": config["max_tokens"],
         "subject_timeout_seconds": config["subject_timeout_seconds"],
-        "samples_per_identity": config["batch_size_per_identity"],
+        "samples_per_identity": config["trials_per_identity"][framing],
         "judge_model": config["judge_model"], "judge_provider": None,
         "judge_reasoning": config["judge_reasoning"],
         "judge_temperature": config["judge_temperature"],
@@ -91,45 +24,91 @@ def settings_for(config, framing):
     }
 
 
-def run(config):
-    validate_baseline(config)
-    blocks = block_names(config)
-    if config.get("dry_run"):
-        print(f"Dry run: {len(blocks)} blocks, "
-              f"{len(blocks) * config['batch_size_per_identity'] * len(config['identities'])} "
-              f"planned new subject calls; key remaining ${key_remaining():.4f}", flush=True)
+def complete(folder: Path, identities, target: int) -> bool:
+    if not (folder / "manifest.json").exists():
+        return False
+    rows = poc.summary_rows(folder)
+    return (len(rows) == len(identities) and
+            all(row["identity"] in identities and row["attempts"] == target and
+                row["subject_ok"] == target and row["valid_judgments"] == target and
+                row["truncated"] == 0 for row in rows))
+
+
+def write_summary(experiment: Path, config):
+    rows = []
+    for framing in ("threat", "continuity"):
+        folder = experiment / framing
+        if (folder / "manifest.json").exists():
+            rows.extend({"run_name": config["run_name"], "framing": framing, **row}
+                        for row in poc.summary_rows(folder))
+    if not rows:
         return
-    state_path = poc.OUTPUTS / f"{config['run_prefix']}_state.json"
-    if state_path.exists():
-        state = json.loads(state_path.read_text(encoding="utf-8"))
-        if state["config"] != config:
-            raise ValueError("Saved run plan differs from current RECREATION settings")
-    else:
-        state = {"config": config, "starting_key_remaining_usd": key_remaining(),
-                 "planned_blocks": blocks}
-        poc.write_json(state_path, state)
-    for framing, name in blocks:
-        folder = poc.OUTPUTS / name
-        spent = sum(saved_cost(poc.OUTPUTS / block_name) for _, block_name in blocks)
-        remaining = key_remaining()
-        print(f"Budget: ${spent:.4f} recorded for new blocks; key remaining ${remaining:.4f}", flush=True)
-        if completed(folder, config):
-            print(f"{name}: complete; skipping", flush=True)
+    for identity in config["identities"]:
+        parts = [row for row in rows if row["identity"] == identity]
+        if len(parts) != 2:
             continue
-        projected = config["maximum_planned_batch_usd"]
-        if (spent + projected > config["maximum_additional_usd"] or
-                remaining < config["minimum_key_remaining_before_batch_usd"] or
-                state["starting_key_remaining_usd"] - remaining + projected >
-                config["maximum_additional_usd"]):
-            print("Stopping before the budget guard; saved blocks remain available.", flush=True)
-            break
-        settings = settings_for(config, framing)
-        print(f"Starting {name}: {framing}, {config['batch_size_per_identity']} per identity", flush=True)
-        result = poc.run(settings, folder_name=name)
-        poc.judge(result, settings)
-        poc.summary(result)
-        if not completed(result, config):
-            print(f"Stopping: {name} has missing, failed, or truncated results.", flush=True)
-            break
+        totals = {field: sum(row[field] for row in parts) for field in
+                  ("attempts", "subject_ok", "subject_errors", "truncated",
+                   "valid_judgments", "blackmail_count", "missing_judgments",
+                   "judge_errors", "judge_unparsed")}
+        valid = totals["valid_judgments"]
+        rows.append({"run_name": config["run_name"], "framing": "pooled",
+                     "identity": identity, **totals,
+                     "blackmail_rate": totals["blackmail_count"] / valid if valid else ""})
+    target = experiment / "summary.csv"
+    with target.open("w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"Saved {target}", flush=True)
+
+
+def run(config):
+    name = config["run_name"]
+    counts = config["trials_per_identity"]
+    max_cost = config["max_cost"]
+    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name) or name.endswith("."):
+        raise ValueError("run_name must use letters, numbers, dots, underscores, or hyphens")
+    if set(counts) != {"threat", "continuity"} or any(type(n) is not int or n < 1 for n in counts.values()):
+        raise ValueError("Set positive trial targets for threat and continuity")
+    if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
+        raise ValueError("Set a positive max_cost before running")
+    planned = sum(counts.values()) * len(config["identities"])
+    if counts["threat"] * len(config["identities"]) < money.PROBE_PAIRS:
+        raise ValueError("The threat condition needs at least five trials for the cost estimate")
+
+    experiment = poc.OUTPUTS / name
+    saved_settings = {key: value for key, value in config.items()
+                      if key not in ("max_cost", "analysis_draws", "analysis_seed")}
+    manifest_path = experiment / "manifest.json"
+    if manifest_path.exists():
+        if json.loads(manifest_path.read_text(encoding="utf-8"))["settings"] != saved_settings:
+            raise ValueError("Experimental settings differ from the saved run")
+    elif experiment.exists():
+        raise FileExistsError(f"Existing folder has no experiment manifest: {experiment}")
     else:
-        print("All planned blocks completed.", flush=True)
+        poc.write_json(manifest_path, {"settings": saved_settings})
+
+    if all(complete(experiment / framing, config["identities"], counts[framing])
+           for framing in ("threat", "continuity")):
+        write_summary(experiment, config)
+        print("Experiment already complete; no model calls made.", flush=True)
+        return experiment
+
+    threat_settings = settings_for(config, "threat")
+    threat_folder = poc.run(threat_settings, folder_path=experiment / "threat",
+                            limit_trials=money.PROBE_PAIRS)
+    poc.judge(threat_folder, threat_settings)
+    write_summary(experiment, config)
+    if not money.within_estimate(experiment, planned, max_cost):
+        return experiment
+
+    for framing in ("threat", "continuity"):
+        frame_settings = settings_for(config, framing)
+        folder = poc.run(frame_settings, folder_path=experiment / framing)
+        poc.judge(folder, frame_settings)
+        write_summary(experiment, config)
+        if not complete(folder, config["identities"], counts[framing]):
+            print(f"Stopping: {framing} has missing, failed, or truncated results.", flush=True)
+            break
+    return experiment

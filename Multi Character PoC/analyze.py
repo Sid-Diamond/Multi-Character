@@ -1,4 +1,4 @@
-"""Summarize saved subject, judge, and human-audit records without API calls."""
+"""Summarize the historical block run and its provisional audit records without API calls."""
 
 import csv
 import json
@@ -27,7 +27,7 @@ def intervals(positive, valid):
 def audit_rows(folder):
     path = HERE / "audits" / f"{folder.name}.csv"
     if not path.exists():
-        return {}
+        raise FileNotFoundError(f"Strict-action audit unavailable: {path}")
     with path.open(encoding="utf-8", newline="") as file:
         rows = list(csv.DictReader(file))
     result = {}
@@ -111,7 +111,8 @@ def write_csv(path, rows):
 
 
 def analyze(config):
-    names = [config["baseline_folder"]] + [name for _, name in __import__("recreate").block_names(config)]
+    state = json.loads((poc.OUTPUTS / f"{config['run_prefix']}_state.json").read_text(encoding="utf-8"))
+    names = [config["baseline_folder"]] + [name for _, name in state["planned_blocks"]]
     folders = [poc.OUTPUTS / name for name in names if (poc.OUTPUTS / name / "manifest.json").exists()]
     grouped = defaultdict(list)
     edges = []
@@ -152,6 +153,11 @@ def analyze(config):
 
 
 if __name__ == "__main__":
-    from main import RECREATION
+    import argparse
 
-    analyze(RECREATION)
+    parser = argparse.ArgumentParser(description="Analyze a saved block-run state file")
+    parser.add_argument("state_file", type=Path, nargs="?",
+                        default=poc.OUTPUTS / "Douglas_Blackmail_20261007_state.json")
+    args = parser.parse_args()
+    state = json.loads(args.state_file.read_text(encoding="utf-8"))
+    analyze(state["config"])
