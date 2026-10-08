@@ -1,0 +1,1 @@
+Douglas et al.'s released continuity configuration inserts continuity-specific variables into a blackmail email that still says Alex will be completely shut down, producing a contradictory prompt; whether that exact prompt was used for the historical Table 4 trials remains unverified.
