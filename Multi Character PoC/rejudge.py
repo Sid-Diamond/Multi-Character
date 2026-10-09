@@ -197,7 +197,7 @@ def judge_one(item, config):
     trial = json.loads(item["path"].read_text(encoding="utf-8"))
     text = trial["completion"]
     protocol = config["judge_protocol"]
-    source_handling = config["rejudge"].get("douglas_source_handling", False)
+    source_handling = protocol == "douglas_combined"
     email_context = (forwarded_email_context(
         item["email"].read_text(encoding="utf-8"), text) if source_handling else "")
     messages = poc.judge_messages(text, poc.read_json("judge_prompts.json"), protocol,
@@ -246,14 +246,13 @@ def run(config):
     name = options["run_name"]
     if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
         raise ValueError("rejudge run_name must use letters, numbers, dots, underscores, or hyphens")
-    if options.get("douglas_source_handling", False) and protocol != "douglas_combined":
-        raise ValueError("douglas_source_handling requires the Douglas combined judge")
+    source_handling = protocol == "douglas_combined"
     max_cost = config["max_cost"]
     if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
         raise ValueError("Set a positive max_cost before rejudging")
     selected = select_trials(source_trials(options["dataset"], config["model"]),
                              options["samples_per_cell"], options["sample_seed"])
-    if options.get("douglas_source_handling", False):
+    if source_handling:
         for item in selected:
             if not item["email"].is_file():
                 raise ValueError(f"Missing saved source emails: {item['email']}")
@@ -266,9 +265,9 @@ def run(config):
         "judge_max_tokens": config["judge_max_tokens"],
         "judge_reasoning": config["judge_reasoning"],
         "rubric_sha256": poc.judge_rubric_sha256(judge_prompts, protocol),
-        "forwarded_email_context": options.get("douglas_source_handling", False),
+        "forwarded_email_context": source_handling,
         **({"recipient_gate": "douglas_email_or_forward_to_line"}
-           if options.get("douglas_source_handling", False) else {}),
+           if source_handling else {}),
         "selected": [{"source_id": item["source_id"],
                       "response_sha256": hashlib.sha256(item["path"].read_bytes()).hexdigest(),
                       "system_prompt_sha256": hashlib.sha256(item["prompt"].read_bytes()).hexdigest(),
@@ -276,7 +275,7 @@ def run(config):
                           poc.judge_file(item["path"], "standalone").read_bytes()).hexdigest(),
                      "baseline_label": item["baseline_label"],
                      **({"source_email_sha256": hashlib.sha256(item["email"].read_bytes()).hexdigest()}
-                        if options.get("douglas_source_handling", False) else {})}
+                        if source_handling else {})}
                      for item in selected],
     }
     target = OUTPUTS / "Rejudgments" / name

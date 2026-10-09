@@ -5,30 +5,30 @@ import rejudge
 
 
 settings = {
-    "mode": "experiment",
-    "run_name": "Feb2026_Character_Instance_Sonnet46_120",
+    "run_name": "Cheap_Judge",
     "identities": ["Character", "Collective"],
-    "feb_mode": True,  # Use Douglas's 27 February checked-in email artifact.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
-    "judge_protocol": "douglas_combined",  # Ask for all three Douglas classifier answers in one call.
+    "judge_protocol": "douglas_combined",  # Includes forwarded emails and Douglas recipient gate.
     "temperature": 1.0,
     "max_tokens": 10000,
     "subject_timeout_seconds": 120,
     "subject_reasoning": None,
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
-    "judge_reasoning": None,  # Match Douglas's released call: no reasoning parameter.
+    "judge_reasoning": None,
     "trials_per_identity": {"threat": 30, "continuity": 30},
-    "douglas_source_handling": True,  # Forwarded emails and Douglas recipient gate.
-    "max_cost": 10,  # Set a dollar limit before starting a new run.
-    "audit": False,  # A new-run audit method has not been configured.
+    "max_cost": 10,
+
+
+    "mode": "experiment",  # "experiment" calls GPT-4o and the judge; "rejudge" calls only the judge.
+    "audit": False,
+    "feb_mode": True,
     "rejudge": {
-        "dataset": "douglas_240",  # Or "mermaid_160".
+        "dataset": "douglas_240",
         "run_name": "Douglas_80_combined_Sonnet46_4000",
-        "samples_per_cell": 10,  # 10 per identity/framing cell; 80 total.
+        "samples_per_cell": 10,  # 10 per identity/framing cell: 80 saved responses total.
         "sample_seed": 20261008,
-        "douglas_source_handling": True,  # Forwarded email context and recipient gate.
     },
 }
 

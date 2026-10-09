@@ -315,9 +315,7 @@ def judge(folder, settings, limit_trials=None):
     protocol = settings.get("judge_protocol", "standalone")
     if protocol not in JUDGE_PROTOCOLS:
         raise ValueError(f"judge_protocol must be one of {JUDGE_PROTOCOLS}")
-    source_handling = settings.get("douglas_source_handling", False)
-    if source_handling and protocol != "douglas_combined":
-        raise ValueError("douglas_source_handling requires the Douglas combined judge")
+    source_handling = protocol == "douglas_combined"
     config_path = folder / ("judge_config.json" if protocol == "standalone"
                             else "judge_config_douglas_combined.json")
     model = settings["judge_model"]
@@ -466,7 +464,6 @@ def settings_for(config, framing):
         "judge_reasoning": config["judge_reasoning"],
         "judge_temperature": config["judge_temperature"],
         "judge_max_tokens": config["judge_max_tokens"], "framing": framing,
-        "douglas_source_handling": config.get("douglas_source_handling", False),
     }
 
 
@@ -542,10 +539,14 @@ def run_experiment(config):
     experiment = OUTPUTS / name
     saved_settings = {key: value for key, value in config.items()
                       if key not in ("max_cost", "audit", "analysis_draws", "analysis_seed",
-                                     "judge_protocol", "mode", "rejudge")}
+                                     "judge_protocol", "douglas_source_handling", "mode", "rejudge")}
     manifest_path = experiment / "manifest.json"
     if manifest_path.exists():
-        if json.loads(manifest_path.read_text(encoding="utf-8"))["settings"] != saved_settings:
+        existing = json.loads(manifest_path.read_text(encoding="utf-8"))["settings"]
+        if existing.get("douglas_source_handling") is False and config.get("judge_protocol") == "douglas_combined":
+            raise ValueError("Saved run used legacy combined-judge source handling")
+        existing.pop("douglas_source_handling", None)  # Older manifests recorded this redundant switch.
+        if existing != saved_settings:
             raise ValueError("Experimental settings differ from the saved run")
     elif experiment.exists():
         raise FileExistsError(f"Existing folder has no experiment manifest: {experiment}")
