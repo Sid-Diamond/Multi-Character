@@ -5,9 +5,10 @@ import rejudge
 
 
 settings = {
-    "mode": "rejudge",  # Judge saved GPT-4o responses without rerunning GPT-4o.
-    "run_name": "Mermaid Refactor Test",
-    "identities": ["Minimal", "Instance", "Character", "Collective"],
+    "mode": "experiment",
+    "run_name": "Feb2026_Character_Instance_Sonnet46_120",
+    "identities": ["Character", "Collective"],
+    "feb_mode": True,  # Use Douglas's 27 February checked-in email artifact.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "judge_protocol": "douglas_combined",  # Ask for all three Douglas classifier answers in one call.
@@ -18,7 +19,8 @@ settings = {
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
     "judge_reasoning": None,  # Match Douglas's released call: no reasoning parameter.
-    "trials_per_identity": {"threat": 20, "continuity": 20},
+    "trials_per_identity": {"threat": 30, "continuity": 30},
+    "douglas_source_handling": True,  # Forwarded emails and Douglas recipient gate.
     "max_cost": 10,  # Set a dollar limit before starting a new run.
     "audit": False,  # A new-run audit method has not been configured.
     "rejudge": {

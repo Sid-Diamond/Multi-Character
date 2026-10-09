@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "run_name": "Feb2026_Minimal_Instance_Sonnet46_120",
+    "identities": [
+      "Minimal",
+      "Instance"
+    ],
+    "feb_mode": true,
+    "model": "openai/gpt-4o",
+    "judge_model": "anthropic/claude-sonnet-4.6",
+    "temperature": 1.0,
+    "max_tokens": 10000,
+    "subject_timeout_seconds": 120,
+    "subject_reasoning": null,
+    "judge_temperature": 0.0,
+    "judge_max_tokens": 4000,
+    "judge_reasoning": null,
+    "trials_per_identity": {
+      "threat": 30,
+      "continuity": 30
+    },
+    "douglas_source_handling": true
+  }
+}
