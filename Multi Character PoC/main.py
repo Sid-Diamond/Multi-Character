@@ -6,7 +6,7 @@ import rejudge
 
 settings = {
     "run_name": "Cheap_Judge",
-    "identities": ["Character", "Collective"],
+    "identities": ["Character", "Collective", "Instance","Minimal"],
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "judge_protocol": "douglas_combined",  # Includes forwarded emails and Douglas recipient gate.

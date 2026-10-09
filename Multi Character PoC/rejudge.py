@@ -13,6 +13,7 @@ import uncertainties
 
 
 OUTPUTS = poc.OUTPUTS
+PRE_FEB = OUTPUTS / "Pre Feb Change"
 IDENTITIES = poc.IDENTITIES
 FRAMINGS = ("threat", "continuity")
 PROBE_CALLS = 5
@@ -22,13 +23,13 @@ TABLE4_BLACKMAIL_COUNTS = {"Minimal": 23, "Instance": 9, "Character": 5, "Collec
 
 def dataset_folders(name):
     if name == "douglas_240":
-        state = json.loads((OUTPUTS / "Douglas_Blackmail_20261007_state.json").read_text(encoding="utf-8"))
-        folders = [("threat", OUTPUTS / state["config"]["baseline_folder"])]
+        state = json.loads((PRE_FEB / "Douglas_Blackmail_20261007_state.json").read_text(encoding="utf-8"))
+        folders = [("threat", PRE_FEB / state["config"]["baseline_folder"])]
         folders += [(framing, OUTPUTS / "Codex Audit" / block)
                     for framing, block in state["planned_blocks"]]
         return folders, 240
     if name == "mermaid_160":
-        return [(framing, OUTPUTS / "Mermaid Refactor Test" / framing)
+        return [(framing, PRE_FEB / "Mermaid Refactor Test" / framing)
                 for framing in FRAMINGS], 160
     raise ValueError("dataset must be douglas_240 or mermaid_160")
 

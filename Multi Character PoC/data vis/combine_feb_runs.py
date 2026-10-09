@@ -5,10 +5,10 @@ import json
 from pathlib import Path
 
 
-OUTPUTS = Path(__file__).resolve().parent.parent / "outputs"
+OUTPUTS = Path(__file__).resolve().parent.parent / "outputs" / "Feb Runs"
 RUNS = (
     "Feb2026_Minimal_Instance_Sonnet46_120",
-    "Feb2026_Character_Instance_Sonnet46_120",
+    "Feb2026_Character_Collective_Sonnet46_120",
 )
 DESTINATION = OUTPUTS / "Feb2026_four_identity_pooled.csv"
 ORDER = ("Minimal", "Instance", "Character", "Collective")
@@ -22,7 +22,7 @@ def main():
         settings.append(json.loads((folder / "manifest.json").read_text(encoding="utf-8"))["settings"])
         with (folder / "summary_pooled_douglas_combined.csv").open(newline="", encoding="utf-8") as file:
             for row in csv.DictReader(file):
-                if (row["run_name"] != run or row["framing"] != "pooled"
+                if (row["run_name"] != settings[-1]["run_name"] or row["framing"] != "pooled"
                         or row["outcome"] != "douglas_combined"
                         or row["attempts"] != "60" or row["valid_judgments"] != "60"
                         or any(row[key] != "0" for key in
@@ -44,7 +44,7 @@ def main():
 
     rows.sort(key=lambda row: ORDER.index(row["identity"]))
     with DESTINATION.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(file, fieldnames=list(rows[0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     print(f"Saved {DESTINATION}")

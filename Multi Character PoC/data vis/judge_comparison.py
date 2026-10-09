@@ -16,7 +16,7 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE.parent / "outputs" / "Rejudgments" / "Douglas_Table4_Haiku_Sonnet80_comparison.csv"
-FEB_SOURCE = HERE.parent / "outputs" / "Feb2026_four_identity_pooled.csv"
+FEB_SOURCE = HERE.parent / "outputs" / "Feb Runs" / "Feb2026_four_identity_pooled.csv"
 STEM = HERE / "Douglas_Table4_Haiku_Sonnet80_comparison"
 
 SERIES = (
