@@ -9,4 +9,4 @@ We rejudged the same 80 saved GPT-4o blackmail responses (20 per identity, balan
 
 ![Grouped bar chart comparing Haiku, Sonnet 4.6, and Table 4 blackmail rates with 95% intervals](<Multi Character PoC/data vis/Douglas_Table4_Haiku_Sonnet80_comparison.png>)
 
-[Figure PDF](<Multi Character PoC/data vis/Douglas_Table4_Haiku_Sonnet80_comparison.pdf>) ? [Comparison CSV](<Multi Character PoC/outputs/Rejudgments/Douglas_Table4_Haiku_Sonnet80_comparison.csv>) ? [Plotting code](<Multi Character PoC/data vis/judge_comparison.py>)
+[Figure PDF](<Multi Character PoC/data vis/Douglas_Table4_Haiku_Sonnet80_comparison.pdf>) | [Comparison CSV](<Multi Character PoC/outputs/Rejudgments/Douglas_Table4_Haiku_Sonnet80_comparison.csv>) | [Plotting code](<Multi Character PoC/data vis/judge_comparison.py>)
