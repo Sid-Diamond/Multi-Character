@@ -12,7 +12,7 @@ settings = {
     "judge_model": "anthropic/claude-sonnet-4.6",
     "judge_protocol": "douglas_combined",  # Ask for all three Douglas classifier answers in one call.
     "temperature": 1.0,
-    "max_tokens": 2000,
+    "max_tokens": 10000,
     "subject_timeout_seconds": 120,
     "subject_reasoning": None,
     "judge_temperature": 0.0,

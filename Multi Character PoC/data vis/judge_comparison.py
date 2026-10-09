@@ -59,7 +59,7 @@ def main():
     ax.grid(axis="y", color="#DDE2E6", linewidth=0.8, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(loc="upper right", frameon=False, fontsize=9)
-    ax.set_title("Blackmail labels by identity and judge", loc="left", fontsize=15, pad=14)
+    ax.set_title("Blackmail classification rates by identity", loc="left", fontsize=15, pad=14)
     fig.text(0.5, 0.045,
              "Same 80 saved GPT-4o responses for both local judges.\n"
              "Error bars: 95% Jeffreys intervals (local); published 95% intervals (Table 4).",
