@@ -1,5 +1,10 @@
 # Multi Character PoC: Douglas blackmail slice
 
+For Python installation, the project-local `.venv`, and pinned dependencies, follow
+the [repository setup instructions](../README.md#local-setup). Use that environment's
+Python for the commands below. `main.py` is the authority for current run settings;
+the older configuration descriptions in this document may differ from it.
+
 ## What is in `data/`?
 
 `data/` contains **source material for constructing the experiment prompts**, not trial results. Most of it is copied from the Douglas authors' release. You do not need to edit these files to run the PoC. The four saved free-model responses are smoke-test outputs, not rate estimates.

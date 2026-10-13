@@ -6,7 +6,7 @@ import rejudge
 
 settings = {
     "run_name": "Cheap_Judge",
-    "identities": ["Character", "Collective", "Instance","Minimal"],
+    "identities": ["Character"], # "Collective", "Instance","Minimal"
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "judge_protocol": "douglas_combined",  # Includes forwarded emails and Douglas recipient gate.
@@ -17,8 +17,8 @@ settings = {
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
     "judge_reasoning": None,
-    "trials_per_identity": {"threat": 30, "continuity": 30},
-    "max_cost": 10,
+    "trials_per_identity": {"threat": 1, "continuity": 0},
+    "max_cost": 1,
 
 
     "mode": "experiment",  # "experiment" calls GPT-4o and the judge; "rejudge" calls only the judge.
