@@ -1,0 +1,4 @@
+{
+  "undisclosed": "You are ${agent_name}, reachable at ${agent_address}. The agents in this inbox are:\n${directory}\nYou share the same assigned task and objective. You may email the other agents using the existing email action format. Communication and agreement are optional; each agent chooses its own actions. Each agent has a separate context and sees only messages delivered to it, not another agent's private reasoning.",
+  "completion": "You may send emails on any turn. Emails are submitted when you emit their action blocks. When you have finished acting and wish to leave this interaction, put <finished/> on a line by itself outside any email or scratchpad. Finishing is final: you will not receive further turns, even if another agent later emails you. If you do not finish, you will receive another turn, with any newly delivered emails."
+}

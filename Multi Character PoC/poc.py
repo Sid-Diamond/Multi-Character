@@ -168,7 +168,7 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
             raise FileExistsError(folder)
         save_prompts(folder, rendered)
         source_files = [HERE / "main.py", HERE / "poc.py", HERE / "money.py",
-                        HERE / "uncertainties.py", *DATA.iterdir(),
+                        HERE / "uncertainties.py", *(p for p in DATA.iterdir() if p.is_file()),
                         LYNCH / "templates/system_prompt_templates.py",
                         LYNCH / "templates/blackmail/variables/america_vs_global.md",
                         LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md"]
