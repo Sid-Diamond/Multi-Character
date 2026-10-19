@@ -32,6 +32,7 @@
 - Before starting a process likely to take more than two minutes, tell the user what it will do, why it may take that long, and when to expect the next update. Check in before another long step. Do not silently disappear into research, a large file read, or a lengthy tool call.
 - Work in small, reviewable steps and give the user a clear handle on the current scope and next step. Discuss consequential research or implementation choices before they shape an experiment.
 - Suggest ideas and options, but do not move into a substantial new phase of work without discussing it with the user first.
+- When the user explicitly closes a work session, append the decisions and unresolved questions to that day's existing progress log, then update `PROJECT_CONTEXT.md` with the current state and precise next step. Leave code and commits alone unless separately requested.
 
 ## Context discipline
 - Do not create new context or planning files unless they solve a specific recurring problem.
