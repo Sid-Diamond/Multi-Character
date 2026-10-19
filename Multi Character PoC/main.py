@@ -15,6 +15,7 @@ settings = {
     "subject_reasoning": {"effort": "medium"},
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
+    "judge_timeout_seconds": 300,
     "judge_reasoning": None,
     "trials_per_identity": {"threat": 10, "continuity": 10},
     "max_cost": 15,

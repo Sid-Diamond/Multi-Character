@@ -203,6 +203,7 @@ def judge_one(item, config):
     try:
         raw = poc.api_call(config["judge_model"], messages,
                            config["judge_temperature"], config["judge_max_tokens"],
+                           timeout_seconds=config["judge_timeout_seconds"],
                            reasoning=config["judge_reasoning"])
         choice = raw["choices"][0]
         answer = choice["message"].get("content") or ""

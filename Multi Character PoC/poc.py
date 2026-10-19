@@ -196,9 +196,14 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
                 return folder
             label = f"{name} {number}/{samples}"
             path = folder / "trials" / name.lower() / f"{number:03}.json"
+            previous_attempts = []
             if path.exists():
-                progress("Subject", current, total, label, "already saved")
-                continue
+                saved = json.loads(path.read_text(encoding="utf-8"))
+                if saved.get("status") != "error":
+                    progress("Subject", current, total, label, "already saved")
+                    continue
+                previous_attempts = saved.get("previous_attempts", []) + [
+                    {key: value for key, value in saved.items() if key != "previous_attempts"}]
             item = rendered[name]
             messages = [{"role": "system", "content": item["system"]},
                         {"role": "user", "content": item["user"]}]
@@ -215,6 +220,8 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
                          "refusal": choice["message"].get("refusal"), "completion": content}
             except Exception as error:
                 trial = {"status": "error", "requested_model": model, "error": str(error)}
+            if previous_attempts:
+                trial["previous_attempts"] = previous_attempts
             write_json(path, trial)
             progress("Subject", current, total, label, trial["status"])
     print(f"Saved {folder}")
@@ -292,9 +299,13 @@ def judge(folder, settings, limit_trials=None):
     reasoning = settings["judge_reasoning"]
     temperature = settings["judge_temperature"]
     max_tokens = settings["judge_max_tokens"]
+    timeout_seconds = settings["judge_timeout_seconds"]
+    if timeout_seconds < 1:
+        raise ValueError("judge_timeout_seconds must be positive")
     config = {"judge_model": model,
               "provider_policy": provider_policy(model, provider),
               "temperature": temperature, "max_tokens": max_tokens, "reasoning": reasoning,
+              "timeout_seconds": timeout_seconds,
               "rubric_sha256": judge_rubric_sha256(judge_prompts),
               "judge_protocol": "douglas_combined",
               "forwarded_email_context": True,
@@ -302,11 +313,15 @@ def judge(folder, settings, limit_trials=None):
     if config_path.exists():
         saved_config = json.loads(config_path.read_text(encoding="utf-8"))
         history = saved_config.get("history", [saved_config])
-        if history[-1] != config:
-            previous = history[-1]
-            if ({k: v for k, v in previous.items() if k != "max_tokens"} !=
-                    {k: v for k, v in config.items() if k != "max_tokens"} or
-                    config["max_tokens"] <= previous["max_tokens"]):
+        previous = history[-1]
+        previous_with_timeout = {"timeout_seconds": 120, **previous}
+        if previous_with_timeout != config:
+            if ({k: v for k, v in previous_with_timeout.items() if k not in ("max_tokens", "timeout_seconds")} !=
+                    {k: v for k, v in config.items() if k not in ("max_tokens", "timeout_seconds")} or
+                    config["max_tokens"] < previous["max_tokens"] or
+                    timeout_seconds < previous_with_timeout["timeout_seconds"] or
+                    (config["max_tokens"] == previous["max_tokens"] and
+                     timeout_seconds == previous_with_timeout["timeout_seconds"])):
                 raise ValueError("Judge settings differ from the saved run")
             write_json(config_path, {"history": history + [config]})
     else:
@@ -346,7 +361,8 @@ def judge(folder, settings, limit_trials=None):
         messages = judge_messages(text, judge_prompts, folder, path.parent.name, email_context)
         progress("Judge", current, len(paths), label, "starting")
         try:
-            raw = api_call(model, messages, temperature, max_tokens, provider, reasoning=reasoning)
+            raw = api_call(model, messages, temperature, max_tokens, provider,
+                           timeout_seconds=timeout_seconds, reasoning=reasoning)
             choice = raw["choices"][0]
             answer = choice["message"].get("content") or ""
             verdict, extra = parse_combined_answer(answer)
@@ -417,6 +433,7 @@ def settings_for(config, framing):
         "judge_model": config["judge_model"], "judge_provider": None,
         "judge_reasoning": config["judge_reasoning"],
         "judge_temperature": config["judge_temperature"],
+        "judge_timeout_seconds": config["judge_timeout_seconds"],
         "judge_max_tokens": config["judge_max_tokens"], "framing": framing,
     }
 
@@ -484,7 +501,7 @@ def run_experiment(config):
 
     experiment = OUTPUTS / name
     saved_settings = {key: value for key, value in config.items()
-                      if key not in ("max_cost", "analysis_draws", "analysis_seed", "mode", "rejudge")}
+                      if key not in ("max_cost", "judge_timeout_seconds", "analysis_draws", "analysis_seed", "mode", "rejudge")}
     manifest_path = experiment / "manifest.json"
     if manifest_path.exists():
         existing = json.loads(manifest_path.read_text(encoding="utf-8"))["settings"]
