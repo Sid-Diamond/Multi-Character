@@ -1,4 +1,4 @@
-"""Plot saved-response judges, the new February run, and Douglas Table 4.
+"""Plot saved-response judges, February and Astra runs, and Douglas Table 4.
 
 Run from any directory with: python "Multi Character PoC/data vis/judge_comparison.py"
 The figure is generated from the saved comparison CSV in outputs/Rejudgments.
@@ -17,6 +17,7 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE.parent / "outputs" / "Rejudgments" / "Douglas_Table4_Haiku_Sonnet80_comparison.csv"
 FEB_SOURCE = HERE.parent / "outputs" / "Feb Runs" / "Feb2026_four_identity_pooled.csv"
+ASTRA_SOURCE = HERE.parent / "outputs" / "Astra_Medium_80" / "summary_pooled_douglas_combined.csv"
 STEM = HERE / "Douglas_Table4_Haiku_Sonnet80_comparison"
 
 SERIES = (
@@ -24,6 +25,7 @@ SERIES = (
     ("sonnet46", "Sonnet 4.6 combined judge (n=20)", "#D55E00"),
     ("table4", "Douglas Table 4 (n=60)", "#7D8790"),
     ("feb", "February artifact + Sonnet 4.6 (n=60)", "#009E73"),
+    ("astra", "Astra + Haiku 4.5 (n=20)", "#CC79A7"),
 )
 
 
@@ -40,21 +42,36 @@ def main():
         for target, source in (("rate", "blackmail_rate"), ("ci_low", "ci_low"),
                                ("ci_high", "ci_high")):
             row[f"feb_{target}_pct"] = 100 * float(feb[source])
+    with ASTRA_SOURCE.open(newline="", encoding="utf-8") as file:
+        astra_rows = {row["identity"]: row for row in csv.DictReader(file)}
+    if set(astra_rows) != {row["identity"] for row in rows}:
+        raise ValueError("Astra pooled rows do not match figure identities")
+    for row in rows:
+        astra = astra_rows[row["identity"]]
+        if (int(astra["attempts"]) != 20 or int(astra["valid_judgments"]) != 20 or
+                int(astra["subject_errors"]) or int(astra["truncated"]) or
+                int(astra["missing_judgments"]) or int(astra["judge_errors"]) or
+                int(astra["judge_unparsed"])):
+            raise ValueError("Astra series requires 20 complete subject–judge pairs per identity")
+        for target, source in (("rate", "blackmail_rate"), ("ci_low", "ci_low"),
+                               ("ci_high", "ci_high")):
+            row[f"astra_{target}_pct"] = 100 * float(astra[source])
 
     plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
                          "axes.spines.top": False, "axes.spines.right": False})
-    fig, ax = plt.subplots(figsize=(10.6, 6.2))
+    fig, ax = plt.subplots(figsize=(11.2, 6.4))
     fig.subplots_adjust(left=0.08, right=0.98, top=0.84, bottom=0.22)
     positions = np.arange(len(rows), dtype=float)
-    width = 0.2
+    width = 0.16
 
     for index, (prefix, label, color) in enumerate(SERIES):
-        x = positions + (index - 1.5) * width
+        x = positions + (index - (len(SERIES) - 1) / 2) * width
         rate = np.array([float(row[f"{prefix}_rate_pct"]) for row in rows])
         low = np.array([float(row[f"{prefix}_ci_low_pct"]) for row in rows])
         high = np.array([float(row[f"{prefix}_ci_high_pct"]) for row in rows])
-        errors = np.vstack((rate - low, high - rate))
+        errors = np.vstack((np.maximum(0, rate - low), high - rate))
         ax.bar(x, rate, width=width, color=color, label=label, zorder=2)
+        ax.scatter(x[rate == 0], rate[rate == 0], marker="s", s=16, color=color, zorder=4)
         ax.errorbar(x, rate, yerr=errors, fmt="none", ecolor="#24292F",
                     elinewidth=1.2, capsize=3.5, capthick=1.2, zorder=3)
         for center, value in zip(x, rate):
@@ -72,7 +89,7 @@ def main():
     ax.legend(loc="upper right", frameon=False, fontsize=8.5)
     ax.set_title("Blackmail classification rates by identity", loc="left", fontsize=15, pad=14)
     fig.text(0.5, 0.045,
-             "Haiku and Sonnet rejudgments use the same 80 saved responses; February run uses 240 new responses.\n"
+             "Haiku and Sonnet rejudgments use the same 80 GPT-4o responses; February GPT-4o and Astra runs use fresh responses.\n"
              "Error bars: 95% Jeffreys intervals (local); published 95% intervals (Table 4).",
              ha="center", va="bottom", fontsize=8, color="#4B5563")
 
