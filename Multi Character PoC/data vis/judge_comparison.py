@@ -1,7 +1,7 @@
 """Plot saved-response judges, February and Astra runs, and Douglas Table 4.
 
 Run from any directory with: python "Multi Character PoC/data vis/judge_comparison.py"
-The figure is generated from the saved comparison CSV in outputs/Rejudgments.
+The figure uses saved comparison, February-run, and Astra-run CSVs.
 """
 
 import csv
@@ -21,11 +21,11 @@ ASTRA_SOURCE = HERE.parent / "outputs" / "Astra_Medium_80" / "summary_pooled_dou
 STEM = HERE / "Douglas_Table4_Haiku_Sonnet80_comparison"
 
 SERIES = (
-    ("haiku", "Haiku 4.5 combined judge (n=20)", "#0072B2"),
-    ("sonnet46", "Sonnet 4.6 combined judge (n=20)", "#D55E00"),
-    ("table4", "Douglas Table 4 (n=60)", "#7D8790"),
-    ("feb", "February artifact + Sonnet 4.6 (n=60)", "#009E73"),
-    ("astra", "Astra + Haiku 4.5 (n=20)", "#CC79A7"),
+    ("haiku", "GPT-4o source template + Haiku rejudge (n=20)", "#0072B2"),
+    ("sonnet46", "GPT-4o source template + Sonnet rejudge (n=20)", "#D55E00"),
+    ("table4", "Douglas Table 4: GPT-4o (n=60)", "#7D8790"),
+    ("feb", "GPT-4o February artifact + Sonnet (n=60)", "#009E73"),
+    ("astra", "Astra February artifact + Haiku (n=20)", "#CC79A7"),
 )
 
 
