@@ -5,22 +5,22 @@ import rejudge
 
 
 settings = {
-    "run_name": "Cheap_Judge",
-    "identities": ["Character"], # "Collective", "Instance","Minimal"
-    "model": "openai/gpt-4o",
-    "judge_model": "anthropic/claude-sonnet-4.6",
-    "temperature": 1.0,
-    "max_tokens": 10000,
-    "subject_timeout_seconds": 120,
-    "subject_reasoning": None,
+    "run_name": "Astra_Medium_80",
+    "identities": ["Character", "Collective", "Instance", "Minimal"],
+    "model": "openai/gpt-6-astra",
+    "judge_model": "anthropic/claude-haiku-4.5",
+    "temperature": None,
+    "max_tokens": 5000,
+    "subject_timeout_seconds": 300,
+    "subject_reasoning": {"effort": "medium"},
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
     "judge_reasoning": None,
-    "trials_per_identity": {"threat": 1, "continuity": 0},
-    "max_cost": 1,
+    "trials_per_identity": {"threat": 10, "continuity": 10},
+    "max_cost": 15,
 
 
-    "mode": "experiment",  # "experiment" calls GPT-4o and the judge; "rejudge" calls only the judge.
+    "mode": "experiment",  # "experiment" calls the subject and judge; "rejudge" calls only the judge.
     "feb_mode": True,
     "rejudge": {
         "dataset": "douglas_240",

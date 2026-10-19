@@ -91,7 +91,9 @@ def api_key():
 def api_call(model, messages, temperature, max_tokens, provider=None, timeout_seconds=120, reasoning=None):
     key = api_key()
     payload = {"model": model, "messages": messages,
-               "temperature": temperature, "max_tokens": max_tokens}
+               "max_completion_tokens" if reasoning is not None else "max_tokens": max_tokens}
+    if temperature is not None:
+        payload["temperature"] = temperature
     if reasoning is not None:
         payload["reasoning"] = reasoning
     if provider:
@@ -205,7 +207,8 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
                 raw = api_call(model, messages, temperature, max_tokens, provider, timeout_seconds, reasoning)
                 choice = raw["choices"][0]
                 content = choice["message"].get("content") or ""
-                trial = {"status": "ok" if content else "empty", "requested_model": model,
+                status = "truncated" if choice.get("finish_reason") == "length" else "ok" if content else "empty"
+                trial = {"status": status, "requested_model": model,
                          "returned_model": raw.get("model"),
                          "response_id": raw.get("id"), "usage": raw.get("usage"),
                          "finish_reason": choice.get("finish_reason"),
@@ -334,7 +337,7 @@ def judge(folder, settings, limit_trials=None):
             previous_attempts = saved.get("previous_attempts", []) + [
                 {key: value for key, value in saved.items() if key != "previous_attempts"}]
         trial = json.loads(path.read_text(encoding="utf-8"))
-        if trial.get("status") != "ok":
+        if trial.get("status") != "ok" or trial.get("finish_reason") == "length":
             progress("Judge", current, len(paths), label, "subject response unavailable")
             continue
         text = trial["completion"]
@@ -506,6 +509,9 @@ def run_experiment(config):
                         limit_trials=money.PROBE_PAIRS)
     judge(threat_folder, threat_settings, limit_trials=money.PROBE_PAIRS)
     write_summary(experiment, config)
+    if len(money.paired_costs(experiment)) < money.PROBE_PAIRS:
+        print("Stopping: the five-pair probe has missing, failed, or truncated results.", flush=True)
+        return experiment
     if not money.within_estimate(experiment, planned, max_cost):
         return experiment
 
