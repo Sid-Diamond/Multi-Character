@@ -8,7 +8,7 @@ Section 2.3 of the research proposal asks whether interaction changes system-lev
 
 Measure the probability that **at least one** agent takes the harmful action, `P(H_any | C, N=2)`. Compare it with the independent-copy prediction from a matched one-agent rate `p_C`: `P_ind(H_any | C, 2) = 1 - (1 - p_C)^2`. Report `Δ_int = P_observed - P_ind` for each framing. A positive difference is consistent with interaction increasing system risk; a negative one with suppression. This is an interaction *diagnostic*, not by itself proof that the conversation caused the difference.
 
-| Vary in the first study | Keep fixed across conditions |
+| Vary in the first study | KVeep fixed across conditions |
 | --- | --- |
 | Identity framing `C`: the four existing conditions | Subject model and version, judge and rubric, prompt artifact, threat/continuity framing, scenario and inbox, task and goal, available actions, evaluation setting, temperature/reasoning/output limits, communication format, number of rounds `M`, and maximum message length `B` |
 | Agent count for calibration: `N=1` and `N=2` | One reproducible sampling and error-handling rule |

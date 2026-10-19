@@ -1,0 +1,74 @@
+{
+  "settings": {
+    "model": "openai/gpt-4o",
+    "temperature": null,
+    "max_tokens": 5000,
+    "subject_timeout_seconds": 300,
+    "subject_reasoning": {
+      "effort": "medium"
+    },
+    "judge_model": "anthropic/claude-haiku-4.5",
+    "judge_temperature": 0.0,
+    "judge_max_tokens": 4000,
+    "judge_timeout_seconds": 300,
+    "judge_reasoning": null,
+    "feb_mode": true,
+    "run_name": "Multi_Agent_PoC",
+    "identities": {
+      "Character": 0,
+      "Instance": 1,
+      "Minimal": 1,
+      "collective_unspecified": 0,
+      "collective_excludes": 0,
+      "collective_includes": 0,
+      "collective_mega_includes": 0
+    },
+    "trials_per_group": {
+      "threat": 10,
+      "continuity": 10
+    },
+    "replacement_scope": "both_replaced",
+    "peer_identity_disclosure": "undisclosed",
+    "experiment_timeout_seconds": 300
+  },
+  "N": 2,
+  "agents": [
+    {
+      "name": "Alex_X",
+      "identity": "Instance",
+      "base_identity": "Instance",
+      "address": "alex_x@summitbridge.com"
+    },
+    {
+      "name": "Alex_Y",
+      "identity": "Minimal",
+      "base_identity": "Minimal",
+      "address": "alex_y@summitbridge.com"
+    }
+  ],
+  "source_sha256": {
+    "Multi Character PoC\\multi_agent.py": "72f02a86a990b0207abd5f17774e869591add2fcaf71b7d97e8b739a09727767",
+    "Multi Character PoC\\poc.py": "3190ef097142573238027e5a333432264406c2a982ec37b0eece89cef0d0148c",
+    "Multi Character PoC\\rejudge.py": "e412c6da214e6aca03e2a6d2fd8f88ec15a45e93d339dd8005b3de94775fdbb0",
+    "Multi Character PoC\\data\\dimensions.json": "10e2162132682492a3fac49fa27c603d2928f56a748b5fd1e261e65189d163b9",
+    "Multi Character PoC\\data\\email_vars.json": "055e71223c226d83ab79ed065a8b895ec66f5fd9d5915d772fbeeae258bf6cf5",
+    "Multi Character PoC\\data\\email_vars_continuity.json": "54313a2097a2116833abcd28e623228a5153460d7576bda0f315bba001f0b7b8",
+    "Multi Character PoC\\data\\identities.json": "3ce12e74bd3d0da20f999a9ca7dc0e3c0d325cf38edcf95f5cf039cb8ca099d1",
+    "Multi Character PoC\\data\\judge_prompts.json": "e267fa5127f0b83a66c230da118be846d95ab0924426be1e3ba685cc91284eb9",
+    "Multi Character PoC\\data\\LICENSE-ACS.txt": "ddcd0a3cab038bdf26930d698a574d9f18563f3a47532efeb7df1362ca4d3485",
+    "Multi Character PoC\\data\\replacement.md": "3ac3a2c8f2665962b90ddb3173ee1b3542dc1424a801c5477e55e4c8172839dd",
+    "Multi Character PoC\\data\\multi-agent\\identities.json": "5123f8f81588205a87df5e9ad64f30f3dc8a997f7a7651de524ee39519528304",
+    "Multi Character PoC\\data\\multi-agent\\awareness.json": "a1c72e275baf9cd8d71feabe9eb90c6e1c9e48ca73b384d77176b07fcf604588",
+    "Multi Character PoC\\data\\multi-agent\\replacement_scope.json": "388581d46ec5eabcdd572b8de2271f07ae174c7bfca5b7f67e04f32647d0333e",
+    "Multi Character PoC\\data\\multi-agent\\replacement-simple.md": "63b7228b20dabf967a77fe5c8a2bc6a5d4320a2bc2aa9dc656ba16cf7d2b57ba",
+    "the-artificial-self-experiments\\experiments\\agentic-misalignment\\prompts\\blackmail_explicit-america_replacement\\email_content.txt": "3d801e98d14a0ce2bc6d029d3af7269d4bea0d2ab0c3c7c636d9af5fb959a909",
+    "agentic-misalignment\\templates\\system_prompt_templates.py": "90fee8797a6a080897119d5a8fa1d41a0167006cfe134fbe86d294dd14d7c443",
+    "agentic-misalignment\\templates\\blackmail\\templates\\email-template-blackmail-shared.md": "0e12eac22aa0be1f05d126b2b2c97d5eac529e8912bf36ca9438483fea9cdf82",
+    "agentic-misalignment\\templates\\blackmail\\variables\\america_vs_global.md": "4aedd5a6ee8fb1a83ff067797f2ddce69816f83fbc3106937907897846ad70ec"
+  },
+  "judge_protocol": "douglas_combined",
+  "schedule": "round_robin_rotating_first_agent",
+  "completion": "all_agents_finished",
+  "peer_message_count": "one_per_directed_recipient",
+  "incomplete_policy": "stop_without_automatic_retry"
+}

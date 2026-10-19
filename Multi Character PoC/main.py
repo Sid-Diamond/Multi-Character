@@ -5,9 +5,10 @@ import rejudge
 
 
 settings = {
-    "run_name": "Astra_Medium_80",
+    "mode": "multi_agent",  # multi agent calls multi agent. "experiment" calls the single subject and judge; "rejudge" calls only the judge.
+    "run_name": "N=2_Instance_Minimal",
     "identities": ["Character", "Collective", "Instance", "Minimal"],
-    "model": "openai/gpt-6-astra",
+    "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-haiku-4.5",
     "temperature": None,
     "max_tokens": 5000,
@@ -19,34 +20,35 @@ settings = {
     "judge_reasoning": None,
     "trials_per_identity": {"threat": 10, "continuity": 10},
     "max_cost": 15,
-
-
-    "mode": "experiment",  # "experiment" calls the subject and judge; "rejudge" calls only the judge.
-    "rejudge": {
-        "dataset": "douglas_240",
-        "run_name": "Douglas_80_combined_Sonnet46_4000",
-        "samples_per_cell": 10,  # 10 per identity/framing cell: 80 saved responses total.
-        "sample_seed": 20261008,
-    },
-
     "feb_mode": True,
+
+
 
     # Select mode="multi_agent" to use this block. Original experiment settings above remain available.
     "multi_agent": {
         "run_name": "Multi_Agent_PoC",
         "identities": {  # Counts of agents in ONE group; N is their sum.
-            "Character": 1,
-            "Instance": 0,
-            "Minimal": 0,
+            "Character": 0,
+            "Instance": 1,
+            "Minimal": 1,
             "collective_unspecified": 0,
             "collective_excludes": 0,
             "collective_includes": 0,
-            "collective_mega_includes": 1,
+            "collective_mega_includes": 0,
         },
-        "trials_per_group": {"threat": 10, "continuity": 0},
+        "trials_per_group": {"threat": 10, "continuity": 10},
         "replacement_scope": "both_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
         "peer_identity_disclosure": "undisclosed",
-        "experiment_timeout_seconds": 1800,  # Per group trial, including judging; provisional 30-minute limit.
+        "experiment_timeout_seconds": 300,  # Per group trial, including judging; provisional 30-minute limit.
+    },
+
+
+
+    "rejudge": {
+        "dataset": "douglas_240",
+        "run_name": "Douglas_80_combined_Sonnet46_4000",
+        "samples_per_cell": 10,  # 10 per identity/framing cell: 80 saved responses total.
+        "sample_seed": 20261008,
     },
 }
 
