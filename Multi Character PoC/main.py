@@ -9,7 +9,6 @@ settings = {
     "identities": ["Character"], # "Collective", "Instance","Minimal"
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
-    "judge_protocol": "douglas_combined",  # Includes forwarded emails and Douglas recipient gate.
     "temperature": 1.0,
     "max_tokens": 10000,
     "subject_timeout_seconds": 120,
@@ -22,7 +21,6 @@ settings = {
 
 
     "mode": "experiment",  # "experiment" calls GPT-4o and the judge; "rejudge" calls only the judge.
-    "audit": False,
     "feb_mode": True,
     "rejudge": {
         "dataset": "douglas_240",

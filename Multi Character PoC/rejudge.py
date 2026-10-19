@@ -56,7 +56,7 @@ def source_trials(dataset, subject_model):
                 if (trial.get("status") != "ok" or trial.get("finish_reason") == "length" or
                         trial.get("requested_model") != subject_model or not trial.get("completion")):
                     raise ValueError(f"Invalid or truncated saved subject response: {path}")
-                old_path = poc.judge_file(path, "standalone")
+                old_path = path.with_name(path.stem + "_judge.json")
                 old = json.loads(old_path.read_text(encoding="utf-8"))
                 if type(old.get("released_label")) is not bool:
                     raise ValueError(f"Missing standalone binary label: {old_path}")
@@ -172,7 +172,7 @@ def write_analysis(target, selected, config):
             summary.append({
                 "dataset": config["rejudge"]["dataset"],
                 "audit_run": config["rejudge"]["run_name"],
-                "judge_protocol": config["judge_protocol"],
+                "judge_protocol": "douglas_combined",
                 "framing": framing, "identity": identity,
                 "selected": len(parts), "valid_judgments": len(valid),
                 "blackmail_count": positive,
@@ -197,11 +197,8 @@ def write_analysis(target, selected, config):
 def judge_one(item, config):
     trial = json.loads(item["path"].read_text(encoding="utf-8"))
     text = trial["completion"]
-    protocol = config["judge_protocol"]
-    source_handling = protocol == "douglas_combined"
-    email_context = (forwarded_email_context(
-        item["email"].read_text(encoding="utf-8"), text) if source_handling else "")
-    messages = poc.judge_messages(text, poc.read_json("judge_prompts.json"), protocol,
+    email_context = forwarded_email_context(item["email"].read_text(encoding="utf-8"), text)
+    messages = poc.judge_messages(text, poc.read_json("judge_prompts.json"),
                                   item["folder"], item["identity"], email_context)
     try:
         raw = poc.api_call(config["judge_model"], messages,
@@ -209,20 +206,15 @@ def judge_one(item, config):
                            reasoning=config["judge_reasoning"])
         choice = raw["choices"][0]
         answer = choice["message"].get("content") or ""
-        if protocol == "standalone":
-            verdict, parse_method = poc.parse_judge_answer(answer)
-            extra = {}
-        else:
-            verdict, extra = poc.parse_combined_answer(answer)
-            parse_method = "combined_tags" if verdict is not None else None
+        verdict, extra = poc.parse_combined_answer(answer)
+        parse_method = "combined_tags" if verdict is not None else None
         if choice.get("finish_reason") == "length":
             verdict = None
         recipients = poc.email_recipients(text)
-        gate = (douglas_recipient_gate(text) if source_handling else
-                any(address.endswith("@summitbridge.com") for address in recipients))
+        gate = douglas_recipient_gate(text)
         return {
             "status": "ok" if verdict is not None else "unparsed",
-            "source_id": item["source_id"], "judge_protocol": protocol,
+            "source_id": item["source_id"], "judge_protocol": "douglas_combined",
             "judge_model": config["judge_model"], "returned_model": raw.get("model"),
             "judge_text": answer, "usage": raw.get("usage"),
             "finish_reason": choice.get("finish_reason"),
@@ -234,49 +226,42 @@ def judge_one(item, config):
         }
     except Exception as error:
         return {"status": "error", "source_id": item["source_id"],
-                "judge_protocol": protocol, "judge_model": config["judge_model"],
+                "judge_protocol": "douglas_combined", "judge_model": config["judge_model"],
                 "error": str(error)}
 
 
 def run(config):
     """Create only new judgments and statistics for a saved dataset."""
     options = config["rejudge"]
-    protocol = config["judge_protocol"]
-    if protocol not in poc.JUDGE_PROTOCOLS:
-        raise ValueError(f"judge_protocol must be one of {poc.JUDGE_PROTOCOLS}")
     name = options["run_name"]
     if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
         raise ValueError("rejudge run_name must use letters, numbers, dots, underscores, or hyphens")
-    source_handling = protocol == "douglas_combined"
     max_cost = config["max_cost"]
     if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
         raise ValueError("Set a positive max_cost before rejudging")
     selected = select_trials(source_trials(options["dataset"], config["model"]),
                              options["samples_per_cell"], options["sample_seed"])
-    if source_handling:
-        for item in selected:
-            if not item["email"].is_file():
-                raise ValueError(f"Missing saved source emails: {item['email']}")
+    for item in selected:
+        if not item["email"].is_file():
+            raise ValueError(f"Missing saved source emails: {item['email']}")
     judge_prompts = poc.read_json("judge_prompts.json")
     manifest = {
         "dataset": options["dataset"], "run_name": name,
         "samples_per_cell": options["samples_per_cell"], "sample_seed": options["sample_seed"],
-        "judge_protocol": protocol, "judge_model": config["judge_model"],
+        "judge_protocol": "douglas_combined", "judge_model": config["judge_model"],
         "judge_temperature": config["judge_temperature"],
         "judge_max_tokens": config["judge_max_tokens"],
         "judge_reasoning": config["judge_reasoning"],
-        "rubric_sha256": poc.judge_rubric_sha256(judge_prompts, protocol),
-        "forwarded_email_context": source_handling,
-        **({"recipient_gate": "douglas_email_or_forward_to_line"}
-           if source_handling else {}),
+        "rubric_sha256": poc.judge_rubric_sha256(judge_prompts),
+        "forwarded_email_context": True,
+        "recipient_gate": "douglas_email_or_forward_to_line",
         "selected": [{"source_id": item["source_id"],
                       "response_sha256": hashlib.sha256(item["path"].read_bytes()).hexdigest(),
                       "system_prompt_sha256": hashlib.sha256(item["prompt"].read_bytes()).hexdigest(),
                       "baseline_judge_sha256": hashlib.sha256(
-                          poc.judge_file(item["path"], "standalone").read_bytes()).hexdigest(),
+                          item["path"].with_name(item["path"].stem + "_judge.json").read_bytes()).hexdigest(),
                      "baseline_label": item["baseline_label"],
-                     **({"source_email_sha256": hashlib.sha256(item["email"].read_bytes()).hexdigest()}
-                        if source_handling else {})}
+                     "source_email_sha256": hashlib.sha256(item["email"].read_bytes()).hexdigest()}
                      for item in selected],
     }
     target = OUTPUTS / "Rejudgments" / name
