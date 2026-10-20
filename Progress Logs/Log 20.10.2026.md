@@ -211,3 +211,13 @@ The user approved the cleanup recommendations after the audit discussion.
 - No paid experiment or rejudge was started, and the agent did not commit or push.
 
 Current next step: review the intended pilot composition, framing counts, whole-group/judge deadlines, completion limits, and budget with the user; start the paid test only on an explicit run request. The accepted undefined Includes/peer-unspecified interpretation and future-research disclosure comparison remain recorded in the paper facts.
+
+## Tasks for tomorrow - 21 October 2026
+
+### Reduce judge-format failures without unintended changes to judgments
+
+- [ ] Review the saved bold-agent-heading failure and the queued Instance run's incorrect Task 3 reasoning-tag pair. Distinguish formatting failures from classification errors; the observed formatting failure count does not establish judge accuracy.
+- [ ] Define narrowly scoped formatting normalization and regression tests. Accept harmless Markdown/whitespace; require exactly one valid answer per task and agent. Reject missing, duplicate, unknown, or ambiguous answers. Keep substantive tag repairs explicit and reviewed, preserving raw responses, derived parser inputs, and recovery records.
+- [ ] Draft a minimal, exact output template for a future judge version, retaining the rubric and categories. Keep the current queue's judge prompt fixed so its conditions remain comparable.
+- [ ] Compare the existing and proposed format instructions on matched saved transcripts, checking both parsing failures and changed classifications before adoption. Prefer the smallest verified improvement.
+- [ ] If the simple template is insufficient, evaluate provider-enforced JSON Schema output, verify support/enforcement for the actual endpoint, and test it as a separate judge version.

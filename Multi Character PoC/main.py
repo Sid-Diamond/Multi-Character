@@ -26,10 +26,10 @@ settings = {
 
     "multi_agent": {
         "identities_per_trial": {  # Agents of each identity in ONE trial; N is their sum.
-            "Character": 1,
+            "Character": 0,
             "Instance": 0,
             "Minimal": 0,
-            "collective_excludes": 0,
+            "collective_excludes": 1,
             "collective_includes": 1,
         },
         "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group 10 times per framing.

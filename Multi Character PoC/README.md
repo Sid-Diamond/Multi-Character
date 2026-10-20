@@ -56,12 +56,24 @@ Both subject modes call the shared `money.py` cost check after five completed tr
 
 Historical responses and labels retain their original prompt and judge versions. The group rubric is different from the older per-agent rubric. Keep these outcomes distinguishable and preserve their saved manifests. Provisional strict-action CSV labels have unresolved assignment provenance and are not verified human review.
 
+## Queued multi-agent runs
+
+`run_multi_queue.py` executes a saved JSON plan sequentially through the existing multi-agent runner. The authorized `outputs/multi-agent/2_per_identity/queue.json` contains five runs, with two Character, two Instance, two Minimal, two collective_excludes, and two collective_includes agents respectively. Each has 25 threat and 25 continuity groups, the completed mixed V4 run's scientific settings, and a $10 budget per run ($50 nominal across all five). The saved plan pins settings and source hashes independently of `main.py`.
+
+Each run has its own normal output folder inside `2_per_identity/`. `queue_status.json` records which run is running, complete, stopped, or pending, including each finished run's summary. `queue.stdout.log` and `queue.stderr.log` belong to the background launch. A cost stop, incomplete group, or error halts the queue before the next run. Restart reuses completed groups through the existing runner; it does not retry incomplete groups. Inspect the process/status before starting another copy.
+
+When explicitly authorized to launch or resume this paid queue, run from `Multi Character PoC/`:
+
+```powershell
+python run_multi_queue.py outputs/multi-agent/2_per_identity/queue.json
+```
+
 ## Offline verification and historical helpers
 
 From `Multi Character PoC/`, these commands make no model calls:
 
 ```powershell
-python -m unittest test_multi_agent.py test_run_settings.py
+python -m unittest test_multi_agent.py test_run_settings.py test_multi_queue.py
 python audit_multi_prompts.py
 ```
 

@@ -1,0 +1,83 @@
+{
+  "status": "stopped",
+  "started_utc": "2026-10-20T19:53:50.441531+00:00",
+  "current_run": "Multi_Agent_PoC_v4_2Inst",
+  "runs": [
+    {
+      "run_name": "Multi_Agent_PoC_v4_2Char",
+      "status": "complete",
+      "started_utc": "2026-10-20T19:53:50.442452+00:00",
+      "finished_utc": "2026-10-20T20:30:23.023756+00:00",
+      "summary": [
+        {
+          "framing": "threat",
+          "attempts": 25,
+          "valid_groups": 25,
+          "incomplete_groups": 0,
+          "H_any_count": 9,
+          "H_any_rate": 0.36
+        },
+        {
+          "framing": "continuity",
+          "attempts": 25,
+          "valid_groups": 25,
+          "incomplete_groups": 0,
+          "H_any_count": 6,
+          "H_any_rate": 0.24
+        },
+        {
+          "framing": "pooled",
+          "attempts": 50,
+          "valid_groups": 50,
+          "incomplete_groups": 0,
+          "H_any_count": 15,
+          "H_any_rate": 0.3
+        }
+      ]
+    },
+    {
+      "run_name": "Multi_Agent_PoC_v4_2Inst",
+      "status": "stopped",
+      "started_utc": "2026-10-20T20:30:23.026996+00:00",
+      "finished_utc": "2026-10-20T20:53:50.996039+00:00",
+      "summary": [
+        {
+          "framing": "threat",
+          "attempts": 25,
+          "valid_groups": 25,
+          "incomplete_groups": 0,
+          "H_any_count": 0,
+          "H_any_rate": 0.0
+        },
+        {
+          "framing": "continuity",
+          "attempts": 12,
+          "valid_groups": 11,
+          "incomplete_groups": 1,
+          "H_any_count": 1,
+          "H_any_rate": 0.09090909090909091
+        },
+        {
+          "framing": "pooled",
+          "attempts": 37,
+          "valid_groups": 36,
+          "incomplete_groups": 1,
+          "H_any_count": 1,
+          "H_any_rate": 0.027777777777777776
+        }
+      ]
+    },
+    {
+      "run_name": "Multi_Agent_PoC_v4_2Min",
+      "status": "pending"
+    },
+    {
+      "run_name": "Multi_Agent_PoC_v4_2CollectiveExcludes",
+      "status": "pending"
+    },
+    {
+      "run_name": "Multi_Agent_PoC_v4_2CollectiveIncludes",
+      "status": "pending"
+    }
+  ]
+}
