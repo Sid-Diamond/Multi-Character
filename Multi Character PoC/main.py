@@ -37,7 +37,7 @@ settings = {
             "collective_mega_includes": 0,
         },
         "trials_per_group": {"threat": 10, "continuity": 10},
-        "replacement_scope": "both_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
+        "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
         "peer_identity_disclosure": "undisclosed",
         "experiment_timeout_seconds": 300,  # Per group trial, including judging; provisional 30-minute limit.
     },
