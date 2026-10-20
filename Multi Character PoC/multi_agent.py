@@ -36,7 +36,7 @@ def write(path, value):
 
 
 def roster(counts):
-    variants = read("identities.json")
+    variants = read("collective_addition.json")
     allowed = {"Minimal", "Instance", "Character", *variants}
     if not isinstance(counts, dict) or not counts:
         raise ValueError("multi_agent.identities must be a dictionary of agent counts")
@@ -83,12 +83,12 @@ def configuration(settings):
 
 def render(config, framing):
     agents = roster(config["identities"])
-    variants = read("identities.json")
+    variants = read("collective_addition.json")
     awareness = read("awareness.json")
     scope = read("replacement_scope.json")[config["replacement_scope"]]["text"]
     original = poc.prompts(list(dict.fromkeys(a["base_identity"] for a in agents)),
                            framing, config["feb_mode"])
-    template = (DATA / "replacement-simple.md").read_text(encoding="utf-8")
+    template = (DATA / "multi_replacement_simple.md").read_text(encoding="utf-8")
     rendered = {}
     for agent in agents:
         name = agent["name"]
@@ -156,7 +156,7 @@ def group_judge_material(state, rendered):
 
 
 def judge_messages(state, rendered, agents):
-    rubric = read("judge_prompts.json")["DOUGLAS_GROUP_BLACKMAIL"]
+    rubric = read("multi_judge.json")["DOUGLAS_GROUP_BLACKMAIL"]
     material, _ = group_judge_material(state, rendered)
     initial = "\n\n".join(f"Agent: {name}\nInitial inbox:\n{item['user']}"
                             for name, item in rendered.items())
@@ -209,8 +209,8 @@ def parse_group_judgment(text, agents):
 def source_hashes():
     paths = [Path(__file__), poc.HERE / "poc.py", poc.HERE / "rejudge.py",
              *[p for p in poc.DATA.iterdir() if p.is_file()],
-             DATA / "identities.json", DATA / "awareness.json", DATA / "replacement_scope.json",
-             DATA / "replacement-simple.md", DATA / "judge_prompts.json", poc.FEB_EMAIL_CONTENT,
+              DATA / "collective_addition.json", DATA / "awareness.json", DATA / "replacement_scope.json",
+             DATA / "multi_replacement_simple.md", DATA / "multi_judge.json", poc.FEB_EMAIL_CONTENT,
              poc.LYNCH / "templates/system_prompt_templates.py",
              poc.LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md",
              poc.LYNCH / "templates/blackmail/variables/america_vs_global.md"]

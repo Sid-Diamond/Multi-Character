@@ -66,7 +66,7 @@ class MultiAgentTests(unittest.TestCase):
         self.assertIn(original["email"].replace("Alex", "Alex_X"), self.rendered["Alex_X"]["email"])
         self.assertNotIn("collective_mega_includes", self.rendered["Alex_X"]["system"])
         self.assertNotIn("${", str(self.rendered))
-        for variant in multi.read("identities.json"):
+        for variant in multi.read("collective_addition.json"):
             config = self.config | {"identities": {variant: 1, "Minimal": 1}}
             agents, rendered = multi.render(config, "continuity")
             self.assertEqual(agents[0]["base_identity"], "Collective")
