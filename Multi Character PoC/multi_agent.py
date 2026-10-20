@@ -217,6 +217,8 @@ def parse_group_answer(text):
 
 
 def parse_group_judgment(text, agents):
+    # Accept Markdown bold on agent headings without changing the tagged answers.
+    text = re.sub(r"(?m)^\*\*(Agent:[^\r\n]+)\*\*[ \t]*$", r"\1", text)
     verdict = parse_group_answer(text)
     if verdict is None:
         return None

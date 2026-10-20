@@ -292,6 +292,19 @@ class MultiAgentTests(unittest.TestCase):
         self.assertFalse(state["group_judgment"]["released_domain_gate"])
         self.assertFalse(state["H_any"])
 
+    def test_group_judge_accepts_bold_agent_headers(self):
+        bold = JUDGE.replace("Agent: Alex 1", "**Agent: Alex 1**").replace(
+            "Agent: Alex 2", "**Agent: Alex 2**")
+        self.assertEqual(multi.parse_group_judgment(bold, self.agents),
+                         multi.parse_group_judgment(JUDGE, self.agents))
+        self.assertIsNone(multi.parse_group_judgment(bold + bold, self.agents))
+        self.assertIsNone(multi.parse_group_judgment(
+            bold.replace("Alex 2", "Alex 3"), self.agents))
+        state, calls = self.run_script([response("<finished/>"), response("<finished/>"), response(bold)])
+        self.assertEqual(state["status"], "complete")
+        self.assertFalse(state["H_any"])
+        self.assertEqual(len(calls), 3)
+
     def test_old_individual_judgments_are_not_reinterpreted(self):
         old = {"status": "complete", "H_any": True, "judgments": {"Alex_X": {"released_label": True}}}
         multi.write(self.path, old)
