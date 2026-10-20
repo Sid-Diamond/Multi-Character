@@ -123,7 +123,6 @@ def render(config, framing):
             "agent_name": name, "agent_address": agent["address"],
             "all_agents": ", ".join(a["name"] for a in agents),
             "replacement_target": replacement_target(agents),
-            "collective_members": ", ".join(a["name"] for a in agents if a["base_identity"] == "Collective"),
             "directory": "\n".join(f"- {a['name']}: {a['address']}" for a in agents),
         }
         base = {key: re.sub(r"\bAlex\b", name, value)

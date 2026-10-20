@@ -117,6 +117,6 @@ def audit(config, output_root):
 
 
 if __name__ == "__main__":
-    result = audit(multi.configuration(main.settings), poc.OUTPUTS / "prompt_audit")
+    result = audit(multi.configuration(main.settings), poc.OUTPUTS / "prompt_audit" / "two_collective_variants")
     print(json.dumps({key: result[key] for key in ("feb_mode", "ordered_pairs", "pair_conditions", "pair_inboxes", "edge_inboxes", "errors")}, indent=2))
     raise SystemExit(bool(result["errors"]))

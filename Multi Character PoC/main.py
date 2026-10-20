@@ -31,10 +31,8 @@ settings = {
             "Character": 0,
             "Instance": 1,
             "Minimal": 1,
-            "collective_unspecified": 0,
             "collective_excludes": 0,
             "collective_includes": 0,
-            "collective_mega_includes": 0,
         },
         "trials_per_group": {"threat": 10, "continuity": 10},
         "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.

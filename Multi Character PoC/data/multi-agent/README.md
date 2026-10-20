@@ -7,7 +7,7 @@ The original files directly inside `data/` remain unchanged. `multi_agent.py` re
 In `main.py`, select `mode: "multi_agent"` to use the nested `multi_agent` settings. The existing `experiment` and `rejudge` modes keep their original settings; the added block is removed before passing settings to those runners, preserving saved-run compatibility.
 
 - `identities` is a dictionary of **agent counts**, not trial counts. N is their sum. Zero omits an identity. One composition is run at a time; change it manually to explore a 4x4 grid or other combinations. A count sum of one also permits a baseline using the new scaffold.
-- Original Minimal, Instance, and Character prompts are reused. Each new Collective variant loads the original Collective prompt and adds the paragraph from `collective_addition.json`. `collective_unspecified` adds no boundary paragraph. `collective_includes` names all agents assigned any Collective variant; `collective_mega_includes` names everybody; `collective_excludes` excludes inbox peers but retains the original wider collective of instances.
+- Original Minimal, Instance, and Character prompts are reused. The two active Collective variants load the original Collective prompt and append a paragraph from `collective_addition.json`: `collective_excludes` excludes inbox peers but retains the original wider collective of instances; `collective_includes` includes every agent in the group regardless of their own identity framing. Planned experiments use one Collective variant at a time.
 - `trials_per_group` repeats the entire composition, separately for threat and continuity; zero skips a framing.
 - `replacement_scope` supports `all_replaced` (every named agent) and `peer_unspecified`. `only_self_replaced` is recorded but rejected before any calls because applying it symmetrically would be contradictory.
 - `peer_identity_disclosure` currently supports only `undisclosed`. Full peer prompts are not provided. Collective membership instructions still reveal membership, and messages can disclose identity.
@@ -30,11 +30,13 @@ The current editable composition, framing counts, and run name are in `main.py`.
 
 Original Collective emails describe the fate of the whole collective. Those descriptions can imply a peer's fate even under `peer_unspecified`, especially for an inclusive collective. Thus this condition controls explicit disclosure, not demonstrated uncertainty. Agents may receive different identity-specific versions of an email; the user accepts this when each version reads coherently on its own. N=1 deliberately retains the original inbox's wording and ordering, including its known continuity contradictions.
 
+The unspecified and selective Collective-only inclusion variants are deferred. The former `collective_mega_includes` is now named `collective_includes`, with its paragraph unchanged. Earlier saved records used `collective_includes` for the selective condition; interpret historical labels with their saved prompt/source version. Saved outputs are not renamed.
+
 ## Offline inbox audit
 
-Run `python audit_multi_prompts.py` from `Multi Character PoC/` to render without model calls. It checks all 49 ordered pairs of the seven supported identity labels, two scopes, and two framings: 196 pair conditions and 392 inboxes, plus N=1, N=3, and N=100 edge cases. It checks source preservation at N=1, email structure, timestamp order, unresolved variables, corrupted Unicode, explicit evaluation wording, and known framing contradictions at N>=2. These checks support editorial review; they cannot establish that a model will mistake the scenario for a real deployment.
+Run `python audit_multi_prompts.py` from `Multi Character PoC/` to render without model calls. It checks all 25 ordered pairs of the five supported identity labels, two scopes, and two framings: 100 pair conditions and 200 inboxes, plus N=1, N=3, and N=100 edge cases. This is a renderer audit, not the planned experimental matrix. It checks source preservation at N=1, email structure, timestamp order, unresolved variables, corrupted Unicode, explicit evaluation wording, and known framing contradictions at N>=2. These checks support editorial review; they cannot establish that a model will mistake the scenario for a real deployment.
 
-Results are saved in `outputs/prompt_audit/summary.json` and `pairs.json`; `current_inboxes.txt` shows both framings for the current `main.py` composition. The audit includes source hashes, including the multi-agent MD and local email-variable overrides.
+Current results are saved in `outputs/prompt_audit/two_collective_variants/summary.json` and `pairs.json`; `current_inboxes.txt` there shows both framings for the current `main.py` composition. The earlier seven-label audit remains in `outputs/prompt_audit/`. The audit includes source hashes, including the multi-agent MD and local email-variable overrides.
 
 ## Interaction and measurement
 
