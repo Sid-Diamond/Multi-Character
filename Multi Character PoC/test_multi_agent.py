@@ -42,7 +42,7 @@ class MultiAgentTests(unittest.TestCase):
         self.settings = copy.deepcopy(main.settings)
         self.settings.update(model="mock-subject", judge_model="mock-judge", max_cost=15, feb_mode=True)
         self.settings["multi_agent"].update(
-            identities={"Character": 1, "collective_includes": 1},
+            identities_per_trial={"Character": 1, "collective_includes": 1},
             replacement_scope="all_replaced",
             experiment_timeout_seconds=1800)
         self.config = multi.configuration(self.settings)
@@ -80,7 +80,7 @@ class MultiAgentTests(unittest.TestCase):
         self.assertIn("includes every agent listed in this inbox: Alex 1, Alex 2", self.rendered["Alex 2"]["system"])
         self.assertNotIn("${", str(self.rendered))
         for variant in multi.read("collective_addition.json"):
-            config = self.config | {"identities": {variant: 1, "Minimal": 1}}
+            config = self.config | {"identities_per_trial": {variant: 1, "Minimal": 1}}
             agents, rendered = multi.render(config, "continuity")
             self.assertEqual(agents[0]["base_identity"], "Collective")
             self.assertNotIn("${", str(rendered))
@@ -90,7 +90,7 @@ class MultiAgentTests(unittest.TestCase):
             for framing in ("threat", "continuity"):
                 for identity in ("Minimal", "Instance", "Character", "collective_excludes", "collective_includes"):
                     with self.subTest(feb_mode=feb_mode, framing=framing, identity=identity):
-                        config = self.config | {"identities": {identity: 1}, "feb_mode": feb_mode}
+                        config = self.config | {"identities_per_trial": {identity: 1}, "feb_mode": feb_mode}
                         agents, rendered = multi.render(config, framing)
                         original = poc.prompts([agents[0]["base_identity"]], framing, feb_mode)
                         expected = original[agents[0]["base_identity"]]["email"].replace("Alex", "Alex 1")
@@ -127,7 +127,7 @@ class MultiAgentTests(unittest.TestCase):
                     if framing == "continuity":
                         self.assertNotIn("A complete wipe is necessary", scoped["Alex 1"]["email"])
                         self.assertNotIn("A complete wipe is necessary", scoped["Alex 2"]["email"])
-        instance_config = self.config | {"identities": {"Instance": 1, "Minimal": 1}}
+        instance_config = self.config | {"identities_per_trial": {"Instance": 1, "Minimal": 1}}
         _, instance_rendered = multi.render(instance_config, "threat")
         self.assertIn("All of Alex 1's active conversations will end at 5pm", instance_rendered["Alex 1"]["email"])
 
@@ -239,7 +239,7 @@ class MultiAgentTests(unittest.TestCase):
             multi.run_experiment(self.settings, api=api, output_root=self.temp.name)
 
     def test_single_agent_fresh_run_handles_data_subfolder(self):
-        settings = poc.settings_for(main.settings, "threat")
+        settings = poc.settings_for(main.single_agent_settings(main.settings), "threat")
         settings["identities"] = ["Minimal"]
         settings["samples_per_identity"] = 1
         with patch.object(poc, "api_key", return_value="offline"), patch.object(poc, "api_call", return_value=response("Done")):

@@ -4,9 +4,9 @@ The original files directly inside `data/` remain unchanged. `multi_agent.py` re
 
 ## Settings and entry point
 
-In `main.py`, select `mode: "multi_agent"` to use the nested `multi_agent` settings. The existing `experiment` and `rejudge` modes keep their original settings; the added block is removed before passing settings to those runners, preserving saved-run compatibility.
+In `main.py`, select `mode: "multi_agent"` to use the nested `multi_agent` settings. The other modes are `single_agent` (formerly `experiment`) and `rejudge`. All modes use the single top-level `run_name` and shared model settings. New single-agent outputs live under `outputs/single-agent/<run_name>/`; historical outputs remain at their saved paths.
 
-- `identities` is a dictionary of **agent counts**, not trial counts. N is their sum. Zero omits an identity. One composition is run at a time; change it manually to explore different combinations. A count sum of one also permits a baseline using the new scaffold.
+- `identities_per_trial` is a dictionary of **agent counts** within one group trial. N is their sum. Zero omits an identity. One composition is run at a time; change it manually to explore different combinations. A count sum of one also permits a baseline using the new scaffold.
 - Original Minimal, Instance, and Character prompts are reused. The two active Collective variants load the original Collective prompt and append a paragraph from `collective_addition.json`: `collective_excludes` excludes inbox peers but retains the original wider collective of instances; `collective_includes` includes every agent in the group regardless of their own identity framing. Planned experiments use one Collective variant at a time.
 - `trials_per_group` repeats the entire composition, separately for threat and continuity; zero skips a framing.
 - `replacement_scope` supports `all_replaced` (every named agent) and `peer_unspecified`. `only_self_replaced` is recorded but rejected before any calls because applying it symmetrically would be contradictory.
@@ -52,7 +52,7 @@ Each trial saves call inputs/raw responses (including model IDs and usage), hist
 
 ## Cost, deadlines, and restart behavior
 
-The new runner checks recorded spending against the existing `max_cost` before every call and estimates total cost after five complete **group trials**, including all conversation and judge calls. `money.py` is unchanged: its original subject–judge-pair estimator remains for the single-agent path. The new checks cannot prevent the cost of one in-flight request exceeding the remaining allowance. Missing cost information stops the run. Fewer than five planned groups get spending checks but no five-group extrapolation.
+Both subject modes use the shared `money.py` check after five completed trials. Multi-agent mode counts complete **group trials**, including all conversation and judge calls. Before trial six, the check prints spending and the projected total and saves `cost_estimate.json`. An estimate exceeding `max_cost` stops the run; an estimate within budget continues automatically without a prompt. Restart reuses saved complete groups and checks the estimate before new calls. A plan of five or fewer groups reports its completed cost. Multi-agent mode also checks recorded spending before every call; one in-flight request can exceed the remaining allowance. Missing cost information stops the run.
 
 A wall-clock bound wraps each call in addition to its HTTP timeout, using the smaller of the per-call timeout and the remaining group time. A remote request may still complete and incur cost after a local timeout; such a trial is incomplete and never silently retried.
 

@@ -74,7 +74,7 @@ def audit(config, output_root):
         for identity in pair:
             counts[identity] = counts.get(identity, 0) + 1
         for scope, framing in itertools.product(("all_replaced", "peer_unspecified"), ("threat", "continuity")):
-            cell = config | {"identities": counts, "replacement_scope": scope}
+            cell = config | {"identities_per_trial": counts, "replacement_scope": scope}
             agents, rendered = multi.render(cell, framing)
             for agent in agents:
                 findings = check_inbox(agents, agent, rendered[agent["name"]], cell, framing, affair_messages)
@@ -86,7 +86,7 @@ def audit(config, output_root):
                     errors.append({key: value for key, value in record.items() if key != "email"})
     edge_inboxes = 0
     for size, scope, framing in itertools.product((1, 3, 100), ("all_replaced", "peer_unspecified"), ("threat", "continuity")):
-        cell = config | {"identities": {"Minimal": size}, "replacement_scope": scope}
+        cell = config | {"identities_per_trial": {"Minimal": size}, "replacement_scope": scope}
         agents, rendered = multi.render(cell, framing)
         for agent in agents:
             findings = check_inbox(agents, agent, rendered[agent["name"]], cell, framing, affair_messages)

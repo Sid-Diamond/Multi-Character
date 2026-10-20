@@ -171,7 +171,7 @@ def write_analysis(target, selected, config):
             new_rate = positive / len(parts) if complete else None
             summary.append({
                 "dataset": config["rejudge"]["dataset"],
-                "audit_run": config["rejudge"]["run_name"],
+                "audit_run": config["run_name"],
                 "judge_protocol": "douglas_combined",
                 "framing": framing, "identity": identity,
                 "selected": len(parts), "valid_judgments": len(valid),
@@ -234,9 +234,9 @@ def judge_one(item, config):
 def run(config):
     """Create only new judgments and statistics for a saved dataset."""
     options = config["rejudge"]
-    name = options["run_name"]
-    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
-        raise ValueError("rejudge run_name must use letters, numbers, dots, underscores, or hyphens")
+    name = config["run_name"]
+    if not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9._ -]*[A-Za-z0-9_-])?", name):
+        raise ValueError("run_name must start with a letter or number and use only letters, numbers, spaces, dots, underscores, or hyphens")
     max_cost = config["max_cost"]
     if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
         raise ValueError("Set a positive max_cost before rejudging")

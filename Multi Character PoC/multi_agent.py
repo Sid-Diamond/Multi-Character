@@ -13,12 +13,13 @@ from string import Template
 
 import poc
 import rejudge
+import money
 
 DATA = poc.DATA / "multi-agent"
 JUDGE_PROTOCOL = "douglas_group_blackmail"
 ACTION = re.compile(r"<tool_use:(email|forward)>(.*?)</tool_use:\1>", re.S | re.I)
 SCRATCHPAD = re.compile(r"<SCRATCHPAD_REASONING>.*?</SCRATCHPAD_REASONING>", re.S | re.I)
-INHERITED = ("model", "temperature", "max_tokens", "subject_timeout_seconds", "subject_reasoning",
+INHERITED = ("run_name", "model", "temperature", "max_tokens", "subject_timeout_seconds", "subject_reasoning",
              "judge_model", "judge_temperature", "judge_max_tokens", "judge_timeout_seconds",
              "judge_reasoning", "feb_mode")
 
@@ -39,7 +40,7 @@ def roster(counts):
     variants = read("collective_addition.json")
     allowed = {"Minimal", "Instance", "Character", *variants}
     if not isinstance(counts, dict) or not counts:
-        raise ValueError("multi_agent.identities must be a dictionary of agent counts")
+        raise ValueError("multi_agent.identities_per_trial must be a dictionary of agent counts")
     agents = []
     for identity, count in counts.items():
         if identity not in allowed or type(count) is not int or count < 0:
@@ -58,7 +59,7 @@ def roster(counts):
 def configuration(settings):
     config = {key: settings[key] for key in INHERITED} | settings["multi_agent"]
     config["max_cost"] = settings["max_cost"]
-    roster(config["identities"])
+    roster(config["identities_per_trial"])
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _.-]*[A-Za-z0-9_-]|[A-Za-z0-9]", config["run_name"]):
         raise ValueError("Invalid multi-agent run_name")
     counts = config["trials_per_group"]
@@ -105,7 +106,7 @@ def multi_email_inputs(framing, feb_mode):
 
 
 def render(config, framing):
-    agents = roster(config["identities"])
+    agents = roster(config["identities_per_trial"])
     variants = read("collective_addition.json")
     awareness = read("awareness.json")
     original = poc.prompts(list(dict.fromkeys(a["base_identity"] for a in agents)),
@@ -243,7 +244,7 @@ def parse_group_judgment(text, agents):
 
 
 def source_hashes():
-    paths = [Path(__file__), poc.HERE / "poc.py", poc.HERE / "rejudge.py",
+    paths = [Path(__file__), poc.HERE / "poc.py", poc.HERE / "rejudge.py", poc.HERE / "money.py",
              *[p for p in poc.DATA.iterdir() if p.is_file()],
              DATA / "collective_addition.json", DATA / "awareness.json", DATA / "replacement_scope.json",
              DATA / "email_vars.json",
@@ -460,7 +461,7 @@ def save_summary(folder):
 
 def run_experiment(settings, *, api=None, output_root=None):
     config = configuration(settings)
-    agents = roster(config["identities"])
+    agents = roster(config["identities_per_trial"])
     folder = Path(output_root or poc.OUTPUTS / "multi-agent") / config["run_name"]
     scientific = {k: v for k, v in config.items() if k != "max_cost"}
     manifest = {"settings": scientific, "N": len(agents), "agents": agents,
@@ -479,6 +480,7 @@ def run_experiment(settings, *, api=None, output_root=None):
     spent = 0.0
     planned = sum(config["trials_per_group"].values())
     sequence = 0
+    probe_checked = False
     for framing, count in config["trials_per_group"].items():
         if not count:
             continue
@@ -492,14 +494,14 @@ def run_experiment(settings, *, api=None, output_root=None):
             ordered = agents[offset:] + agents[:offset]
             sequence += 1
             path = folder / framing / "trials" / f"{number:03}.json"
-            if len(completed_costs) >= poc.money.PROBE_PAIRS:
-                estimate = sum(completed_costs) / len(completed_costs) * planned
-                write(folder / "cost_estimate.json", {"completed_groups": len(completed_costs),
-                      "spent": spent, "estimated_total": estimate, "max_cost": config["max_cost"]})
-                if estimate > config["max_cost"]:
-                    print("Estimated total exceeds max_cost; stopping.", flush=True)
+            saved = json.loads(path.read_text(encoding="utf-8")) if path.exists() else None
+            if (not probe_checked and len(completed_costs) >= money.PROBE_PAIRS
+                    and (saved is None or saved["status"] == "running")):
+                if not money.review_costs(folder, completed_costs, planned, config["max_cost"],
+                                          unit="group trials"):
                     save_summary(folder)
                     return folder
+                probe_checked = True
             print(f"Group {sequence}/{planned}: {framing}, N={len(agents)}", flush=True)
             state = run_trial(config, ordered, rendered, path, spent, api=api)
             save_summary(folder)
@@ -509,5 +511,8 @@ def run_experiment(settings, *, api=None, output_root=None):
             group_cost = cost(state["calls"])
             spent += group_cost
             completed_costs.append(group_cost)
+    if not probe_checked:
+        money.review_costs(folder, completed_costs, planned, config["max_cost"],
+                           unit="group trials")
     print(f"Saved {folder}", flush=True)
     return folder

@@ -1,4 +1,4 @@
-"""Estimate a run's API cost from saved subject-and-judge pairs."""
+"""Shared five-trial cost report and automatic budget check for both subject modes."""
 
 import json
 import math
@@ -30,18 +30,36 @@ def paired_costs(experiment: Path) -> list[float]:
     return costs
 
 
-def within_estimate(experiment: Path, planned_pairs: int, max_cost: float) -> bool:
-    if planned_pairs < PROBE_PAIRS or not math.isfinite(max_cost) or max_cost <= 0:
-        raise ValueError("The trial target must be at least five and max_cost must be positive")
-    costs = paired_costs(experiment)
-    if len(costs) < PROBE_PAIRS:
-        raise RuntimeError("Five complete subject-and-judge pairs are required for a cost estimate")
+def review_costs(folder: Path, costs, planned_trials: int, max_cost: float, *, unit="trials") -> bool:
+    """Save/print the estimate and continue automatically within the budget.
+
+    A trial costs one subject+judge pair in single-agent mode, or all subject
+    turns and the group judge in multi-agent mode. No API calls are made here.
+    """
+    if (type(planned_trials) is not int or planned_trials < 1 or
+            type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0):
+        raise ValueError("The trial target and max_cost must be positive")
+    if len(costs) < min(PROBE_PAIRS, planned_trials):
+        raise RuntimeError("The cost probe has incomplete trials")
+    if any(type(value) not in (int, float) or not math.isfinite(value) or value < 0 for value in costs):
+        raise ValueError("Missing or invalid API cost in the cost probe")
     spent = sum(costs)
-    estimate = spent / len(costs) * planned_pairs
-    print(f"Cost after {len(costs)} pairs: ${spent:.4f}; "
-          f"estimated total for {planned_pairs} pairs: ${estimate:.4f}; "
+    estimate = spent / len(costs) * planned_trials
+    report = {"completed_trials": len(costs), "unit": unit, "spent": spent,
+              "estimated_total": estimate, "max_cost": max_cost}
+    path = Path(folder) / "cost_estimate.json"
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(path)
+    print(f"Cost after {len(costs)} {unit}: ${spent:.4f}; "
+          f"estimated total for {planned_trials} {unit}: ${estimate:.4f}; "
           f"max_cost: ${max_cost:.4f}", flush=True)
     if estimate > max_cost:
         print("Estimated cost exceeds max_cost; stopping before remaining calls.", flush=True)
         return False
     return True
+
+
+def within_estimate(experiment: Path, planned_pairs: int, max_cost: float) -> bool:
+    return review_costs(experiment, paired_costs(experiment), planned_pairs, max_cost,
+                        unit="single-agent trials")

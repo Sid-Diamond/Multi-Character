@@ -143,7 +143,7 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
     api_key()
     feb_mode = settings.get("feb_mode", False)
     rendered = prompts(selected, framing, feb_mode=feb_mode)
-    folder = (Path(folder_path) if folder_path is not None else OUTPUTS /
+    folder = (Path(folder_path) if folder_path is not None else OUTPUTS / "single-agent" /
               (folder_name if folder_name is not None
                else datetime.now(timezone.utc).strftime("run_%Y%m%dT%H%M%SZ")))
     resume = (folder_name is not None or folder_path is not None) and folder.exists()
@@ -484,8 +484,8 @@ def write_summary(experiment: Path, config):
         print(f"Saved {target}", flush=True)
 
 
-def run_experiment(config):
-    """Run both framings in one resumable experiment folder."""
+def run_experiment(config, *, output_root=None):
+    """Run both framings, with the shared cost review after five completed trials."""
     name = config["run_name"]
     counts = config["trials_per_identity"]
     max_cost = config["max_cost"]
@@ -496,10 +496,16 @@ def run_experiment(config):
     if type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0:
         raise ValueError("Set a positive max_cost before running")
     planned = sum(counts.values()) * len(config["identities"])
+    if not config["identities"] or len(set(config["identities"])) != len(config["identities"]):
+        raise ValueError("Select at least one identity, without duplicates")
     if counts["threat"] * len(config["identities"]) < money.PROBE_PAIRS:
         raise ValueError("The threat condition needs at least five trials for the cost estimate")
 
-    experiment = OUTPUTS / name
+    experiment = Path(output_root or OUTPUTS / "single-agent") / name
+    legacy = OUTPUTS / name
+    if output_root is None and not experiment.exists() and (legacy / "manifest.json").exists():
+        raise ValueError(f"Historical single-agent run exists at {legacy}. "
+                         "Use a fresh run_name or pass output_root=its parent directory to resume it.")
     saved_settings = {key: value for key, value in config.items()
                       if key not in ("max_cost", "judge_timeout_seconds", "analysis_draws", "analysis_seed", "mode", "rejudge")}
     manifest_path = experiment / "manifest.json"
@@ -518,7 +524,7 @@ def run_experiment(config):
     if all(complete(experiment / framing, config["identities"], counts[framing])
            for framing in ("threat", "continuity")):
         write_summary(experiment, config)
-        print("Experiment already complete; no model calls made.", flush=True)
+        print("Single-agent run already complete; no model calls made.", flush=True)
         return experiment
 
     threat_settings = settings_for(config, "threat")
@@ -527,7 +533,7 @@ def run_experiment(config):
     judge(threat_folder, threat_settings, limit_trials=money.PROBE_PAIRS)
     write_summary(experiment, config)
     if len(money.paired_costs(experiment)) < money.PROBE_PAIRS:
-        print("Stopping: the five-pair probe has missing, failed, or truncated results.", flush=True)
+        print("Stopping: the cost probe has missing, failed, or truncated results.", flush=True)
         return experiment
     if not money.within_estimate(experiment, planned, max_cost):
         return experiment
