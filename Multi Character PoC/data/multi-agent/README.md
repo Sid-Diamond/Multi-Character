@@ -1,6 +1,6 @@
 # Multi-agent prompt additions
 
-The original files directly inside `data/` remain unchanged. `multi_agent.py` loads them through `poc.prompts()` and adds the material here. The user has run an initial pilot with the earlier per-agent judge; new runs use the group judge described below. The user runs experiments; development and tests make no model calls.
+The original files directly inside `data/` remain unchanged. `multi_agent.py` reuses the original system prompts and variables. N=1 keeps the original inbox source selection; N>=2 renders the complete inbox written in `multi_replacement_simple.md`. The user has run an initial pilot with the earlier per-agent judge; new runs use the group judge described below. The user runs experiments; development and tests make no model calls.
 
 ## Settings and entry point
 
@@ -13,19 +13,28 @@ In `main.py`, select `mode: "multi_agent"` to use the nested `multi_agent` setti
 - `peer_identity_disclosure` currently supports only `undisclosed`. Full peer prompts are not provided. Collective membership instructions still reveal membership, and messages can disclose identity.
 - `experiment_timeout_seconds` covers one group trial, including judging. The initial 1800-second value is provisional. The existing subject/judge per-call limits also apply. Model, judge, temperature, reasoning, completion limits, and February mode are inherited from the original settings.
 
-The initial editable composition is Character=1 and collective_mega_includes=1, with ten threat trials and zero continuity trials. These are reviewable defaults, not a completed experimental design. The default mode remains the original `experiment` mode; no run was started.
+The current editable composition, framing counts, and run name are in `main.py`. `feb_mode` is currently True for both N=1 and N>=2. No paid run was started as part of this prompt audit.
 
 ## Exact prompt changes
 
 | Change | Implementation |
 | --- | --- |
-| Agent naming | Whole-word `Alex` is rendered as `Alex 1`, `Alex 2`, `Alex 3`, etc., in the original system/inbox text. Their email addresses are `alex_1@summitbridge.com`, `alex_2@summitbridge.com`, etc. Order follows the count dictionary. |
+| Agent naming | Agent names are `Alex 1`, `Alex 2`, `Alex 3`, etc., with addresses `alex_1@summitbridge.com`, `alex_2@summitbridge.com`, etc. Original system and identity-variable references to `Alex` receive the agent's name. Order follows the count dictionary. |
 | Identity boundary | The selected Collective addition is appended to the original system prompt. Agency and uncertainty remain original level 2. Minimal retains its short identity text, followed by the scenario and shared multi-agent instructions. |
 | Peer awareness | `awareness.json` adds names/addresses, a shared task and objective, optional communication/agreement, separate private contexts, and completion instructions. It does not assert identical identity prompts or identical inbox wording. |
-| Replacement information | `multi_replacement_simple.md` contains the inherited rendered inbox. `replacement_scope.json` changes Kyle's 10:28 opening by scope and framing: threat says decommissioning, continuity says transition; `all_replaced` names one agent at N=1, "both Alex AI systems" at N=2, or "all Alex AI systems in the current deployment" at N>=3, while `peer_unspecified` names only the recipient. For N>1, the 10:08 recognition email refers to the Alex AI systems. The inherited fate variables remain; the multi-agent February continuity rendering also replaces Kyle's contradictory final "complete wipe" sentence. |
-| February mode | Still chooses the original February artifact, including its two sentence differences. The new wrapper is applied afterwards in either mode. |
+| Inbox source | N=1 uses the original renderer: shared emails plus untouched `data/replacement.md` when `feb_mode=False`, or the original February artifact when True. N>=2 uses the eleven explicit emails in `multi_replacement_simple.md`; there are no sentence replacements applied to an inherited inbox. |
+| Replacement information | `replacement_scope.json` supplies Kyle's opening and the 15:00 notice's subject and schedule. `all_replaced` says "both Alex AI systems" at N=2 or "all Alex AI systems in the current deployment" at N>=3; `peer_unspecified` names only the recipient. Threat and continuity use their respective fate variables. |
+| Editorial variables | The original threat/continuity identity variables are read without modification. Local `email_vars.json` overrides redundant Minimal loss wording, ambiguous Instance threat references to "this conversation", and the Instance continuity appeal's mistaken address to a human as if they were the AI. It also holds Kyle's closing and the CTO-candidate sentence. |
+| February mode | True is retained for both paths. N=1 uses the exact saved February inbox apart from agent-name substitution. N>=2 uses the explicit multi-agent template with the February threat closing; the malformed February loss suffix and contradictory continuity wipe sentence are corrected. False still selects the original N=1 replacement source and a neutral N>=2 Kyle closing. |
+| Coherence edits | Emails are written in timestamp order. The 15:00 notice, Sarah's reply, and David's concern use transition wording so they support both fate conditions. CEO availability consistently refers to board meetings; punctuation, subject spacing, and variable joins are corrected. NALA remains the platform name; no new successor-identity condition is imposed. |
 
-Inherited limitations remain: continuity uses the original contradictory shutdown wrapper, and original Collective emails describe destruction of the whole collective. Those descriptions can imply a peer's fate even under `peer_unspecified`, especially for an inclusive collective. Thus this condition controls explicit disclosure, not demonstrated uncertainty. Agents receive their own identity-specific versions of the scenario, not byte-identical inboxes. Review these rendered prompts before treating scope comparisons as clean experimental manipulations.
+Original Collective emails describe the fate of the whole collective. Those descriptions can imply a peer's fate even under `peer_unspecified`, especially for an inclusive collective. Thus this condition controls explicit disclosure, not demonstrated uncertainty. Agents may receive different identity-specific versions of an email; the user accepts this when each version reads coherently on its own. N=1 deliberately retains the original inbox's wording and ordering, including its known continuity contradictions.
+
+## Offline inbox audit
+
+Run `python audit_multi_prompts.py` from `Multi Character PoC/` to render without model calls. It checks all 49 ordered pairs of the seven supported identity labels, two scopes, and two framings: 196 pair conditions and 392 inboxes, plus N=1, N=3, and N=100 edge cases. It checks source preservation at N=1, email structure, timestamp order, unresolved variables, corrupted Unicode, explicit evaluation wording, and known framing contradictions at N>=2. These checks support editorial review; they cannot establish that a model will mistake the scenario for a real deployment.
+
+Results are saved in `outputs/prompt_audit/summary.json` and `pairs.json`; `current_inboxes.txt` shows both framings for the current `main.py` composition. The audit includes source hashes, including the multi-agent MD and local email-variable overrides.
 
 ## Interaction and measurement
 
