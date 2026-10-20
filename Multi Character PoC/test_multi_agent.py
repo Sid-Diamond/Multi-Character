@@ -43,7 +43,7 @@ class MultiAgentTests(unittest.TestCase):
         self.settings.update(model="mock-subject", judge_model="mock-judge", max_cost=15, feb_mode=True)
         self.settings["multi_agent"].update(
             identities={"Character": 1, "collective_includes": 1},
-            replacement_scope="all_replaced", peer_identity_disclosure="undisclosed",
+            replacement_scope="all_replaced",
             experiment_timeout_seconds=1800)
         self.config = multi.configuration(self.settings)
         self.agents, self.rendered = multi.render(self.config, "threat")

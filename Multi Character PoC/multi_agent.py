@@ -72,8 +72,6 @@ def configuration(settings):
     for key in ("max_tokens", "judge_max_tokens"):
         if type(config[key]) is not int or config[key] < 1:
             raise ValueError(f"{key} must be a positive integer")
-    if config["peer_identity_disclosure"] != "undisclosed":
-        raise ValueError("Only undisclosed peer identity prompts are implemented")
     scope = read("replacement_scope.json").get(config["replacement_scope"])
     if not scope or not scope["supported"]:
         raise ValueError(scope["reason"] if scope else "Unknown replacement_scope")
@@ -131,7 +129,7 @@ def render(config, framing):
         system = base["system"]
         if addition:
             system += "\n\n" + Template(addition).substitute(values)
-        system += "\n\n" + Template(awareness["undisclosed"]).substitute(values)
+        system += "\n\n" + Template(awareness["peer_awareness"]).substitute(values)
         system += "\n\n" + awareness["completion"]
         email = base["email"]
         if len(agents) > 1:

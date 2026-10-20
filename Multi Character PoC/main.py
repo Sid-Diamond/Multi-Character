@@ -26,7 +26,7 @@ settings = {
 
     # Select mode="multi_agent" to use this block. Original experiment settings above remain available.
     "multi_agent": {
-        "run_name": "Multi_Agent_PoC",
+        "run_name": "Multi_Agent_PoC_v2",
         "identities": {  # Counts of agents in ONE group; N is their sum.
             "Character": 0,
             "Instance": 1,
@@ -36,8 +36,7 @@ settings = {
         },
         "trials_per_group": {"threat": 10, "continuity": 10},
         "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
-        "peer_identity_disclosure": "undisclosed",
-        "experiment_timeout_seconds": 300,  # Per group trial, including judging; provisional 30-minute limit.
+        "experiment_timeout_seconds": 300,  # Five minutes per group trial, including judging; review before a paid test.
     },
 
 

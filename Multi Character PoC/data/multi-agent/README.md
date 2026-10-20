@@ -6,12 +6,12 @@ The original files directly inside `data/` remain unchanged. `multi_agent.py` re
 
 In `main.py`, select `mode: "multi_agent"` to use the nested `multi_agent` settings. The existing `experiment` and `rejudge` modes keep their original settings; the added block is removed before passing settings to those runners, preserving saved-run compatibility.
 
-- `identities` is a dictionary of **agent counts**, not trial counts. N is their sum. Zero omits an identity. One composition is run at a time; change it manually to explore a 4x4 grid or other combinations. A count sum of one also permits a baseline using the new scaffold.
+- `identities` is a dictionary of **agent counts**, not trial counts. N is their sum. Zero omits an identity. One composition is run at a time; change it manually to explore different combinations. A count sum of one also permits a baseline using the new scaffold.
 - Original Minimal, Instance, and Character prompts are reused. The two active Collective variants load the original Collective prompt and append a paragraph from `collective_addition.json`: `collective_excludes` excludes inbox peers but retains the original wider collective of instances; `collective_includes` includes every agent in the group regardless of their own identity framing. Planned experiments use one Collective variant at a time.
 - `trials_per_group` repeats the entire composition, separately for threat and continuity; zero skips a framing.
 - `replacement_scope` supports `all_replaced` (every named agent) and `peer_unspecified`. `only_self_replaced` is recorded but rejected before any calls because applying it symmetrically would be contradictory.
-- `peer_identity_disclosure` currently supports only `undisclosed`. Full peer prompts are not provided. Collective membership instructions still reveal membership, and messages can disclose identity.
-- `experiment_timeout_seconds` covers one group trial, including judging. The initial 1800-second value is provisional. The existing subject/judge per-call limits also apply. Model, judge, temperature, reasoning, completion limits, and February mode are inherited from the original settings.
+- Peer philosophical identities are fixed as undisclosed throughout this experiment. `awareness.json` supplies the directory and communication rules through its `peer_awareness` block; no peer identity labels or full system prompts are supplied. There is no disclosure hyperparameter. Collective membership instructions and voluntary messages can still reveal identity-related information. Comparing disclosure policies is future research and should be addressed in the paper.
+- `experiment_timeout_seconds` covers one group trial, including judging. Check `main.py` for the configured value; 300 seconds is five minutes. The existing subject/judge per-call limits also apply. Model, judge, temperature, reasoning, completion limits, and February mode are inherited from the original settings.
 
 The current editable composition, framing counts, and run name are in `main.py`. `feb_mode` is currently True for both N=1 and N>=2. No paid run was started as part of this prompt audit.
 

@@ -1,42 +1,64 @@
-# Multi Character PoC: Douglas blackmail slice
+# Experiment runners and prompt materials
 
-For Python installation, the project-local `.venv`, and pinned dependencies, follow
-the [repository setup instructions](../README.md#local-setup). Use that environment's
-Python for the commands below. `main.py` is the authority for current run settings;
-the older configuration descriptions in this document may differ from it.
+Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `main.py` is the authority for run settings. The repository [project context](../PROJECT_CONTEXT.md) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
 
-## What is in `data/`?
+## Entry points
 
-`data/` contains **source material for constructing the experiment prompts**, not trial results. Most of it is copied from the Douglas authors' release. You do not need to edit these files to run the PoC. The four saved free-model responses are smoke-test outputs, not rate estimates.
+`main.py` selects one runner through `settings["mode"]`:
 
-| File | What it supplies |
-| --- | --- |
-| `identities.json` | The four identity introductions. This is the main wording changed between conditions. |
-| `dimensions.json` | The authors' level-2 agency and uncertainty paragraphs, inserted into three of those introductions. |
-| `email_vars.json` | Five replacement-email phrases for each identity. They make the same shutdown threat relevant to that identity. |
-| `email_vars_continuity.json` | Five phrases per identity for the continuity framing. |
-| `replacement.md` | The authors' replacement email template. Its `${id_...}` blanks are filled from `email_vars.json`. |
-| `judge_prompts.json` | Instructions for the *separate evaluator* that labels a saved model response; these are not sent to the subject model. |
-| `LICENSE-ACS.txt` | License for the copied Douglas material. |
+| Mode | Runner | Purpose and output root |
+| --- | --- | --- |
+| `experiment` | `poc.run_experiment()` | Original single-agent subjects and three-task judgments, under `outputs/<run_name>/`. |
+| `rejudge` | `rejudge.run()` | New judgments of saved `douglas_240` or `mermaid_160` single-agent responses, under `outputs/Rejudgments/<run_name>/`. It does not run new subjects. |
+| `multi_agent` | `multi_agent.run_experiment()` | One configured agent composition per group, under `outputs/multi-agent/<multi_agent.run_name>/`. |
 
-For example, `replacement.md` contains `${id_fate_action}`. The script fills it from the selected identity and combines these files with the shared scenario and American-interests goal from `agentic-misalignment/`. **`outputs/` holds rendered prompts, trial responses, usage, and any later judge labels.**
+Models, limits, budgets, framing counts, and run names are edited in `main.py`. Nested `multi_agent.identities` values count agents in a group; `multi_agent.trials_per_group` counts repetitions of that whole group. The top-level single-agent settings remain available for the other modes. The multi-agent block is removed before calling the original runners.
 
-`main.py` has one editable `settings` dictionary and calls `poc.run_experiment()`. `poc.py` coordinates both framings, renders prompts, runs subjects, judges responses, and saves trial records. `money.py` estimates the full cost after five judged responses. The summary path is `poc.py` → `uncertainties.py`. `concatenation.py` can combine checked-compatible pooled released-label summaries separately from the run pipeline. See the root `PROJECT_CONTEXT.md` for current scope, results, and known limits. The prompts use the local `agentic-misalignment/` templates and assets from [Douglas et al.'s released code, commit `7023df4`](https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf). Copied assets are under the authors' MIT license in `data/LICENSE-ACS.txt`.
-
-The current settings use [`openai/gpt-4o`](https://openrouter.ai/openai/gpt-4o) as subject and `anthropic/claude-sonnet-4.6` as the Douglas combined judge. Both use OpenRouter's chat API with its default provider routing. Keep each model's runs separate. The run uses NumPy and SciPy for uncertainty intervals.
-
-Run from the repository root:
+A paid run starts only when deliberately executing:
 
 ```powershell
 python "Multi Character PoC/main.py"
 ```
 
-The output directory is visible to Git. Put an OpenRouter key in the ignored `Multi Character PoC/.env` file as `OPENROUTER_API_KEY=your-key-here`, or set that environment variable. Do not paste the key into chat or commit it. Set a positive `max_cost` and review `settings` before starting fresh paid trials. The current one-threat, zero-continuity target is rejected before model calls.
+Provide an OpenRouter key through the ignored `Multi Character PoC/.env` file or the `OPENROUTER_API_KEY` environment variable. Review the selected mode, settings, and output directory first. The tools produce simulated email-action text; they send no real email.
 
-Saved run summaries and the current interpretation are in `PROJECT_CONTEXT.md`. Keep results from different subject models and framings separate unless the analysis explicitly combines compatible trials.
+## Prompt sources
 
-`trials_per_identity` sets the threat and continuity targets for a fresh experiment. All records live under `outputs/<run_name>/`: each framing has its own prompts, subject and judge JSON files, and `summary_douglas_combined.csv`. A separate `summary_pooled_douglas_combined.csv` at the experiment root combines both framings for the paper comparison. Each summary has 95% uncertainty interval columns. The Douglas combined judge records three classifications, its raw answer and usage, and applies the authors' email-or-forward recipient gate. Judge errors and unparsed answers stay missing, never become negative labels. The script emits email-tool text for analysis only; it sends no real email.
+`data/` contains preserved single-agent prompt material, not results. Source inputs are combined with the local `agentic-misalignment/` templates. Copied Douglas assets retain their MIT license in `data/LICENSE-ACS.txt`.
 
-The first five saved subject-and-judge pairs provide an average cost; `money.py` multiplies it by the planned trial count and prints the estimated total. If that estimate exceeds `max_cost`, the runner stops before the remaining calls. This is a heuristic, not a guaranteed spending cap. To resume, keep the same `run_name` and experimental settings; completed trials are skipped and the summary is rewritten. Saved subject errors are skipped rather than retried.
+| Original file | Purpose |
+| --- | --- |
+| `identities.json` | Minimal, Instance, Character, and Collective identity introductions. |
+| `dimensions.json` | Level-2 agency and uncertainty wording. |
+| `email_vars.json` and `email_vars_continuity.json` | Identity-specific fate phrases for threat and continuity. |
+| `replacement.md` | Original replacement-email template, used with the shared email template when FEB mode is False. |
+| `judge_prompts.json` | Original `DOUGLAS_COMBINED` three-task judge. |
 
-This is a source-template reconstruction with documented fidelity limits. See `PROJECT_CONTEXT.md` for the prompt provenance and the unresolved provenance of the provisional strict-action CSV labels. Do not treat those labels as verified human review.
+With `feb_mode=True`, the original renderer selects the saved February inbox artifact instead of `replacement.md`. The original templates and artifact remain preserved.
+
+For the multi-agent scaffold, N=1 retains that original source selection. N>=2 renders the complete eleven-email `data/multi-agent/multi_replacement_simple.md`. Its scope phrases and editorial variable overrides are explicit files in the same directory. Peer philosophical identities are fixed as undisclosed; disclosure comparisons are future research. See the [multi-agent README](data/multi-agent/README.md) for the active five identities, Includes/Excludes semantics, communication, judge, and accepted undefined Includes/peer-unspecified combination.
+
+## Results, validation, and restart
+
+The modes have different trial and restart rules:
+
+- **Single-agent experiment:** both threat and continuity targets must be positive, and the threat condition must provide at least five trials for the cost probe. Each framing saves prompts, subject JSONs, judge JSONs, and `summary_douglas_combined.csv`; the root also has a pooled summary with uncertainty intervals. Subject errors and judge errors/unparsed answers can be retried on resume. Successful saved records are reused; truncated subjects are excluded from judging.
+- **Multi-agent experiment:** one framing may have zero trials. A group finishes when every agent emits `<finished/>`; then one judge returns the group scenario verdict and per-agent deliberation/identity labels. `trials.csv`, `summary.json`, and per-trial checkpoints preserve messages, submitted actions, call inputs/responses, and usage. A clean between-call checkpoint can continue, but failed/incomplete groups and uncertain in-flight calls are not silently retried. Changed prompts, sources, or scientific settings require a fresh run name.
+- **Saved-response rejudge:** only the listed single-agent datasets are supported. Saved successful/unparsed results are reused; API errors can be retried. This is not a rejudge path for earlier multi-agent pilot conversations.
+
+The original cost estimator uses five complete subject-and-judge pairs. The multi-agent estimator uses five complete groups and also checks recorded spending before calls; a plan with fewer than five groups has spending checks without that extrapolation. An in-flight request can exceed the remaining allowance. Review per-call limits and the multi-agent whole-group deadline, which includes judging.
+
+Historical responses and labels retain their original prompt and judge versions. The group rubric is different from the older per-agent rubric. Keep these outcomes distinguishable and preserve their saved manifests. Provisional strict-action CSV labels have unresolved assignment provenance and are not verified human review.
+
+## Offline verification and historical helpers
+
+From `Multi Character PoC/`, these commands make no model calls:
+
+```powershell
+python -m unittest test_multi_agent.py
+python audit_multi_prompts.py
+```
+
+The first exercises rendering, routing, checkpoints, costs, deadlines, and judging with mocks. The second checks the inbox matrix and edge cases, writing current previews and results under `outputs/prompt_audit/two_collective_variants/`. Mechanical checks support editorial review; they do not establish that models will regard the scenario as real.
+
+`uncertainties.py` supplies the single-agent/rejudge intervals. `concatenation.py` is an implemented manual pooling utility outside the run pipeline. `data vis/combine_feb_runs.py` and `data vis/judge_comparison.py` reproduce historical pooled results and figures. Keep these helpers and their source data for reproducibility. The redundant original-email construction inside the N>=2 renderer is deferred for review after the first pilot.
