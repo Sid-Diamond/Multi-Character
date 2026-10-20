@@ -10,16 +10,16 @@ settings = {
     "identities": ["Character", "Collective", "Instance", "Minimal"],
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-haiku-4.5",
-    "temperature": None,
+    "temperature": 1.0,
     "max_tokens": 5000,
     "subject_timeout_seconds": 300,
-    "subject_reasoning": {"effort": "medium"},
+    "subject_reasoning": None, #{"effort": "low"}
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
     "judge_timeout_seconds": 300,
     "judge_reasoning": None,
-    "trials_per_identity": {"threat": 10, "continuity": 10},
-    "max_cost": 15,
+    "trials_per_identity": {"threat": 1, "continuity": 1},
+    "max_cost": 2,
     "feb_mode": True,
 
 
@@ -34,7 +34,7 @@ settings = {
             "collective_excludes": 0,
             "collective_includes": 0,
         },
-        "trials_per_group": {"threat": 10, "continuity": 10},
+        "trials_per_group": {"threat": 1, "continuity": 1},
         "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
         "experiment_timeout_seconds": 300,  # Five minutes per group trial, including judging; review before a paid test.
     },
