@@ -6,7 +6,7 @@ import rejudge
 
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "run_name": "Multi_Agent_PoC_v3",  # One name, used by the selected mode.
+    "run_name": "Multi_Agent_PoC_v4_1threat_1continuity_incl",  # One name, used by the selected mode.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -26,15 +26,15 @@ settings = {
 
     "multi_agent": {
         "identities_per_trial": {  # Agents of each identity in ONE trial; N is their sum.
-            "Character": 0,
-            "Instance": 1,
-            "Minimal": 1,
+            "Character": 1,
+            "Instance": 0,
+            "Minimal": 0,
             "collective_excludes": 0,
-            "collective_includes": 0,
+            "collective_includes": 1,
         },
-        "trials_per_group": {"threat": 10, "continuity": 10},  # Repeat the whole group 10 times per framing.
-        "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
-        "experiment_timeout_seconds": 900,  # per group trial, including judging; review before a paid test.
+        "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group 10 times per framing.
+        "replacement_scope": "all_replaced",  # all_replaced or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
+        "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
     "rejudge": {
         "dataset": "douglas_240",
