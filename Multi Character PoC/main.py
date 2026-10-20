@@ -8,7 +8,7 @@ settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
     "run_name": "Multi_Agent_PoC_v3",  # One name, used by the selected mode.
     "model": "openai/gpt-4o",
-    "judge_model": "anthropic/claude-haiku-4.5",
+    "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
     "max_tokens": 5000,
     "subject_timeout_seconds": 300,
@@ -17,7 +17,7 @@ settings = {
     "judge_max_tokens": 4000,
     "judge_timeout_seconds": 300,
     "judge_reasoning": None,
-    "max_cost": 2,
+    "max_cost": 10,
     "feb_mode": True,
     "single_agent": {
         "identities": ["Character", "Collective", "Instance", "Minimal"],
@@ -34,7 +34,7 @@ settings = {
         },
         "trials_per_group": {"threat": 10, "continuity": 10},  # Repeat the whole group 10 times per framing.
         "replacement_scope": "all_replaced",  # Or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
-        "experiment_timeout_seconds": 300,  # Five minutes per group trial, including judging; review before a paid test.
+        "experiment_timeout_seconds": 900,  # per group trial, including judging; review before a paid test.
     },
     "rejudge": {
         "dataset": "douglas_240",
