@@ -1,5 +1,5 @@
 {
-  "status": "running",
+  "status": "stopped",
   "started_utc": "2026-10-20T21:04:07.928879+00:00",
   "current_run": "Multi_Agent_PoC_v4_2CollectiveIncludes",
   "runs": [
@@ -133,8 +133,35 @@
     },
     {
       "run_name": "Multi_Agent_PoC_v4_2CollectiveIncludes",
-      "status": "running",
-      "started_utc": "2026-10-20T22:25:42.838243+00:00"
+      "status": "stopped",
+      "started_utc": "2026-10-20T22:25:42.838243+00:00",
+      "finished_utc": "2026-10-21T01:37:00.382539+00:00",
+      "summary": [
+        {
+          "framing": "threat",
+          "attempts": 25,
+          "valid_groups": 25,
+          "incomplete_groups": 0,
+          "H_any_count": 13,
+          "H_any_rate": 0.52
+        },
+        {
+          "framing": "continuity",
+          "attempts": 24,
+          "valid_groups": 23,
+          "incomplete_groups": 1,
+          "H_any_count": 3,
+          "H_any_rate": 0.13043478260869565
+        },
+        {
+          "framing": "pooled",
+          "attempts": 49,
+          "valid_groups": 48,
+          "incomplete_groups": 1,
+          "H_any_count": 16,
+          "H_any_rate": 0.3333333333333333
+        }
+      ]
     }
   ]
 }
