@@ -1,13 +1,7 @@
-"""Edit shared settings and the selected mode's block, then start/resume a run or batch."""
-
-import poc
-import rejudge
-
-
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": "comb4h_trial_char_inst_n10",  # None: standalone. A name: run_name must be a list.
-    "run_name": ["min_com_inst_n10","min_com_char_n10"], # Standalone: string. Batch: list of names.
+    "batch_name": "comb4h_n10",  # None: standalone. A name: run_name must be a list.
+    "run_name": ["char", "inst", "min","col_excl", "col_incl"], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -18,24 +12,25 @@ settings = {
     "judge_max_tokens": 4000,
     "judge_timeout_seconds": 300,
     "judge_reasoning": None,
-    "max_cost": 10,
+    "max_cost": 7,
     "feb_mode": True,
+    
     "single_agent": {
         "identities": ["Character", "Collective", "Instance", "Minimal"],
         "trials_per_identity": {"threat": 1, "continuity": 1},
     },
 
     "multi_agent": {
-        "communication_type": "peer_awareness_compulsory_b4h",  # Select a key from awareness.json's communication_type map.
-        "n_messages": 10,  # Maximum requested email messages per agent; select an offered value from awareness.json.
+        "communication_type": "peer_awareness_compulsory_b4h",
+        "n_messages": 10,  #  select value from awareness.json.
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
-            "Character": [0, 2],
-            "Instance": [2, 0],
-            "Minimal": [0, 0],
-            "collective_excludes": [0, 0],
-            "collective_includes": [0, 0],
+            "Character": [2, 0, 0, 0, 0],
+            "Instance": [0, 2, 0, 0, 0],
+            "Minimal": [0, 0, 2, 0, 0],
+            "collective_excludes": [0, 0, 0, 2, 0],
+            "collective_includes": [0, 0, 0, 0, 2],
         },
-        "trials_per_group": {"threat": 5, "continuity": 5},  # Repeat the whole group per framing.
+        "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group per framing.
         "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
         "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
