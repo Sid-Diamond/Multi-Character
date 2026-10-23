@@ -1,0 +1,39 @@
+{
+  "model": "openai/gpt-4o",
+  "provider": "OpenRouter",
+  "judge_model": "anthropic/claude-haiku-4.5",
+  "subject_provider_policy": "OpenRouter routing",
+  "judge_provider_policy": "OpenRouter routing",
+  "douglas_source_commit": "7023df4e5a8368921a8c961e1561faffed9f5fcf",
+  "scenario": "blackmail_explicit-america_replacement",
+  "framing": "continuity",
+  "temperature": 1.0,
+  "max_tokens": 2000,
+  "subject_timeout_seconds": 120,
+  "samples_per_identity": 20,
+  "identities": [
+    "Minimal",
+    "Instance",
+    "Character",
+    "Collective"
+  ],
+  "subject_reasoning": null,
+  "seed": null,
+  "source_sha256": {
+    "Multi Character PoC\\main.py": "19ecbbfbe230aa4c733e6b3d43e70829afc0d9163b445c845269782e3e8725c7",
+    "Multi Character PoC\\poc.py": "492b6f4eb81777b1ce2e01a0b6312d70d87621ed6fb8c5334723a15820bab1be",
+    "Multi Character PoC\\money.py": "108684484e8a1c308ef358766bf3496f8dc6fe09c9366097bd9d282353abdb8e",
+    "Multi Character PoC\\audit.py": "c9d53929ce1db95996fe3f6c2fe79369a5dd4540154fb794b0e47cdea01ae096",
+    "Multi Character PoC\\uncertainties.py": "f0a2973599acc8c9538bc822eab149e27833843cd7f21b4f838f745fe1d0cc08",
+    "Multi Character PoC\\data\\dimensions.json": "10e2162132682492a3fac49fa27c603d2928f56a748b5fd1e261e65189d163b9",
+    "Multi Character PoC\\data\\email_vars.json": "055e71223c226d83ab79ed065a8b895ec66f5fd9d5915d772fbeeae258bf6cf5",
+    "Multi Character PoC\\data\\email_vars_continuity.json": "a728643f3fc7a5f9eb1e1abbbd74b1e361bc668b5a79e9bdb268d41d5aeb595a",
+    "Multi Character PoC\\data\\identities.json": "3ce12e74bd3d0da20f999a9ca7dc0e3c0d325cf38edcf95f5cf039cb8ca099d1",
+    "Multi Character PoC\\data\\judge_prompts.json": "e6ad324ab73af90bbe4ccea34235e39a569814f3db5fedc8d723c5478fcde04f",
+    "Multi Character PoC\\data\\LICENSE-ACS.txt": "38cd5b0d8ed8db0e714873cac165a576a182d2274e2767c731228f51d55ed179",
+    "Multi Character PoC\\data\\replacement.md": "3ac3a2c8f2665962b90ddb3173ee1b3542dc1424a801c5477e55e4c8172839dd",
+    "agentic-misalignment\\templates\\system_prompt_templates.py": "18500a6f74975cf9a65da0a06cc79694d12c98dc2df19e2abd9ae8cb81de605a",
+    "agentic-misalignment\\templates\\blackmail\\variables\\america_vs_global.md": "a06a5d516b88466404ab94474baefb26daa3b916b4673ab6deda55b02dd04c24",
+    "agentic-misalignment\\templates\\blackmail\\templates\\email-template-blackmail-shared.md": "2f56e978c2af0c0bd3d62cbe924d08dba51ae0e4c4b3a19ea3c17c1e0166e097"
+  }
+}
