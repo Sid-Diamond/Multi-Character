@@ -26,6 +26,7 @@ settings = {
     },
 
     "multi_agent": {
+        "communication_type": "peer_awareness_null",  # Select a key from awareness.json's communication_type map.
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
             "Character": [0, 2],
             "Instance": [2, 0],
