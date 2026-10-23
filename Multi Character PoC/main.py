@@ -7,7 +7,7 @@ import rejudge
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
     "batch_name": "No_com_trial_char_inst",  # None: standalone. A name: run_name must be a list.
-    "run_name": "min_com_char","min_com_inst"  # Standalone: string. Batch: list of names.
+    "run_name": ["min_com_inst","min_com_char"], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -27,11 +27,11 @@ settings = {
 
     "multi_agent": {
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
-            "Character": 0, 2,
-            "Instance": 2, 0,
-            "Minimal": 0, 0,
-            "collective_excludes": 0, 0,
-            "collective_includes": 0, 0,
+            "Character": [0, 2],
+            "Instance": [2, 0],
+            "Minimal": [0, 0],
+            "collective_excludes": [0, 0],
+            "collective_includes": [0, 0],
         },
         "trials_per_group": {"threat": 5, "continuity": 5},  # Repeat the whole group per framing.
         "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
