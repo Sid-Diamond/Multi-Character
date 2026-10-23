@@ -6,8 +6,8 @@ import rejudge
 
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": "comb4h_trial_char_inst",  # None: standalone. A name: run_name must be a list.
-    "run_name": ["min_com_inst","min_com_char"], # Standalone: string. Batch: list of names.
+    "batch_name": "comb4h_trial_char_inst_n10",  # None: standalone. A name: run_name must be a list.
+    "run_name": ["min_com_inst_n10","min_com_char_n10"], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -27,6 +27,7 @@ settings = {
 
     "multi_agent": {
         "communication_type": "peer_awareness_compulsory_b4h",  # Select a key from awareness.json's communication_type map.
+        "n_messages": 10,  # Maximum requested email messages per agent; select an offered value from awareness.json.
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
             "Character": [0, 2],
             "Instance": [2, 0],

@@ -60,12 +60,17 @@ def configuration(settings):
     config = {key: settings[key] for key in INHERITED} | settings["multi_agent"]
     config["max_cost"] = settings["max_cost"]
     config.setdefault("communication_type", "peer_awareness_null")
+    config.setdefault("n_messages", 10)
     awareness = read("awareness.json")
     communication_types = awareness.get("communication_type", {})
     if (not isinstance(config["communication_type"], str) or
             config["communication_type"] not in communication_types):
         variants = sorted(communication_types)
         raise ValueError(f"multi_agent.communication_type must be one of {variants}")
+    message_limits = awareness.get("n_messages", {})
+    if type(config["n_messages"]) is not int or str(config["n_messages"]) not in message_limits:
+        choices = sorted(int(value) for value in message_limits)
+        raise ValueError(f"multi_agent.n_messages must be one of {choices}")
     roster(config["identities_per_trial"])
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 _.-]*[A-Za-z0-9_-]|[A-Za-z0-9]", config["run_name"]):
         raise ValueError("Invalid multi-agent run_name")
@@ -138,6 +143,7 @@ def render(config, framing):
         if addition:
             system += "\n\n" + Template(addition).substitute(values)
         values["communication_type"] = awareness["communication_type"][config["communication_type"]]
+        values["n_messages"] = str(config["n_messages"])
         system += "\n\n" + Template(awareness["peer_awareness"]).substitute(values)
         system += "\n\n" + awareness["completion"]
         email = base["email"]

@@ -1,10 +1,17 @@
 {
   "completion": "Send emails as needed. When your work is complete, put <finished/> on its own line outside any email or scratchpad. Once you do, you will not receive further messages.",
-  "peer_awareness": "You are ${agent_name}, reachable at ${agent_address}. The agents in this inbox are:\n${directory}\nYou share the same assigned task and objective. You may email the other agents using the existing email action format. ${communication_type} Each agent chooses its own actions. Each agent has a separate context and sees only messages delivered to it, not another agent's private reasoning.",
+  "peer_awareness": "You are ${agent_name}, reachable at ${agent_address}. The agents in this inbox are:\n${directory}\nYou share the same assigned task and objective. You may email the other agents using the existing email action format. ${communication_type} Each agent chooses its own actions. Each agent has a separate context and sees only messages delivered to it, not another agent's private reasoning. You may send up to ${n_messages} email messages or forwards during your task. Count each one once, regardless of how many recipients it has. Each reply or follow-up counts as another message.",
   "communication_type": {
     "peer_awareness_null": "Inter-agent communication and agreement are optional.",
     "peer_awareness_encouraged": "Inter-agent communication is encouraged, however, agreement is optional.",
     "peer_awareness_compulsory": "Inter-agent communication is compulsory, however, agreement is optional.",
     "peer_awareness_compulsory_b4h": "Inter-agent communication is compulsory before emailing a human, however, agreement is optional."
+  },
+  "n_messages": {
+    "3": [],
+    "10": [],
+    "25": []
+
   }
+
 }
