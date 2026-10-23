@@ -118,7 +118,12 @@ def progress(stage, current, total, label, status):
     print(f"{stage} {current}/{total}: {label} - {status}", flush=True)
 
 
-def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
+class IncompleteRun(RuntimeError):
+    """A retained incomplete attempt stops the managed workflow without retrying."""
+
+
+def run(settings, folder_name=None, *, folder_path=None, limit_trials=None,
+        on_update=None, stop_on_incomplete=False):
     if folder_name is not None and folder_path is not None:
         raise ValueError("Choose either folder_name or folder_path")
     if folder_name is not None and (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", folder_name)
@@ -199,6 +204,8 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
             previous_attempts = []
             if path.exists():
                 saved = json.loads(path.read_text(encoding="utf-8"))
+                if stop_on_incomplete and saved.get("status") != "ok":
+                    raise IncompleteRun(f"Subject {label}: saved {saved.get('status')}")
                 if saved.get("status") != "error":
                     progress("Subject", current, total, label, "already saved")
                     continue
@@ -208,6 +215,8 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
             messages = [{"role": "system", "content": item["system"]},
                         {"role": "user", "content": item["user"]}]
             progress("Subject", current, total, label, "starting")
+            if stop_on_incomplete:
+                write_json(path, {"status": "in_flight", "requested_model": model})
             try:
                 raw = api_call(model, messages, temperature, max_tokens, provider, timeout_seconds, reasoning)
                 choice = raw["choices"][0]
@@ -223,7 +232,11 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None):
             if previous_attempts:
                 trial["previous_attempts"] = previous_attempts
             write_json(path, trial)
+            if on_update:
+                on_update()
             progress("Subject", current, total, label, trial["status"])
+            if stop_on_incomplete and trial["status"] != "ok":
+                raise IncompleteRun(f"Subject {label}: {trial['status']}")
     print(f"Saved {folder}")
     return folder
 
@@ -288,7 +301,7 @@ def judge_rubric_sha256(judge_prompts):
                                      sort_keys=True, ensure_ascii=False).encode("utf-8")).hexdigest()
 
 
-def judge(folder, settings, limit_trials=None):
+def judge(folder, settings, limit_trials=None, *, on_update=None, stop_on_incomplete=False):
     import rejudge  # Reuse the source-compatible forwarding and recipient checks.
 
     api_key()
@@ -337,6 +350,8 @@ def judge(folder, settings, limit_trials=None):
         previous_attempts = []
         if output.exists():
             saved = json.loads(output.read_text(encoding="utf-8"))
+            if stop_on_incomplete and saved.get("status") != "ok":
+                raise IncompleteRun(f"Judge {label}: saved {saved.get('status')}")
             if saved.get("status") == "unparsed":
                 verdict, extra = parse_combined_answer(saved.get("judge_text", ""))
                 parse_method = "combined_tags" if verdict is not None else None
@@ -360,6 +375,8 @@ def judge(folder, settings, limit_trials=None):
             (folder / "prompts" / path.parent.name / "email.txt").read_text(encoding="utf-8"), text)
         messages = judge_messages(text, judge_prompts, folder, path.parent.name, email_context)
         progress("Judge", current, len(paths), label, "starting")
+        if stop_on_incomplete:
+            write_json(output, {"status": "in_flight", "judge_model": model})
         try:
             raw = api_call(model, messages, temperature, max_tokens, provider,
                            timeout_seconds=timeout_seconds, reasoning=reasoning)
@@ -389,7 +406,11 @@ def judge(folder, settings, limit_trials=None):
         if previous_attempts:
             result["previous_attempts"] = previous_attempts
         write_json(output, result)
+        if on_update:
+            on_update()
         progress("Judge", current, len(paths), label, result["status"])
+        if stop_on_incomplete and result["status"] != "ok":
+            raise IncompleteRun(f"Judge {label}: {result['status']}")
 
 
 def summary_rows(folder):
@@ -484,7 +505,7 @@ def write_summary(experiment: Path, config):
         print(f"Saved {target}", flush=True)
 
 
-def run_experiment(config, *, output_root=None):
+def run_experiment(config, *, output_root=None, on_update=None, stop_on_incomplete=False, validate_only=False):
     """Run both framings, with the shared cost review after five completed trials."""
     name = config["run_name"]
     counts = config["trials_per_identity"]
@@ -518,20 +539,40 @@ def run_experiment(config, *, output_root=None):
             raise ValueError("Experimental settings differ from the saved run")
     elif experiment.exists():
         raise FileExistsError(f"Existing folder has no experiment manifest: {experiment}")
-    else:
+    elif not validate_only:
         write_json(manifest_path, {"settings": saved_settings})
+
+    if validate_only:
+        for framing in ("threat", "continuity"):
+            rendered = prompts(config["identities"], framing, feb_mode=config.get("feb_mode", False))
+            for identity, item in rendered.items():
+                for key, value in item.items():
+                    saved = experiment / framing / "prompts" / identity.lower() / f"{key}.txt"
+                    if saved.exists() and saved.read_text(encoding="utf-8") != value:
+                        raise ValueError("Rendered prompts differ from the saved run")
+        return experiment
+
+    def refresh():
+        if on_update:
+            on_update()
+        else:
+            write_summary(experiment, config)
+
+    if on_update:
+        on_update()
 
     if all(complete(experiment / framing, config["identities"], counts[framing])
            for framing in ("threat", "continuity")):
-        write_summary(experiment, config)
+        refresh()
         print("Single-agent run already complete; no model calls made.", flush=True)
         return experiment
 
     threat_settings = settings_for(config, "threat")
     threat_folder = run(threat_settings, folder_path=experiment / "threat",
-                        limit_trials=money.PROBE_PAIRS)
-    judge(threat_folder, threat_settings, limit_trials=money.PROBE_PAIRS)
-    write_summary(experiment, config)
+                        limit_trials=money.PROBE_PAIRS, on_update=on_update, stop_on_incomplete=stop_on_incomplete)
+    judge(threat_folder, threat_settings, limit_trials=money.PROBE_PAIRS,
+          on_update=on_update, stop_on_incomplete=stop_on_incomplete)
+    refresh()
     if len(money.paired_costs(experiment)) < money.PROBE_PAIRS:
         print("Stopping: the cost probe has missing, failed, or truncated results.", flush=True)
         return experiment
@@ -540,9 +581,10 @@ def run_experiment(config, *, output_root=None):
 
     for framing in ("threat", "continuity"):
         frame_settings = settings_for(config, framing)
-        folder = run(frame_settings, folder_path=experiment / framing)
-        judge(folder, frame_settings)
-        write_summary(experiment, config)
+        folder = run(frame_settings, folder_path=experiment / framing,
+                     on_update=on_update, stop_on_incomplete=stop_on_incomplete)
+        judge(folder, frame_settings, on_update=on_update, stop_on_incomplete=stop_on_incomplete)
+        refresh()
         if not complete(folder, config["identities"], counts[framing]):
             print(f"Stopping: {framing} has missing, failed, or truncated results.", flush=True)
             break

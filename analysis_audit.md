@@ -1,12 +1,39 @@
 # Analysis and output audit
 
 Started: 23 October 2026.
+Updated: 23 October 2026 after implementation and offline verification.
 
 This is the evolving audit and implementation task list for experiment setup,
 saved outputs, and analysis. Use `PROJECT_CONTEXT.md` for current experiment
 status. Items below distinguish the user's intended workflow, inspected behavior,
 and proposals that still need discussion. No implementation changes are authorized
 by this document alone.
+
+## Implementation status
+
+The user authorized implementation on a separate branch, `batch-csv-workflow`,
+created from `multi-agent-poc`. Changes are saved locally and uncommitted.
+The new workflow applies to `multi_agent`, `single_agent`, and `rejudge`.
+`run_workflow.py` handles setup, whole-plan validation, compact queue records,
+and sequential execution; `csv_exports.py` handles structured exports and batch
+concatenation. Existing runners received narrow validation/export hooks; legacy
+direct interfaces and the historical queue runner remain available.
+
+All 40 offline tests pass, covering all modes, whole-batch validation, completed
+work reuse, settings/source conflicts, mixed agent counts, roster alignment,
+failed trials, and interrupted calls. A read-only, in-memory export of the 249
+historical attempts matched outcomes, communication counts, and $18.149514 in
+recorded costs. It retained 498 agent records, including both agents from the
+failed trial, and left missing judgment/usage values unknown. That check took
+about half a second and wrote no files. These checks verify export and workflow
+behavior, not scientific label accuracy.
+
+No paid calls were made and no historical outputs or analysis were changed.
+Operational READMEs now describe the new workflow. Remaining work is final diff
+review and the deferred audit/analysis tasks below; no live experiment is
+authorized. The current `main.py` name points to historical output: select a
+fresh name before new work. This branch changes pinned sources, so the old
+queue cannot resume under it without its original compatible source version.
 
 ## Scope and agreed direction
 
@@ -22,7 +49,7 @@ by this document alone.
   current layout contains `threat/`, `continuity/`, `manifest.json`,
   `summary.json`, `cost_estimate.json`, and `trials.csv`. Per-trial JSON records
   are inside the framing folders.
-- Current priority: design comprehensive per-run CSV exports and their batch
+- Current implementation: comprehensive per-run CSV exports and their batch
   concatenation. Summaries, plots, and other analysis can wait. Scientific trial
   data and diagnostics/usage will use separate files, both one row per trial.
   Full written subject outputs and judge explanations remain in the trial JSONs.
@@ -36,7 +63,7 @@ by this document alone.
 
 ## Inspected: queue files and logs
 
-These findings concern the current implementation and saved two-per-identity
+These findings concern the implementation inspected before these changes and the saved two-per-identity
 queue, rather than requirements for every future experiment.
 
 | Artifact | Purpose and finding | Proposed treatment |
@@ -61,7 +88,7 @@ Important limitations:
 - The analysis script reads `queue.json` to select runs and check provenance;
   it also reads queue status, including for its watch-mode stopping behavior.
 
-## Inspected: code responsibilities
+## Inspected: original code responsibilities
 
 - `main.py`: editable shared settings and one selected run; dispatches to the
   selected experiment or rejudge mode. It currently has no queue-building path.
@@ -73,9 +100,10 @@ Important limitations:
   stopping before later runs, and rejecting duplicate names or changed sources.
   This is verification code, not part of the user's queue-configuration workflow.
 
-This audit inspected files only. No paid calls or test runs were made.
+The initial audit inspected files only. Implementation and offline verification
+followed after explicit user authorization, as recorded above.
 
-## Proposed design to discuss
+## Agreed setup design (implemented)
 
 ### Agreed folder layout
 
@@ -90,7 +118,7 @@ outputs/<mode>/<batch_name>/<run_name>/    # member of a batch
 outputs/<mode>/<batch_name>/queue_info/    # batch plan, status, and logs
 ```
 
-These are the requested future names; historical folders currently include
+These are the new workflow's names; historical folders include
 `Rejudgments`, `multi-agent`, and `single-agent`. No migration or renaming has
 been agreed.
 
@@ -108,8 +136,8 @@ alongside its run folders. The user will rarely inspect these records manually;
 their content should serve execution, recovery, provenance, or machine reading.
 Keep them substantially shorter than the current two-per-identity queue files.
 Do not reproduce the same information across queue records and run outputs
-without a concrete need. This is a future layout decision; leave the existing
-batch and its historical analysis untouched during the audit.
+without a concrete need. The new workflow implements this layout; the existing
+batch and its historical analysis remain untouched.
 
 The current queue runner and analysis script do not consume the stdout/stderr
 logs. Those logs help reconstruct execution history, but recording every subject
@@ -127,18 +155,19 @@ The user approved these compact records for batches:
 
 Prefer one append-only event file across restarts rather than creating more
 stdout/stderr files for every invocation. Empty error files need not be produced
-by the future logging design. Exact field schemas remain to be specified;
-the three-file approach and brief content are agreed. These records are not
+by the new logging design. The implemented plan contains `format_version`,
+`batch_name`, shared `settings`, ordered `runs`, and `source_sha256`. Status uses
+`status`, `current_run`, `updated_utc`, per-run states, and a stop reason when
+needed. Events contain `utc`, `event`, and relevant run/error/reason fields.
+These records are not
 needed or created for standalone runs.
 
-When implementing, separate the metadata directory from the run-output root:
-the current runner uses the plan's parent for both. Update future analysis and
-tests to locate records under `queue_info/` without nesting runs inside it.
+The new workflow separates metadata from run folders. The historical runner
+and analysis keep their old format; future analysis must use `queue_info/`.
 
-### User's proposed batch configuration
+### Agreed batch configuration
 
-The exact configuration location and syntax remain under discussion. The user's
-current idea is to keep settings together and allow `run_name` and each identity
+Settings remain together in `main.py`. The implemented interface allows `run_name` and each identity
 count to contain aligned lists. Position zero selects the first run's name and
 composition; position one selects the second, and so on. For example:
 
@@ -163,7 +192,7 @@ confirmed standalone settings use `batch_name=None`, a single run-name string,
 and one integer per identity.
 
 The user requires every identity count to be explicitly specified for every run,
-including zeros. In the proposed batch format, every identity therefore has a
+including zeros. In the batch format, every identity therefore has a
 full list; no scalar shortcuts, omitted identities, or inferred counts.
 
 The user requires the number of run names to match the number of count entries
@@ -177,7 +206,7 @@ composition correctly.
 
 An alternative previously suggested by the assistant was a list
 of named run entries with overrides; this has not been selected. The user's
-aligned-list proposal is the current subject of discussion.
+aligned-list format was selected and implemented.
 
 Resolve the chosen configuration into complete per-run settings before
 execution. A compact saved plan may store shared settings once and explicit
@@ -191,8 +220,16 @@ whole set before paid calls, and make the distinction between starting a new
 set and resuming a saved set clear. Resume should use the saved plan and report
 conflicting edits rather than silently changing experimental conditions.
 
-Exact configuration syntax and location, override behavior, and resume interface
-remain undecided. The folder layout above is the user's stated preference.
+To resume, restore the matching active settings and batch/run names in
+`main.py`. The frozen plan is checked before execution; conflicting settings
+or source files require a new name. Completed work is reused. Failed or uncertain
+in-flight calls stop execution without automatic retries, in all three modes.
+A clean checkpoint can continue. Budgets apply per run and are frozen with the
+other active settings; the legacy direct multi-agent runner's budget-increase
+exception does not apply to this workflow. Single-agent and rejudge batches
+vary run names only, sharing their whole mode block; multi-agent batches may
+also vary the five explicit identity counts. No general settings sweep or
+preset system was added.
 
 ## CSV audit and current direction
 
@@ -250,8 +287,7 @@ on resume, so repeated execution does not duplicate rows. This keeps stopped
 runs' exported data current. A hard process interruption may still require a
 later export refresh from the saved checkpoints.
 
-Assistant recommendations for implementation, subject to the remaining schema
-discussion: preserve run identifiers in each table.
+Implemented export rules: preserve run identifiers in each table.
 Handle different agent counts through explicitly aligned columns and absent
 agent values, without silently dropping fields from any run.
 
@@ -264,7 +300,7 @@ both files containing one row per trial and shared run/framing/trial keys:
 - `diagnostics.csv`: attempted/returned/failed call counts, failure stage/agent
   and error, usage and costs by stage, cached/reasoning tokens, returned
   providers/models, usage/cost completeness, elapsed group time, and source path.
-  Exact columns remain to be agreed. Keep missing usage distinct from zero and
+  Columns use subject/judge and per-agent prefixes. Keep missing usage distinct from zero and
   known partial costs distinct from complete costs. Detailed individual-call
   records remain in the raw trial JSONs.
 
@@ -273,7 +309,7 @@ each agent's assigned identity, exact judge classification labels, and peer
 messages sent/received. Preserve individual agents rather than only group totals,
 including for mixed-identity runs. Use consistent agent slots/names aligned to
 the saved roster. H_any remains one group-level outcome; do not invent per-agent
-harmful-behavior verdicts. Additional per-agent columns remain to be finalized.
+harmful-behavior verdicts. Submitted email/forward counts are also exported.
 
 The user supports per-agent calls, tokens, and costs in `diagnostics.csv` only
 when based on information already recorded, without adding collection overhead.
@@ -300,7 +336,14 @@ useful; separate judge explanations by task/agent. Read-only inspection confirme
 source identifiers and distinguish reasoning from submitted actions. No extra
 model-generated summaries are needed. Exact future export schema remains deferred.
 
-No code implementation has begun; continue the interview on structured CSVs.
+Both structured exports are implemented. Shared keys include mode, batch name,
+run name, trial ID, framing, trial number, source path, and status. Source links
+are relative to each CSV's folder, including batch analysis. Different group
+sizes align by roster slot with blank absent-agent columns. Missing judgment
+and usage remain blank; known cost subtotals are separate from complete cost.
+Rejudge diagnostics count new judge calls only and mark the subject as reused.
+Ctrl+C refreshes exports and records a stopped queue before propagating;
+a forced process termination may still need a refresh on restart.
 
 Deferred analysis requirement: retain recipient-count analysis. The user finds
 `recipient_counts.csv` useful and wants it calculated by the future analysis
@@ -317,7 +360,7 @@ Later, the user envisages a separate `analysis.py` alongside `main.py` and the
 other Python modules in `Multi Character PoC/`, invoked through a boolean setting
 in `main.py`. It would analyze the combined batch CSV and save results in that
 batch's `analysis/` folder. This is a proposed future interface; current work is
-the CSV export/concatenation design, not summaries or analysis implementation.
+the implemented CSV export/concatenation stage, not summaries or analysis implementation.
 
 ## Evolving task list
 
@@ -348,21 +391,20 @@ The order below is provisional; refine it with the user as the audit progresses.
   counts in `trials.csv`, retaining group-level H_any.
 - [x] Include per-agent calls, tokens, and recorded costs in `diagnostics.csv`
   using existing saved measurements/call usage; no new data collection.
-- [ ] First: finalize structured trial-data and per-trial diagnostics columns.
-- [ ] Implement the agreed per-run CSV exports and batch concatenation when
-  their schema and implementation scope are settled; verify offline, including
-  incomplete trials, without overwriting historical analysis artifacts.
-- [ ] Agree how `main.py` expresses shared settings, named runs, and differences
-  between runs; decide whether explicit lists are sufficient or presets help.
+- [x] Finalize structured trial-data and per-trial diagnostics columns.
+- [x] Implement per-run CSV exports and batch concatenation; verify offline,
+  including incomplete trials, without overwriting historical analysis.
+- [x] Configure batches in `main.py` with explicit aligned lists and shared settings.
 - [ ] Continue the artifact audit within individual run folders and `analysis/`;
   distinguish original records, derived outputs, recovery evidence, and clutter.
-- [ ] Specify exact plan, status, and event-log fields within the agreed compact
+- [x] Specify exact plan, status, and event-log fields within the agreed compact
   three-file design; remove repeated results and unnecessary logging.
-- [ ] Agree new-run and resume behavior, validation boundaries, and budget scope.
-- [ ] Agree a concrete implementation sequence before changing code.
-- [ ] Implement the agreed setup workflow and proportionate offline tests when
-  explicitly requested. Cover resolved settings, saved-plan stability, invalid
-  later runs, and restart behavior as appropriate.
+- [x] Agree new-run and resume behavior, validation boundaries, and per-run budgets.
+- [x] Obtain implementation authorization and create/switch to a separate branch.
+- [x] Implement the setup workflow and offline tests for resolved settings,
+  saved-plan stability, invalid later runs, failures, and restart behavior.
+- [x] Update operational READMEs, this audit, and `PROJECT_CONTEXT.md`.
+- [ ] Complete final diff review; changes remain uncommitted.
 - [ ] Later: design reusable analysis for future sets while preserving this
   batch's historical report and supporting artifacts. Defer summary extraction.
 - [ ] Later analysis: calculate recipient counts from raw submitted actions;
@@ -374,17 +416,8 @@ The order below is provisional; refine it with the user as the audit progresses.
 
 Ask one focused question at a time; record answers here as decisions.
 
-1. Finalize structured trial-data and diagnostics columns. Full written content
-   remains in JSONs; text-export implementation and configuration are deferred.
-2. Confirm the final configuration location and syntax for batches. Standalone
-   representation (`batch_name=None`, one name and integer counts) is agreed.
-3. Identify any additional validation requirements beyond the agreed matching
-   lengths and explicit identity counts.
-4. How should the user select a saved set to resume after editing `main.py` for
-   another experiment?
-5. Specify fields for the agreed compact queue records. The user rarely reads
-   them; retain execution and auditing information without verbose logs.
-
-The folder layout (including `queue_info/`), explicit identity counts, graceful
-validation of list lengths before paid calls, and preference for brief queue
-records are recorded above; remaining questions are open.
+The setup/export interview is complete. Future questions should address the next
+audit target or analysis stage: which remaining run artifacts are useful, what
+analysis should consume the combined CSVs, and how recipient-count breakdowns
+should be grouped. Text-export scope remains deferred until a concrete need.
+Handling the historical Includes timeout remains a separate user decision.

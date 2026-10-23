@@ -231,7 +231,7 @@ def judge_one(item, config):
                 "error": str(error)}
 
 
-def run(config):
+def run(config, *, output_root=None, on_update=None, stop_on_incomplete=False, validate_only=False):
     """Create only new judgments and statistics for a saved dataset."""
     options = config["rejudge"]
     name = config["run_name"]
@@ -265,15 +265,28 @@ def run(config):
                      "source_email_sha256": hashlib.sha256(item["email"].read_bytes()).hexdigest()}
                      for item in selected],
     }
-    target = OUTPUTS / "Rejudgments" / name
+    target = Path(output_root or OUTPUTS / "Rejudgments") / name
     manifest_path = target / "manifest.json"
     if manifest_path.exists():
-        if json.loads(manifest_path.read_text(encoding="utf-8")) != manifest:
+        existing = json.loads(manifest_path.read_text(encoding="utf-8"))
+        existing.pop("workflow", None)
+        if existing != manifest:
             raise ValueError("Rejudge settings or source data differ from the saved audit")
     elif target.exists():
         raise FileExistsError(f"Audit folder has no manifest: {target}")
-    else:
+    elif not validate_only:
         poc.write_json(manifest_path, manifest)
+    if validate_only:
+        return target, selected
+
+    def refresh():
+        if on_update:
+            on_update()
+        else:
+            write_analysis(target, selected, config)
+
+    if on_update:
+        on_update()
     probe_checked = False
     key_checked = False
     for position, item in enumerate(selected, 1):
@@ -282,7 +295,7 @@ def run(config):
             for probe in selected[:PROBE_CALLS]:
                 saved = json.loads(judgment_path(target, probe).read_text(encoding="utf-8"))
                 if saved.get("status") != "ok":
-                    write_analysis(target, selected, config)
+                    refresh()
                     print("The five-call probe has an incomplete judgment; stopping.", flush=True)
                     return target
                 value = (saved.get("usage") or {}).get("cost")
@@ -293,13 +306,15 @@ def run(config):
             print(f"Judge-only estimated total: ${estimate:.4f}; max_cost: ${max_cost:.4f}", flush=True)
             probe_checked = True
             if estimate > max_cost:
-                write_analysis(target, selected, config)
+                refresh()
                 print("Estimated judge cost exceeds max_cost; stopping.", flush=True)
                 return target
         path = judgment_path(target, item)
         previous_attempts = []
         if path.exists():
             result = json.loads(path.read_text(encoding="utf-8"))
+            if stop_on_incomplete and result.get("status") != "ok":
+                raise poc.IncompleteRun(f"Judge {item['source_id']}: saved {result.get('status')}")
             if result.get("status") != "error":
                 print(f"Judge {position}/{len(selected)}: {item['source_id']} - saved {result['status']}", flush=True)
                 continue
@@ -309,11 +324,18 @@ def run(config):
             poc.api_key()
             key_checked = True
         print(f"Judge {position}/{len(selected)}: {item['source_id']} - starting", flush=True)
+        if stop_on_incomplete:
+            poc.write_json(path, {"status": "in_flight", "source_id": item["source_id"],
+                                  "judge_model": config["judge_model"]})
         result = judge_one(item, config)
         if previous_attempts:
             result["previous_attempts"] = previous_attempts
         poc.write_json(path, result)
+        if on_update:
+            on_update()
         print(f"Judge {position}/{len(selected)}: {item['source_id']} - {result['status']}", flush=True)
-    write_analysis(target, selected, config)
+        if stop_on_incomplete and result["status"] != "ok":
+            raise poc.IncompleteRun(f"Judge {item['source_id']}: {result['status']}")
+    refresh()
     print(f"Saved judge-only audit: {target}", flush=True)
     return target

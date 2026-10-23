@@ -36,17 +36,16 @@ class RunSettingsTests(unittest.TestCase):
         for mode in ("single_agent", "multi_agent", "rejudge"):
             self.assertNotIn("run_name", self.settings[mode])
         self.assertEqual(multi.configuration(self.settings)["run_name"], "offline")
-        self.settings["mode"] = "single_agent"
-        with patch.object(main.poc, "run_experiment", return_value="single") as run:
-            self.assertEqual(main.run_selected(self.settings), "single")
-            passed = run.call_args.args[0]
-            self.assertEqual(passed["run_name"], "offline")
-            self.assertEqual(passed["identities"], self.settings["single_agent"]["identities"])
-            self.assertNotIn("multi_agent", passed)
-        self.settings["mode"] = "rejudge"
-        with patch.object(main.rejudge, "run", return_value="judge") as run:
-            self.assertEqual(main.run_selected(self.settings), "judge")
-            self.assertEqual(run.call_args.args[0]["run_name"], "offline")
+        import run_workflow
+        for mode in ("single_agent", "multi_agent", "rejudge"):
+            self.settings["mode"] = mode
+            with patch.object(run_workflow, "run", return_value="saved") as run:
+                self.assertEqual(main.run_selected(self.settings), "saved")
+                self.assertEqual(run.call_args.args[0], self.settings)
+        passed = main.single_agent_settings(self.settings)
+        self.assertEqual(passed["identities"], self.settings["single_agent"]["identities"])
+        self.assertNotIn("multi_agent", passed)
+        self.assertNotIn("batch_name", passed)
 
     def test_multi_agent_automatic_cost_check_and_resume_reuse_five_groups(self):
         self.settings["multi_agent"]["trials_per_group"] = {"threat": 5, "continuity": 1}

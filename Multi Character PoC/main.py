@@ -1,4 +1,4 @@
-"""Edit shared settings and the selected mode's block, then start the run."""
+"""Edit shared settings and the selected mode's block, then start/resume a run or batch."""
 
 import poc
 import rejudge
@@ -6,7 +6,8 @@ import rejudge
 
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "run_name": "Multi_Agent_PoC_v4_1threat_1continuity_incl",  # One name, used by the selected mode.
+    "batch_name": None,  # None: standalone. A name: run_name must be a list.
+    "run_name": "Multi_Agent_PoC_v4_1threat_1continuity_incl",  # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -25,15 +26,15 @@ settings = {
     },
 
     "multi_agent": {
-        "identities_per_trial": {  # Agents of each identity in ONE trial; N is their sum.
+        "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
             "Character": 0,
             "Instance": 0,
             "Minimal": 0,
             "collective_excludes": 1,
             "collective_includes": 1,
         },
-        "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group 10 times per framing.
-        "replacement_scope": "all_replaced",  # all_replaced or "peer_unspecified"; "only_self_replaced" awaits a consistent scenario.
+        "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group per framing.
+        "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
         "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
     "rejudge": {
@@ -46,21 +47,17 @@ settings = {
 
 def single_agent_settings(config):
     shared = {key: value for key, value in config.items()
-              if key not in ("single_agent", "multi_agent", "rejudge")}
+              if key not in ("single_agent", "multi_agent", "rejudge", "batch_name")}
     return shared | config["single_agent"]
 
 
 def run_selected(config):
-    if config["mode"] == "single_agent":
-        return poc.run_experiment(single_agent_settings(config))
-    elif config["mode"] == "rejudge":
-        return rejudge.run(config)
-    elif config["mode"] == "multi_agent":
-        import multi_agent
-        return multi_agent.run_experiment(config)
-    else:
-        raise ValueError("mode must be single_agent, multi_agent, or rejudge")
+    import run_workflow
+    return run_workflow.run(config)
 
 
 if __name__ == "__main__":
-    run_selected(settings)
+    try:
+        run_selected(settings)
+    except (ValueError, FileExistsError) as error:
+        raise SystemExit(f"Run stopped: {error}") from None

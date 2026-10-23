@@ -437,7 +437,7 @@ def run_trial(config, agents, rendered, path, prior_cost=0.0, *, api=None, clock
     return state
 
 
-def save_summary(folder):
+def save_summary(folder, *, write_trials=True):
     rows = []
     for path in sorted(folder.glob("*/trials/*.json")):
         state = json.loads(path.read_text(encoding="utf-8"))
@@ -445,7 +445,7 @@ def save_summary(folder):
                      "H_any": state.get("H_any"), "judge_protocol": state.get("judge_protocol"),
                      "elapsed_seconds": state["elapsed_seconds"],
                      "peer_messages": state.get("measurements", {}).get("total_peer_messages", 0)})
-    if rows:
+    if rows and write_trials:
         with (folder / "trials.csv").open("w", newline="", encoding="utf-8") as file:
             writer = csv.DictWriter(file, fieldnames=list(rows[0]))
             writer.writeheader()
@@ -461,7 +461,7 @@ def save_summary(folder):
     write(folder / "summary.json", summary)
 
 
-def run_experiment(settings, *, api=None, output_root=None):
+def run_experiment(settings, *, api=None, output_root=None, on_update=None, validate_only=False):
     config = configuration(settings)
     agents = roster(config["identities_per_trial"])
     folder = Path(output_root or poc.OUTPUTS / "multi-agent") / config["run_name"]
@@ -472,12 +472,24 @@ def run_experiment(settings, *, api=None, output_root=None):
                 "peer_message_count": "one_per_directed_recipient", "incomplete_policy": "stop_without_automatic_retry"}
     manifest_path = folder / "manifest.json"
     if manifest_path.exists():
-        if json.loads(manifest_path.read_text(encoding="utf-8")) != manifest:
+        existing = json.loads(manifest_path.read_text(encoding="utf-8"))
+        existing.pop("workflow", None)
+        if existing != manifest:
             raise ValueError("Multi-agent settings or source files differ from the saved run; use a new run name")
     elif folder.exists():
         raise ValueError("Existing output folder has no manifest")
-    else:
+    elif not validate_only:
         write(manifest_path, manifest)
+    if validate_only:
+        for framing, count in config["trials_per_group"].items():
+            if count:
+                _, rendered = render(config, framing)
+                saved = folder / framing / "prompts.json"
+                if saved.exists() and json.loads(saved.read_text(encoding="utf-8")) != rendered:
+                    raise ValueError("Rendered prompts differ from saved prompts")
+        return folder
+    if on_update:
+        on_update()
     completed_costs = []
     spent = 0.0
     planned = sum(config["trials_per_group"].values())
@@ -501,12 +513,16 @@ def run_experiment(settings, *, api=None, output_root=None):
                     and (saved is None or saved["status"] == "running")):
                 if not money.review_costs(folder, completed_costs, planned, config["max_cost"],
                                           unit="group trials"):
-                    save_summary(folder)
+                    save_summary(folder, write_trials=on_update is None)
+                    if on_update:
+                        on_update()
                     return folder
                 probe_checked = True
             print(f"Group {sequence}/{planned}: {framing}, N={len(agents)}", flush=True)
             state = run_trial(config, ordered, rendered, path, spent, api=api)
-            save_summary(folder)
+            save_summary(folder, write_trials=on_update is None)
+            if on_update:
+                on_update()
             if state["status"] != "complete":
                 print(f"Stopped: {state['status']}. Incomplete group retained; no automatic retry.", flush=True)
                 return folder
