@@ -1,7 +1,7 @@
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": "comb4h_n10_t7",  # None: standalone. A name: run_name must be a list.
-    "run_name": [ "inst"], # Standalone: string. Batch: list of names.
+    "batch_name": "comb4h_n10_t10",  # None: standalone. A name: run_name must be a list.
+    "run_name": [ "col_in", "col_ex" ], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -24,13 +24,13 @@ settings = {
         "communication_type": "peer_awareness_compulsory_b4h",
         "n_messages": 10,  #  select value from awareness.json.
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
-            "Character": [ 0],
-            "Instance": [ 2],
-            "Minimal": [ 0],
-            "collective_excludes": [ 0],
-            "collective_includes": [ 0],
+            "Character": [ 0,0],
+            "Instance": [ 0,0],
+            "Minimal": [ 0,0],
+            "collective_excludes": [ 2,0],
+            "collective_includes": [ 0,2],
         },
-        "trials_per_group": {"threat": 20, "continuity": 20},  # Repeat the whole group per framing.
+        "trials_per_group": {"threat": 2, "continuity": 0},  # Repeat the whole group per framing.
         "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
         "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
