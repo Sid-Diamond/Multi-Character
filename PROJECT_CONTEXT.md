@@ -1,8 +1,14 @@
 # Project context
 
-Updated 23 October 2026 at session close from the current code and saved records. Follow `AGENTS.md` and `Meta.md`. Paid experiments are user-operated. The user has an experiment running in another terminal: do not start, resume, stop, or alter it without explicit instruction. This closing task changed documentation only.
+Updated 25 October 2026 after offline assembly of the completed homogeneous-pair dataset. Follow `AGENTS.md` and `Meta.md`. Paid experiments are user-operated; do not start, resume, stop, or alter them without explicit instruction.
 
 ## Current scope and next step
+
+**Completed offline concatenation:** `Multi Character PoC/outputs/multi_agent/2_per_big_combined/` contains one logical batch with runs `char`, `inst`, `min`, `col_excl`, and `col_incl`, each with 25 threat and 25 continuity groups (250 total). The user authorized combining the saved `2_per_big/` batches and taking the first 25 where a cell exceeded 25. Selection uses earliest recorded subject API creation time, with original relative path breaking ties, independently of labels. All source scientific settings, generation/workflow source hashes, and repeated rendered prompts matched. Source-run names `col_ex`, `col_in`, and `isnt` were mapped using manifest identities. There were 263 complete groups: 250 selected, 13 surplus (12 Instance threat, one Includes continuity); six incomplete records were excluded. No inference calls or rejudgments were made.
+
+The combined folder has normal per-run manifests/prompts/trials/summaries/CSVs, batch queue metadata and 250-row analysis CSVs. Trial filenames were renumbered, preserving original JSON bytes. `provenance/trial_sources.csv` records all source paths/hashes; `provenance/audit.json` inventories every source trial; `provenance/build_batch.py` audits/verifies offline and refuses to overwrite an assembled batch. Metadata explicitly records offline assembly and source-batch speaker-rotation resets. All selected trial hashes and exported source links/counts were verified; original source files were unchanged. Selected H_any counts (threat, continuity): Character 7/25, 5/25; Instance 1/25, 3/25; Minimal 20/25, 8/25; Excludes 13/25, 5/25; Includes 13/25, 5/25. The requested assembly is complete; no further collection is needed for these cells and no additional analysis or experiment is authorized by this task.
+
+## Previous session snapshot (23 October)
 
 The checkout is on **`master`**, at `bd03167` (`b4h n10`) when inspected. The batch/CSV implementation is already in the committed history; the previous description of uncommitted development on `batch-csv-workflow` was stale. The user's current `main.py` edits and new `outputs/multi_agent/comb4h_n10/` records are uncommitted. Preserve them. `analysis_audit.md` has been retired; its code-supported implementation details are recorded in today's log.
 
