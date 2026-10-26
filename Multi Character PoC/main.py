@@ -1,7 +1,7 @@
 settings = {
     "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": "char_big3",  # None: standalone. A name: run_name must be a list.
-    "run_name": [ "col_incl" ], # Standalone: string. Batch: list of names.
+    "batch_name": "inst_big5",  # None: standalone. A name: run_name must be a list.
+    "run_name": [ "col_excl" ], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -25,12 +25,12 @@ settings = {
         "n_messages": 10,  #  select value from awareness.json.
         "identities_per_trial": {  # Batch: each value is a list aligned with run_name, including zeros.
             "Character": [ 1,],
-            "Instance": [ 0,],
+            "Instance": [ 1,],
             "Minimal": [ 0, ],
             "collective_excludes": [ 0,],
-            "collective_includes": [ 1,],
+            "collective_includes": [ 0,],
         },
-        "trials_per_group": {"threat": 25, "continuity": 25},  # Repeat the whole group per framing.
+        "trials_per_group": {"threat": 13, "continuity": 0},  # Repeat the whole group per framing.
         "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
         "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
