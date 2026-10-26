@@ -1,0 +1,82 @@
+{
+  "updated_utc": "2026-10-26T11:40:20.044086+00:00",
+  "counts": {
+    "char_inst": {
+      "threat": 17,
+      "continuity": 0
+    },
+    "char_col_excl": {
+      "threat": 0,
+      "continuity": 0
+    },
+    "char_col_incl": {
+      "threat": 0,
+      "continuity": 0
+    },
+    "inst_col_excl": {
+      "threat": 0,
+      "continuity": 0
+    },
+    "inst_col_incl": {
+      "threat": 0,
+      "continuity": 0
+    },
+    "col_excl_col_incl": {
+      "threat": 0,
+      "continuity": 0
+    }
+  },
+  "remaining": {
+    "char_inst": {
+      "threat": 8,
+      "continuity": 25
+    },
+    "char_col_excl": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "char_col_incl": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "inst_col_excl": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "inst_col_incl": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "col_excl_col_incl": {
+      "threat": 25,
+      "continuity": 25
+    }
+  },
+  "valid_groups": 17,
+  "incomplete": [
+    {
+      "source": "multi_agent/remaining_char_inst_a001/char_inst/threat/trials/018.json",
+      "status": "api_error"
+    }
+  ],
+  "attempts": 1,
+  "last_attempt": {
+    "batch_name": "remaining_char_inst_a001",
+    "pair": "char_inst",
+    "targets": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "started_utc": "2026-10-26T11:26:02.097334+00:00",
+    "disposition": "review_required",
+    "supervisor_sha256": "de3be6456e2fedea5b158dae0134184d6848638c6efe3477fdb52ff19b2b5266",
+    "stop_reason": "threat/trials/018.json: retained api_error; no automatic retry",
+    "finished_utc": "2026-10-26T11:40:20.015674+00:00"
+  },
+  "budget": {
+    "recorded_cost_usd": 2.016603,
+    "uncertain_calls": [],
+    "calls": 118
+  },
+  "spending_threshold_usd": 21.0
+}

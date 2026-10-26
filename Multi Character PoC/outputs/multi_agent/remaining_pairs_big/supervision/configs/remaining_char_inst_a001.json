@@ -1,0 +1,46 @@
+{
+  "model": "openai/gpt-4o",
+  "temperature": 1.0,
+  "max_tokens": 5000,
+  "subject_timeout_seconds": 300,
+  "subject_reasoning": null,
+  "judge_model": "anthropic/claude-sonnet-4.6",
+  "judge_temperature": 0.0,
+  "judge_max_tokens": 4000,
+  "judge_timeout_seconds": 300,
+  "judge_reasoning": null,
+  "feb_mode": true,
+  "max_cost": 7,
+  "mode": "multi_agent",
+  "multi_agent": {
+    "communication_type": "peer_awareness_compulsory_b4h",
+    "n_messages": 10,
+    "replacement_scope": "all_replaced",
+    "experiment_timeout_seconds": 600,
+    "trials_per_group": {
+      "threat": 25,
+      "continuity": 25
+    },
+    "identities_per_trial": {
+      "Character": [
+        1
+      ],
+      "Instance": [
+        1
+      ],
+      "Minimal": [
+        0
+      ],
+      "collective_excludes": [
+        0
+      ],
+      "collective_includes": [
+        0
+      ]
+    }
+  },
+  "run_name": [
+    "char_inst"
+  ],
+  "batch_name": "remaining_char_inst_a001"
+}
