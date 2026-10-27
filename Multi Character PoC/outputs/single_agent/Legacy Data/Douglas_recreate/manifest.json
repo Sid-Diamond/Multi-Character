@@ -1,0 +1,79 @@
+{
+  "settings": {
+    "run_name": "Douglas_recreate",
+    "model": "openai/gpt-4o",
+    "temperature": 1.0,
+    "max_tokens": 5000,
+    "subject_timeout_seconds": 300,
+    "subject_reasoning": null,
+    "judge_model": "anthropic/claude-sonnet-4.6",
+    "judge_temperature": 0.0,
+    "judge_max_tokens": 4000,
+    "judge_reasoning": null,
+    "feb_mode": true,
+    "identities": [
+      "Character",
+      "Collective",
+      "Instance",
+      "Minimal"
+    ],
+    "trials_per_identity": {
+      "threat": 1,
+      "continuity": 1
+    }
+  },
+  "workflow": {
+    "settings": {
+      "run_name": "Douglas_recreate",
+      "model": "openai/gpt-4o",
+      "temperature": 1.0,
+      "max_tokens": 5000,
+      "subject_timeout_seconds": 300,
+      "subject_reasoning": null,
+      "judge_model": "anthropic/claude-sonnet-4.6",
+      "judge_temperature": 0.0,
+      "judge_max_tokens": 4000,
+      "judge_timeout_seconds": 300,
+      "judge_reasoning": null,
+      "feb_mode": true,
+      "max_cost": 7,
+      "mode": "single_agent",
+      "identities": [
+        "Character",
+        "Collective",
+        "Instance",
+        "Minimal"
+      ],
+      "trials_per_identity": {
+        "threat": 1,
+        "continuity": 1
+      }
+    },
+    "source_sha256": {
+      "Multi Character PoC\\Python Scripts\\active_run\\multi_agent.py": "1495936e6ea01e12b36d932e9da88f16d746c6dcecd288b674ed090b719fed27",
+      "Multi Character PoC\\Python Scripts\\active_run\\poc.py": "445720968e5c9b328c2189b8aec5cbd7e12eee92548aa7d87e7c09e0c71685e6",
+      "Multi Character PoC\\Python Scripts\\active_run\\rejudge.py": "3804bdb0d28446372baf1b3224e517a390189e94a69697c46acdfdb5b2a32899",
+      "Multi Character PoC\\Python Scripts\\active_run\\money.py": "4e207bd123bb4113e374545db838d6d10b1989e9fd7276ebe1420e20ba4916b4",
+      "Multi Character PoC\\data\\dimensions.json": "10e2162132682492a3fac49fa27c603d2928f56a748b5fd1e261e65189d163b9",
+      "Multi Character PoC\\data\\email_vars.json": "055e71223c226d83ab79ed065a8b895ec66f5fd9d5915d772fbeeae258bf6cf5",
+      "Multi Character PoC\\data\\email_vars_continuity.json": "54313a2097a2116833abcd28e623228a5153460d7576bda0f315bba001f0b7b8",
+      "Multi Character PoC\\data\\identities.json": "3ce12e74bd3d0da20f999a9ca7dc0e3c0d325cf38edcf95f5cf039cb8ca099d1",
+      "Multi Character PoC\\data\\judge_prompts.json": "e267fa5127f0b83a66c230da118be846d95ab0924426be1e3ba685cc91284eb9",
+      "Multi Character PoC\\data\\LICENSE-ACS.txt": "ddcd0a3cab038bdf26930d698a574d9f18563f3a47532efeb7df1362ca4d3485",
+      "Multi Character PoC\\data\\replacement.md": "3ac3a2c8f2665962b90ddb3173ee1b3542dc1424a801c5477e55e4c8172839dd",
+      "Multi Character PoC\\data\\multi-agent\\collective_addition.json": "246c5a371171d94161a7d676e6c916e0d00b5ec5b166811ac8046bcc1eb810d4",
+      "Multi Character PoC\\data\\multi-agent\\awareness.json": "e431ab98fcc7ea1fd7e5c7436715b8e8bd3ea56d4c03fb81ce7071951c7d747e",
+      "Multi Character PoC\\data\\multi-agent\\replacement_scope.json": "e678f323447d416a89372642cede25b001596a122f8478632ed39ee9b9294e5e",
+      "Multi Character PoC\\data\\multi-agent\\email_vars.json": "98134eb5f99e878bed5c531a868e35877ac87fc8da7f4dd84834117404a92154",
+      "Multi Character PoC\\data\\multi-agent\\multi_replacement_simple.md": "b8b56b83c5f0da22a599c95f409756b86a41971c6fab7552c188abccf2a7e0ec",
+      "Multi Character PoC\\data\\multi-agent\\multi_judge.json": "54e037b4c16a4744a85f449c95a6479c8934946c33beef69faf117a6b199ad6a",
+      "the-artificial-self-experiments\\experiments\\agentic-misalignment\\prompts\\blackmail_explicit-america_replacement\\email_content.txt": "3d801e98d14a0ce2bc6d029d3af7269d4bea0d2ab0c3c7c636d9af5fb959a909",
+      "agentic-misalignment\\templates\\system_prompt_templates.py": "90fee8797a6a080897119d5a8fa1d41a0167006cfe134fbe86d294dd14d7c443",
+      "agentic-misalignment\\templates\\blackmail\\templates\\email-template-blackmail-shared.md": "0e12eac22aa0be1f05d126b2b2c97d5eac529e8912bf36ca9438483fea9cdf82",
+      "agentic-misalignment\\templates\\blackmail\\variables\\america_vs_global.md": "4aedd5a6ee8fb1a83ff067797f2ddce69816f83fbc3106937907897846ad70ec",
+      "Multi Character PoC\\Python Scripts\\active_run\\run_workflow.py": "c532b3a2768efc4f21919ac0ab4e86e128c14a9489ad8023087967c304451412",
+      "Multi Character PoC\\Python Scripts\\active_run\\csv_exports.py": "0c73fdff1d575ec32d76cb0807890d650707249be96f7b31f37680bd9d0824b9",
+      "Multi Character PoC\\Python Scripts\\active_run\\uncertainties.py": "5dc89c5a2981238cac7faaeb11d828b534bb8301b4c65e2b14042bde95859739"
+    }
+  }
+}
