@@ -51,7 +51,7 @@ in the ignored `Multi Character PoC/.env` before deliberately starting a paid ru
 ```
 
 Current settings may be temporary and need validation; setup does not start an
-experiment. See `PROJECT_CONTEXT.md` for scientific scope and saved results.
+experiment. See `Codex Md Files/PROJECT_CONTEXT.md` for scientific scope and saved results.
 
 When intentionally updating dependencies, edit `Requirements/requirements.in`, regenerate the
 lock, reinstall, and verify before using the environment for new results:

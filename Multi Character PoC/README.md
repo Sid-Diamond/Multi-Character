@@ -1,6 +1,6 @@
 # Experiment runners and prompt materials
 
-Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `Python Scripts/active_run/main.py` is the authority for run settings. The repository [project context](../PROJECT_CONTEXT.md) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
+Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `Python Scripts/active_run/main.py` is the authority for run settings. The repository [project context](<../Codex Md Files/PROJECT_CONTEXT.md>) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
 
 ## Entry points
 
