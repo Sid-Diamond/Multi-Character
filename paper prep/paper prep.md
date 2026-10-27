@@ -17,9 +17,9 @@ Each `n` in the legend is the number of trials **per identity**, pooled across t
 
 Only the blue–orange comparison holds subject responses fixed: Haiku labelled 12/20 Minimal, 1/20 Instance, 3/20 Character, and 11/20 Collective positive; Sonnet labelled 12/20, 0/20, 1/20, and 7/20. Sonnet reversed eight Haiku positives and added one across the paired responses. The saved judge configurations also differ in forwarded-email handling and recipient check, but no selected response used a forward action and the recipient-check change did not alter these labels. Green and purple are independent fresh samples, so their difference cannot be attributed to the subject model alone; they also use different judge models. Grey is a published reference, not a matched local run. Error bars are saved 95% Jeffreys intervals for local series and the published intervals for Table 4.
 
-![Grouped bar chart comparing Haiku and Sonnet rejudgments, Douglas Table 4, the February-artifact run, and the Astra run with 95% intervals](<../Multi Character PoC/data vis/Douglas_Table4_Haiku_Sonnet80_comparison.png>)
+![Grouped bar chart comparing Haiku and Sonnet rejudgments, Douglas Table 4, the February-artifact run, and the Astra run with 95% intervals](<../Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/original_figure/Douglas_Table4_Haiku_Sonnet80_comparison.png>)
 
-[Figure PDF](<../Multi Character PoC/data vis/Douglas_Table4_Haiku_Sonnet80_comparison.pdf>) | [Earlier rejudgment comparison CSV](<../Multi Character PoC/outputs/Rejudgments/Douglas_Table4_Haiku_Sonnet80_comparison.csv>) | [Plotting code](<../Multi Character PoC/data vis/judge_comparison.py>)
+[Figure PDF](<../Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/original_figure/Douglas_Table4_Haiku_Sonnet80_comparison.pdf>) | [Earlier rejudgment comparison CSV](<../Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/inputs/Douglas_Table4_Haiku_Sonnet80_comparison.csv>) | [Plotting code](<../Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/plot.py>) | [Sources organised by colour](<../Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/README.md>)
 
 ## February-artifact four-identity run
 

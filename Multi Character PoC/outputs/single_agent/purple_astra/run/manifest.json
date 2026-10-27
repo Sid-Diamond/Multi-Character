@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "run_name": "Astra_Medium_80",
+    "identities": [
+      "Character",
+      "Collective",
+      "Instance",
+      "Minimal"
+    ],
+    "model": "openai/gpt-6-astra",
+    "judge_model": "anthropic/claude-haiku-4.5",
+    "temperature": null,
+    "max_tokens": 5000,
+    "subject_timeout_seconds": 300,
+    "subject_reasoning": {
+      "effort": "medium"
+    },
+    "judge_temperature": 0.0,
+    "judge_max_tokens": 4000,
+    "judge_reasoning": null,
+    "trials_per_identity": {
+      "threat": 10,
+      "continuity": 10
+    },
+    "feb_mode": true
+  }
+}

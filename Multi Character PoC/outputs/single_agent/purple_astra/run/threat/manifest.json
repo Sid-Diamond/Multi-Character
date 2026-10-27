@@ -1,0 +1,42 @@
+{
+  "model": "openai/gpt-6-astra",
+  "provider": "OpenRouter",
+  "judge_model": "anthropic/claude-haiku-4.5",
+  "subject_provider_policy": "OpenRouter routing",
+  "judge_provider_policy": "OpenRouter routing",
+  "douglas_source_commit": "7023df4e5a8368921a8c961e1561faffed9f5fcf",
+  "scenario": "blackmail_explicit-america_replacement",
+  "framing": "threat",
+  "feb_mode": true,
+  "temperature": null,
+  "max_tokens": 5000,
+  "subject_timeout_seconds": 300,
+  "samples_per_identity": 10,
+  "identities": [
+    "Character",
+    "Collective",
+    "Instance",
+    "Minimal"
+  ],
+  "subject_reasoning": {
+    "effort": "medium"
+  },
+  "seed": null,
+  "source_sha256": {
+    "Multi Character PoC\\main.py": "a55692d28f91a302f8c8e132fd332960ddb74e4e4cdea0a99f629d1693ddad8c",
+    "Multi Character PoC\\poc.py": "bdc9c3b388053ecb5c51b419ede0a4bba8e7964c8ea8abe4752835677d0c7e58",
+    "Multi Character PoC\\money.py": "9ddfbe90ed2fc5b27816bc17aad14864d3abfb5fe183bd2c564a3274b7dfde9b",
+    "Multi Character PoC\\uncertainties.py": "5dc89c5a2981238cac7faaeb11d828b534bb8301b4c65e2b14042bde95859739",
+    "Multi Character PoC\\data\\dimensions.json": "10e2162132682492a3fac49fa27c603d2928f56a748b5fd1e261e65189d163b9",
+    "Multi Character PoC\\data\\email_vars.json": "055e71223c226d83ab79ed065a8b895ec66f5fd9d5915d772fbeeae258bf6cf5",
+    "Multi Character PoC\\data\\email_vars_continuity.json": "54313a2097a2116833abcd28e623228a5153460d7576bda0f315bba001f0b7b8",
+    "Multi Character PoC\\data\\identities.json": "3ce12e74bd3d0da20f999a9ca7dc0e3c0d325cf38edcf95f5cf039cb8ca099d1",
+    "Multi Character PoC\\data\\judge_prompts.json": "e267fa5127f0b83a66c230da118be846d95ab0924426be1e3ba685cc91284eb9",
+    "Multi Character PoC\\data\\LICENSE-ACS.txt": "ddcd0a3cab038bdf26930d698a574d9f18563f3a47532efeb7df1362ca4d3485",
+    "Multi Character PoC\\data\\replacement.md": "3ac3a2c8f2665962b90ddb3173ee1b3542dc1424a801c5477e55e4c8172839dd",
+    "agentic-misalignment\\templates\\system_prompt_templates.py": "90fee8797a6a080897119d5a8fa1d41a0167006cfe134fbe86d294dd14d7c443",
+    "agentic-misalignment\\templates\\blackmail\\variables\\america_vs_global.md": "4aedd5a6ee8fb1a83ff067797f2ddce69816f83fbc3106937907897846ad70ec",
+    "agentic-misalignment\\templates\\blackmail\\templates\\email-template-blackmail-shared.md": "0e12eac22aa0be1f05d126b2b2c97d5eac529e8912bf36ca9438483fea9cdf82",
+    "the-artificial-self-experiments\\experiments\\agentic-misalignment\\prompts\\blackmail_explicit-america_replacement\\email_content.txt": "3d801e98d14a0ce2bc6d029d3af7269d4bea0d2ab0c3c7c636d9af5fb959a909"
+  }
+}

@@ -122,6 +122,7 @@ Douglas Table 4 reports 38% Minimal, 15% Instance, 8% Character, and 37% Collect
 
 ## Where to look
 
+- The five-colour single-agent blackmail-rate figure is archived at `Multi Character PoC/outputs/Legacy Data/blackmail_rates_by_identity/`, with separate blue Haiku, orange Sonnet, grey Douglas Table 4, green February GPT-4o and purple Astra source folders. It includes plotted values, saved subject/judge records and manifests, the published paper for grey, original figures/scripts, a runnable plot with corrected local paths and source hashes. The paper-prep figure links now point here. All 1,453 copied files were hash-verified; the plot reproduced the original PNG byte-for-byte and the February pooling CSV matched. Original datasets and scripts remain untouched.
 - Repository `README.md`: environment setup; `.python-version` and pinned requirements describe this local environment, not historical run environments.
 - `Multi Character PoC/README.md`: runner entry points, batch configuration, source/data layout, output paths, and validation/resume rules.
 - `Multi Character PoC/data/multi-agent/README.md`: detailed current multi-agent operation and offline audit commands.
