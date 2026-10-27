@@ -4,14 +4,15 @@ The source files are grouped by their role. Run commands below from the reposito
 
 | Folder | Contents |
 | --- | --- |
-| `active_run/` | `main.py`, workflow, subject/judge runners, cost and uncertainty helpers, CSV exports, and standalone queue/collection runners. |
+| `main.py` | Entry point and run settings. |
+| `active_run/` | Workflow, subject/judge runners, cost and uncertainty helpers, CSV exports, and standalone queue/collection runners. |
 | `code_audit_and_concatenation/` | Offline prompt audit, manual CSV concatenation, and regression tests. |
 | `analysis/data vis/` | Historical plotting and February pooling scripts, plus their saved figure files. Future analyses of the combined run CSVs can live under `analysis/`. |
 
-To start a new paid run deliberately, edit `active_run/main.py` and then use:
+To start a new paid run deliberately, edit `main.py` and then use:
 
 ```powershell
-.venv\Scripts\python.exe "Multi Character PoC/Python Scripts/active_run/main.py"
+.venv\Scripts\python.exe "Multi Character PoC/Python Scripts/main.py"
 ```
 
 To run the offline regression suite:

@@ -1,7 +1,12 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "Python Scripts" / "active_run"))
+
 settings = {
-    "mode": "multi_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": "colexclincl",  # None: standalone. A name: run_name must be a list.
-    "run_name": [ "col" ], # Standalone: string. Batch: list of names.
+    "mode": "single_agent",  # "single_agent", "multi_agent", or "rejudge".
+    "batch_name": NotImplemented,  # None: standalone. A name: run_name must be a list.
+    "run_name": [ "Douglas_recreate" ], # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -17,7 +22,7 @@ settings = {
     
     "single_agent": {
         "identities": ["Character", "Collective", "Instance", "Minimal"],
-        "trials_per_identity": {"threat": 0, "continuity": 1},
+        "trials_per_identity": {"threat": 30, "continuity": 30},
     },
 
     "multi_agent": {
@@ -34,6 +39,7 @@ settings = {
         "replacement_scope": "all_replaced",  # all_replaced or peer_unspecified; only_self_replaced is rejected.
         "experiment_timeout_seconds": 600,  # per group trial, including judging; review before a paid test.
     },
+    
     "rejudge": {
         "dataset": "douglas_240",
         "samples_per_cell": 10,  # 10 per identity/framing cell: 80 saved responses total.

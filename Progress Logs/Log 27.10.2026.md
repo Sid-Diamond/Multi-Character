@@ -16,7 +16,7 @@ The five-colour blackmail-rate figure assets were organized into separate colour
 
 The top-level PoC Python files were grouped under `Multi Character PoC/Python Scripts/`:
 
-- `active_run/` holds `main.py`, the run workflow/runners, cost and uncertainty helpers, CSV exporter, and standalone queue/collection runners.
+- `main.py` is directly under `Python Scripts/`; `active_run/` holds the workflow/runners, cost and uncertainty helpers, CSV exporter, and standalone queue/collection runners.
 - `code_audit_and_concatenation/` holds the prompt audit, manual concatenation utility, and five offline test files.
 - `analysis/data vis/` contains the previous `data vis` folder and its plotting and pooling scripts. The parent `analysis/` remains available for future CSV analyses.
 
@@ -27,3 +27,8 @@ The offline regression suite passed **46 tests** after the code move. A smoke ch
 ## Current state and next step
 
 The planned collection is complete: 750 groups across all 15 identity pairs, with no missing framing cells. The combined dataset is ready for offline analysis. Analysis questions, comparisons, and any interpretation plan remain unspecified. Continue repository tidying only as requested. Inspect the current `main.py` settings before any future experiment; the current source layout is different from the saved run manifests.
+
+
+## Entry-point location correction
+
+After this log was written, the user noted that two `main.py` files existed. The newer root-level file held the current `single_agent` settings and was added in a later repository commit; the older `active_run/main.py` retained completed `colexclincl` settings. Kept the newer file and moved it to `Python Scripts/main.py`; removed the older duplicate from `active_run/`. Updated `poc.py` source-file hashing to include `Python Scripts/main.py`, added the runtime-module import path in the entry point, updated offline test import paths, and corrected launch/settings links. No tests or paid runs were run during this location correction.

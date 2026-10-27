@@ -1,6 +1,6 @@
 # Experiment runners and prompt materials
 
-Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `Python Scripts/active_run/main.py` is the authority for run settings. The repository [project context](<../Codex Md Files/PROJECT_CONTEXT.md>) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
+Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `Python Scripts/main.py` is the authority for run settings. The repository [project context](<../Codex Md Files/PROJECT_CONTEXT.md>) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
 
 ## Entry points
 
@@ -64,7 +64,7 @@ Full prose stays in JSON. No messages export, summary CSVs, plots, recipient-cou
 A paid run starts only when deliberately executing:
 
 ```powershell
-python "Multi Character PoC/Python Scripts/active_run/main.py"
+python "Multi Character PoC/Python Scripts/main.py"
 ```
 
 Provide an OpenRouter key through the ignored `Multi Character PoC/.env` file or the `OPENROUTER_API_KEY` environment variable. Review the selected mode, settings, and output directory first. The tools produce simulated email-action text; they send no real email.
