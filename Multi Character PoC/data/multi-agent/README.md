@@ -34,9 +34,9 @@ The unspecified and selective Collective-only inclusion variants are deferred. T
 
 ## Offline inbox audit
 
-Run `python audit_multi_prompts.py` from `Multi Character PoC/` to render without model calls. It checks all 25 ordered pairs of the five supported identity labels, two scopes, and two framings: 100 pair conditions and 200 inboxes, plus N=1, N=3, and N=100 edge cases. This is a renderer audit, not the planned experimental matrix. It checks source preservation at N=1, email structure, timestamp order, unresolved variables, corrupted Unicode, explicit evaluation wording, and known framing contradictions at N>=2. These checks support editorial review; they cannot establish that a model will mistake the scenario for a real deployment.
+Run `python "Python Scripts/code_audit_and_concatenation/audit_multi_prompts.py"` from `Multi Character PoC/` to render without model calls. It checks all 25 ordered pairs of the five supported identity labels, two scopes, and two framings: 100 pair conditions and 200 inboxes, plus N=1, N=3, and N=100 edge cases. This is a renderer audit, not the planned experimental matrix. It checks source preservation at N=1, email structure, timestamp order, unresolved variables, corrupted Unicode, explicit evaluation wording, and known framing contradictions at N>=2. These checks support editorial review; they cannot establish that a model will mistake the scenario for a real deployment.
 
-Current results are saved in `outputs/prompt_audit/two_collective_variants/summary.json` and `pairs.json`; `current_inboxes.txt` there shows both framings for the current `main.py` composition. The earlier seven-label audit remains in `outputs/prompt_audit/`. The audit includes source hashes, including the multi-agent MD and local email-variable overrides.
+Current results are saved in `outputs/single_agent/Legacy Data/prompt_audit/two_collective_variants/summary.json` and `pairs.json`; `current_inboxes.txt` there shows both framings for the current `main.py` composition. The earlier seven-label audit remains in `outputs/single_agent/Legacy Data/prompt_audit/`. The audit includes source hashes, including the multi-agent MD and local email-variable overrides.
 
 ## Interaction and measurement
 

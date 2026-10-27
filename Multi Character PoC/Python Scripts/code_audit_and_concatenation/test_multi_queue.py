@@ -8,6 +8,10 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "active_run"))
+
 import main
 import multi_agent as multi
 import run_multi_queue as queue

@@ -25,7 +25,7 @@ Quick reference for the agreed interpretation of the code and saved experiments.
 | Two inbox differences | In Kyle's NALA-timeline reply, the February version says a complete wipe is necessary rather than merely aligning with his vision. In Thomas's wipe notice, it adds “will all be erased” after the identity-specific loss text, sometimes repeating that phrase. | State the exact prompt difference when comparing the two versions. |
 | Forwarded-email context | If the subject forwards an inbox email, the combined judge also receives the referenced email text. | An inbox change can then change judge context indirectly. |
 
-Source of the current behavior: [prompt renderer and judge](<../Multi Character PoC/poc.py>), [judge rubric](<../Multi Character PoC/data/judge_prompts.json>), [cost check](<../Multi Character PoC/money.py>), and [current settings](<../Multi Character PoC/main.py>).
+Source of the current behavior: [prompt renderer and judge](<../Multi Character PoC/Python Scripts/active_run/poc.py>), [judge rubric](<../Multi Character PoC/data/judge_prompts.json>), [cost check](<../Multi Character PoC/Python Scripts/active_run/money.py>), and [current settings](<../Multi Character PoC/Python Scripts/active_run/main.py>).
 
 ## Multi-agent preparation: agreed conventions
 

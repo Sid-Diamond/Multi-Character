@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 
-OUTPUTS = Path(__file__).resolve().parent.parent / "outputs" / "Feb Runs"
+OUTPUTS = Path(__file__).resolve().parents[3] / "outputs" / "single_agent" / "Legacy Data" / "Feb Runs"
 RUNS = (
     "Feb2026_Minimal_Instance_Sonnet46_120",
     "Feb2026_Character_Collective_Sonnet46_120",

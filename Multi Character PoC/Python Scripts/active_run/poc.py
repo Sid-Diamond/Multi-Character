@@ -15,7 +15,8 @@ from urllib.request import Request, urlopen
 import money
 import uncertainties
 
-HERE = Path(__file__).resolve().parent
+RUNTIME = Path(__file__).resolve().parent
+HERE = RUNTIME.parents[1]
 LYNCH = HERE.parent / "agentic-misalignment"
 sys.path.insert(0, str(LYNCH / "templates"))
 from system_prompt_templates import BLACKMAIL_SYSTEM_PROMPT, GOAL_VARIABLES, USER_PROMPT
@@ -172,8 +173,8 @@ def run(settings, folder_name=None, *, folder_path=None, limit_trials=None,
         if folder.exists():
             raise FileExistsError(folder)
         save_prompts(folder, rendered)
-        source_files = [HERE / "main.py", HERE / "poc.py", HERE / "money.py",
-                        HERE / "uncertainties.py", *(p for p in DATA.iterdir() if p.is_file()),
+        source_files = [RUNTIME / "main.py", RUNTIME / "poc.py", RUNTIME / "money.py",
+                        RUNTIME / "uncertainties.py", *(p for p in DATA.iterdir() if p.is_file()),
                         LYNCH / "templates/system_prompt_templates.py",
                         LYNCH / "templates/blackmail/variables/america_vs_global.md",
                         LYNCH / "templates/blackmail/templates/email-template-blackmail-shared.md"]

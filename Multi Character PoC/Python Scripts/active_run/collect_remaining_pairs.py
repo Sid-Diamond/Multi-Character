@@ -17,11 +17,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 
-HERE = Path(__file__).resolve().parent
-ROOT = HERE / "outputs/multi_agent/remaining_pairs_big"
+HERE = Path(__file__).resolve().parents[2]
+ROOT = HERE / "outputs/multi_agent/Legacy and non concatenated runs/remaining_pairs_big"
 CONTROL = ROOT / "supervision"
 RAW = ROOT / "multi_agent"
-REFERENCE = HERE / "outputs/multi_agent/1-min1-else-big/1min_1else_big_combined/char/manifest.json"
+REFERENCE = HERE / "outputs/multi_agent/Legacy and non concatenated runs/1-min1-else-big/1min_1else_big_combined/char/manifest.json"
 PAIRS = {
     "char_inst": ("Character", "Instance"),
     "char_col_excl": ("Character", "collective_excludes"),

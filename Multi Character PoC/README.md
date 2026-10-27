@@ -1,6 +1,6 @@
 # Experiment runners and prompt materials
 
-Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `main.py` is the authority for run settings. The repository [project context](../PROJECT_CONTEXT.md) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
+Follow the [repository setup instructions](../README.md#local-setup) for Python, the local `.venv`, and pinned dependencies. `Python Scripts/active_run/main.py` is the authority for run settings. The repository [project context](../PROJECT_CONTEXT.md) records current scope and saved results; [paper facts](<../paper prep/experiment facts for paper.md>) records agreed scientific conventions and prompt differences.
 
 ## Entry points
 
@@ -64,7 +64,7 @@ Full prose stays in JSON. No messages export, summary CSVs, plots, recipient-cou
 A paid run starts only when deliberately executing:
 
 ```powershell
-python "Multi Character PoC/main.py"
+python "Multi Character PoC/Python Scripts/active_run/main.py"
 ```
 
 Provide an OpenRouter key through the ignored `Multi Character PoC/.env` file or the `OPENROUTER_API_KEY` environment variable. Review the selected mode, settings, and output directory first. The tools produce simulated email-action text; they send no real email.
@@ -106,7 +106,7 @@ Each run has its own normal output folder inside `2_per_identity/`. `queue_statu
 The historical invocation below also requires its original compatible source version. This development branch changes pinned runner sources, so it will reject resuming that old queue. Do not replace historical hashes to bypass that protection. When explicitly authorized and using compatible sources, run from `Multi Character PoC/`:
 
 ```powershell
-python run_multi_queue.py outputs/multi-agent/2_per_identity/queue.json
+python "Python Scripts/active_run/run_multi_queue.py" "outputs/multi_agent/Legacy and non concatenated runs/remaining/2per-big/2_per_identity/Queue Data/queue.json"
 ```
 
 ## Offline verification and historical helpers
@@ -114,10 +114,10 @@ python run_multi_queue.py outputs/multi-agent/2_per_identity/queue.json
 From `Multi Character PoC/`, these commands make no model calls:
 
 ```powershell
-python -m unittest discover -v
-python audit_multi_prompts.py
+python -m unittest discover -s "Python Scripts/code_audit_and_concatenation" -p "test_*.py" -v
+python "Python Scripts/code_audit_and_concatenation/audit_multi_prompts.py"
 ```
 
-The tests exercise rendering, routing, checkpoints, costs, deadlines, judging, mode settings, and automatic budget checks/resume after five trials with mocks. The audit checks the inbox matrix and edge cases, writing current previews and results under `outputs/prompt_audit/two_collective_variants/`. Mechanical checks support editorial review; they do not establish that models will regard the scenario as real.
+The tests exercise rendering, routing, checkpoints, costs, deadlines, judging, mode settings, and automatic budget checks/resume after five trials with mocks. The audit checks the inbox matrix and edge cases, writing current previews and results under `outputs/single_agent/Legacy Data/prompt_audit/two_collective_variants/`. Mechanical checks support editorial review; they do not establish that models will regard the scenario as real.
 
-`uncertainties.py` supplies the single-agent/rejudge intervals. `concatenation.py` is an implemented manual pooling utility outside the run pipeline. `data vis/combine_feb_runs.py` and `data vis/judge_comparison.py` reproduce historical pooled results and figures. Keep these helpers and their source data for reproducibility. The redundant original-email construction inside the N>=2 renderer is deferred for review after the first pilot.
+`Python Scripts/active_run/uncertainties.py` supplies the single-agent/rejudge intervals. `Python Scripts/code_audit_and_concatenation/concatenation.py` is an implemented manual pooling utility outside the run pipeline. `Python Scripts/analysis/data vis/combine_feb_runs.py` and `judge_comparison.py` reproduce historical pooled results and figures. Keep these helpers and their source data for reproducibility. The redundant original-email construction inside the N>=2 renderer is deferred for review after the first pilot.

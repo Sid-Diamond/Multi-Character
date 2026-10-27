@@ -105,7 +105,7 @@ def validate(settings):
 def source_hashes():
     hashes = multi_agent.source_hashes()
     for name in ("run_workflow.py", "csv_exports.py", "uncertainties.py"):
-        path = poc.HERE / name
+        path = poc.RUNTIME / name
         hashes[str(path.relative_to(poc.HERE.parent))] = hashlib.sha256(path.read_bytes()).hexdigest()
     return hashes
 

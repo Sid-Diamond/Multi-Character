@@ -9,6 +9,10 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "active_run"))
+
 import main
 import money
 import multi_agent as multi
@@ -29,7 +33,12 @@ class RunSettingsTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.settings = copy.deepcopy(main.settings)
-        self.settings.update(run_name="offline", model="mock-subject", judge_model="mock-judge", max_cost=10)
+        self.settings.update(batch_name=None, run_name="offline", model="mock-subject",
+                             judge_model="mock-judge", max_cost=10)
+        self.settings["multi_agent"]["identities_per_trial"] = {
+            "Character": 1, "Instance": 0, "Minimal": 0,
+            "collective_excludes": 0, "collective_includes": 1,
+        }
         self.enterContext(redirect_stdout(io.StringIO()))
 
     def test_one_run_name_and_mode_dispatch(self):

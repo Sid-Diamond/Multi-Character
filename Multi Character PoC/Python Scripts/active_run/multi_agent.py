@@ -260,7 +260,7 @@ def parse_group_judgment(text, agents):
 
 
 def source_hashes():
-    paths = [Path(__file__), poc.HERE / "poc.py", poc.HERE / "rejudge.py", poc.HERE / "money.py",
+    paths = [Path(__file__), poc.RUNTIME / "poc.py", poc.RUNTIME / "rejudge.py", poc.RUNTIME / "money.py",
              *[p for p in poc.DATA.iterdir() if p.is_file()],
              DATA / "collective_addition.json", DATA / "awareness.json", DATA / "replacement_scope.json",
              DATA / "email_vars.json",

@@ -1,6 +1,6 @@
 """Plot saved-response judges, February and Astra runs, and Douglas Table 4.
 
-Run from any directory with: python "Multi Character PoC/data vis/judge_comparison.py"
+Run from any directory with: python "Multi Character PoC/Python Scripts/analysis/data vis/judge_comparison.py"
 The figure uses saved comparison, February-run, and Astra-run CSVs.
 """
 
@@ -15,9 +15,10 @@ import numpy as np
 
 
 HERE = Path(__file__).resolve().parent
-SOURCE = HERE.parent / "outputs" / "Rejudgments" / "Douglas_Table4_Haiku_Sonnet80_comparison.csv"
-FEB_SOURCE = HERE.parent / "outputs" / "Feb Runs" / "Feb2026_four_identity_pooled.csv"
-ASTRA_SOURCE = HERE.parent / "outputs" / "Astra_Medium_80" / "summary_pooled_douglas_combined.csv"
+LEGACY = HERE.parents[2] / "outputs" / "single_agent" / "Legacy Data"
+SOURCE = LEGACY / "Rejudgments" / "Douglas_Table4_Haiku_Sonnet80_comparison.csv"
+FEB_SOURCE = LEGACY / "Feb Runs" / "Feb2026_four_identity_pooled.csv"
+ASTRA_SOURCE = LEGACY / "Astra_Medium_80" / "summary_pooled_douglas_combined.csv"
 STEM = HERE / "Douglas_Table4_Haiku_Sonnet80_comparison"
 
 SERIES = (

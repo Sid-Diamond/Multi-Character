@@ -40,14 +40,14 @@ Verify dependencies without model calls:
 
 ```powershell
 uv pip check --python .venv\Scripts\python.exe
-.venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'Multi Character PoC'); import poc, rejudge; print('Imports OK')"
+.venv\Scripts\python.exe -c "import sys; sys.path.insert(0, 'Multi Character PoC/Python Scripts/active_run'); import poc, rejudge; print('Imports OK')"
 ```
 
-Review `Multi Character PoC/main.py` settings and provide your own OpenRouter key
+Review `Multi Character PoC/Python Scripts/active_run/main.py` settings and provide your own OpenRouter key
 in the ignored `Multi Character PoC/.env` before deliberately starting a paid run:
 
 ```powershell
-.venv\Scripts\python.exe "Multi Character PoC/main.py"
+.venv\Scripts\python.exe "Multi Character PoC/Python Scripts/active_run/main.py"
 ```
 
 Current settings may be temporary and need validation; setup does not start an

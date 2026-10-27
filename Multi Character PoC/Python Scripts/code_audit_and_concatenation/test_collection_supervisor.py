@@ -5,6 +5,10 @@ import unittest
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "active_run"))
+
 import collect_remaining_pairs as supervisor
 
 

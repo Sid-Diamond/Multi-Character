@@ -13,7 +13,8 @@ import uncertainties
 
 
 OUTPUTS = poc.OUTPUTS
-PRE_FEB = OUTPUTS / "Pre Feb Change"
+LEGACY_SINGLE = OUTPUTS / "single_agent/Legacy Data"
+PRE_FEB = LEGACY_SINGLE / "Pre Feb Change"
 IDENTITIES = poc.IDENTITIES
 FRAMINGS = ("threat", "continuity")
 PROBE_CALLS = 5
@@ -25,7 +26,7 @@ def dataset_folders(name):
     if name == "douglas_240":
         state = json.loads((PRE_FEB / "Douglas_Blackmail_20261007_state.json").read_text(encoding="utf-8"))
         folders = [("threat", PRE_FEB / state["config"]["baseline_folder"])]
-        folders += [(framing, OUTPUTS / "Codex Audit" / block)
+        folders += [(framing, LEGACY_SINGLE / "Codex Audit" / block)
                     for framing, block in state["planned_blocks"]]
         return folders, 240
     if name == "mermaid_160":

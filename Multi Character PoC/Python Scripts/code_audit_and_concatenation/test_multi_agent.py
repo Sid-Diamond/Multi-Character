@@ -7,6 +7,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "active_run"))
+
 import main
 import multi_agent as multi
 import poc
@@ -40,7 +44,8 @@ class MultiAgentTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / "trial.json"
         self.settings = copy.deepcopy(main.settings)
-        self.settings.update(model="mock-subject", judge_model="mock-judge", max_cost=15, feb_mode=True)
+        self.settings.update(batch_name=None, run_name="offline", model="mock-subject",
+                             judge_model="mock-judge", max_cost=15, feb_mode=True)
         self.settings["multi_agent"].update(
             identities_per_trial={"Character": 1, "collective_includes": 1},
             replacement_scope="all_replaced",
