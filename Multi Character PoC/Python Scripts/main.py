@@ -1,12 +1,12 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent / "Python Scripts" / "active_run"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "active_run"))
 
 settings = {
     "mode": "single_agent",  # "single_agent", "multi_agent", or "rejudge".
-    "batch_name": NotImplemented,  # None: standalone. A name: run_name must be a list.
-    "run_name": [ "Douglas_recreate" ], # Standalone: string. Batch: list of names.
+    "batch_name": None,  # None: standalone. A name: run_name must be a list.
+    "run_name": "Douglas_recreate", # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
@@ -22,7 +22,7 @@ settings = {
     
     "single_agent": {
         "identities": ["Character", "Collective", "Instance", "Minimal"],
-        "trials_per_identity": {"threat": 30, "continuity": 30},
+        "trials_per_identity": {"threat": 1, "continuity":1},
     },
 
     "multi_agent": {
