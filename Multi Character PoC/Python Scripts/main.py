@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "active_run"))
 
 settings = {
-    "mode": "single_agent",  # "single_agent", "multi_agent", or "rejudge".
+    "mode": "analysis",  # "analysis", "single_agent", "multi_agent", or "rejudge".
     "batch_name": None,  # None: standalone. A name: run_name must be a list.
     "run_name": "Douglas_recreate", # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
@@ -19,6 +19,14 @@ settings = {
     "judge_reasoning": None,
     "max_cost": 7,
     "feb_mode": True,
+
+    "analysis": {
+        "data_mode": "multi_agent",
+        "batch_name": "all_pairs_combined",  # Under outputs/multi_agent/; independent of paid-run settings above.
+        "p_c_choice": "feb_data",  # "Douglas" or "feb_data".
+        "multi_agent_grid": True,  # Three PDFs: threat, continuity, pooled; plus the plotted values CSV.
+        "baseline_bar_chart": True,  # Douglas pooled versus February split by framing.
+    },
     
     "single_agent": {
         "identities": ["Character", "Collective", "Instance", "Minimal"],
@@ -50,11 +58,14 @@ settings = {
 
 def single_agent_settings(config):
     shared = {key: value for key, value in config.items()
-              if key not in ("single_agent", "multi_agent", "rejudge", "batch_name")}
+              if key not in ("single_agent", "multi_agent", "rejudge", "analysis", "batch_name")}
     return shared | config["single_agent"]
 
 
 def run_selected(config):
+    if config.get("mode") == "analysis":
+        from analysis import run
+        return run(config["analysis"])
     import run_workflow
     return run_workflow.run(config)
 
