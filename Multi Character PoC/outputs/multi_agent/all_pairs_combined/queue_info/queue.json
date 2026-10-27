@@ -158,6 +158,16 @@
       }
     },
     {
+      "run_name": "collective_excludes__collective_includes",
+      "identities_per_trial": {
+        "Character": 0,
+        "Instance": 0,
+        "Minimal": 0,
+        "collective_excludes": 1,
+        "collective_includes": 1
+      }
+    },
+    {
       "run_name": "collective_includes__collective_includes",
       "identities_per_trial": {
         "Character": 0,
@@ -196,7 +206,7 @@
   },
   "aggregation": {
     "artifact_type": "offline_concatenation",
-    "created_utc": "2026-10-27T11:13:18.933758+00:00",
+    "created_utc": "2026-10-27T11:41:13.565994+00:00",
     "selection_rule": "First 25 valid, distinct completed groups per unordered pair and framing, ordered by earliest subject API creation time (Unix seconds), then original trial path relative to outputs/multi_agent. Selection is independent of outcome.",
     "target_per_framing": 25,
     "original_trials_byte_preserved": true,
