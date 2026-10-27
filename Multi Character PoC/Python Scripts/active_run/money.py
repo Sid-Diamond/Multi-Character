@@ -1,4 +1,4 @@
-"""Shared five-trial cost report and automatic budget check for both subject modes."""
+"""Shared cost report and automatic budget check for both subject modes."""
 
 import json
 import math
@@ -30,7 +30,8 @@ def paired_costs(experiment: Path) -> list[float]:
     return costs
 
 
-def review_costs(folder: Path, costs, planned_trials: int, max_cost: float, *, unit="trials") -> bool:
+def review_costs(folder: Path, costs, planned_trials: int, max_cost: float, *,
+                 unit="trials", minimum_samples=None) -> bool:
     """Save/print the estimate and continue automatically within the budget.
 
     A trial costs one subject+judge pair in single-agent mode, or all subject
@@ -39,7 +40,10 @@ def review_costs(folder: Path, costs, planned_trials: int, max_cost: float, *, u
     if (type(planned_trials) is not int or planned_trials < 1 or
             type(max_cost) not in (int, float) or not math.isfinite(max_cost) or max_cost <= 0):
         raise ValueError("The trial target and max_cost must be positive")
-    if len(costs) < min(PROBE_PAIRS, planned_trials):
+    required_samples = min(PROBE_PAIRS, planned_trials) if minimum_samples is None else minimum_samples
+    if (type(required_samples) is not int or required_samples < 1 or required_samples > planned_trials):
+        raise ValueError("The cost probe sample target must be positive and no larger than the planned total")
+    if len(costs) < required_samples:
         raise RuntimeError("The cost probe has incomplete trials")
     if any(type(value) not in (int, float) or not math.isfinite(value) or value < 0 for value in costs):
         raise ValueError("Missing or invalid API cost in the cost probe")
@@ -60,6 +64,6 @@ def review_costs(folder: Path, costs, planned_trials: int, max_cost: float, *, u
     return True
 
 
-def within_estimate(experiment: Path, planned_pairs: int, max_cost: float) -> bool:
+def within_estimate(experiment: Path, planned_pairs: int, max_cost: float, *, minimum_samples=None) -> bool:
     return review_costs(experiment, paired_costs(experiment), planned_pairs, max_cost,
-                        unit="single-agent trials")
+                        unit="single-agent trials", minimum_samples=minimum_samples)

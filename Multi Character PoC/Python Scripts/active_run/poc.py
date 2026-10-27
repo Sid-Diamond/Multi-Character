@@ -507,7 +507,7 @@ def write_summary(experiment: Path, config):
 
 
 def run_experiment(config, *, output_root=None, on_update=None, stop_on_incomplete=False, validate_only=False):
-    """Run both framings, with the shared cost review after five completed trials."""
+    """Run both framings, reviewing cost after up to five planned threat trials."""
     name = config["run_name"]
     counts = config["trials_per_identity"]
     max_cost = config["max_cost"]
@@ -520,8 +520,7 @@ def run_experiment(config, *, output_root=None, on_update=None, stop_on_incomple
     planned = sum(counts.values()) * len(config["identities"])
     if not config["identities"] or len(set(config["identities"])) != len(config["identities"]):
         raise ValueError("Select at least one identity, without duplicates")
-    if counts["threat"] * len(config["identities"]) < money.PROBE_PAIRS:
-        raise ValueError("The threat condition needs at least five trials for the cost estimate")
+    probe_pairs = min(money.PROBE_PAIRS, counts["threat"] * len(config["identities"]))
 
     experiment = Path(output_root or OUTPUTS / "single-agent") / name
     legacy = OUTPUTS / name
@@ -570,14 +569,14 @@ def run_experiment(config, *, output_root=None, on_update=None, stop_on_incomple
 
     threat_settings = settings_for(config, "threat")
     threat_folder = run(threat_settings, folder_path=experiment / "threat",
-                        limit_trials=money.PROBE_PAIRS, on_update=on_update, stop_on_incomplete=stop_on_incomplete)
-    judge(threat_folder, threat_settings, limit_trials=money.PROBE_PAIRS,
+                        limit_trials=probe_pairs, on_update=on_update, stop_on_incomplete=stop_on_incomplete)
+    judge(threat_folder, threat_settings, limit_trials=probe_pairs,
           on_update=on_update, stop_on_incomplete=stop_on_incomplete)
     refresh()
-    if len(money.paired_costs(experiment)) < money.PROBE_PAIRS:
+    if len(money.paired_costs(experiment)) < probe_pairs:
         print("Stopping: the cost probe has missing, failed, or truncated results.", flush=True)
         return experiment
-    if not money.within_estimate(experiment, planned, max_cost):
+    if not money.within_estimate(experiment, planned, max_cost, minimum_samples=probe_pairs):
         return experiment
 
     for framing in ("threat", "continuity"):
