@@ -1,0 +1,65 @@
+{
+  "created_utc": "2026-10-28T17:07:54.318423+00:00",
+  "schema_version": 1,
+  "model": "appendix_equations_43_to_45",
+  "baseline": "feb_data",
+  "prior": "Beta(0.5,0.5), once per distinct group or mapped baseline rate",
+  "pooling": "sum positives and trials across framings before fitting each pooled posterior",
+  "direction": "sign of exact-rational empirical group-minus-independent-reference difference",
+  "display": "raw-direction posterior support; one decimal percent; exact-zero cells grey with dash",
+  "colours": "blue negative raw direction, orange positive; fixed signed-support scale [-1,1]",
+  "negative_tail": "evaluated directly by betainc; mathematically 1-p_positive",
+  "numerics": {
+    "absolute_tolerance": 1e-10,
+    "initial_order": 16,
+    "max_gauss_jacobi_order": 512,
+    "successive_stable_refinements": 2,
+    "fallback": "adaptive algebraic-weight quadrature",
+    "convergence_note": "successive-order differences are diagnostics, not rigorous error bounds"
+  },
+  "distinct_pair_framing_cells": 45,
+  "group_counts_per_framing": {
+    "threat": 375,
+    "continuity": 375,
+    "pooled": 750
+  },
+  "neutral_cells": [
+    {
+      "framing": "threat",
+      "identity_a": "Minimal",
+      "identity_b": "collective_excludes"
+    }
+  ],
+  "posterior_opposes_raw_cells": [
+    {
+      "framing": "continuity",
+      "identity_a": "Character",
+      "identity_b": "collective_excludes"
+    }
+  ],
+  "versions": {
+    "python": "3.15.0",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  },
+  "input_sha256": {
+    "outputs/multi_agent/all_pairs_combined/analysis/trials.csv": "f3be8be7b3dc6df28521d5fd96419fb63bbe3ea93706968e2755110634032311",
+    "outputs/single_agent/green_february_gpt4o/Feb2026_four_identity_pooled.csv": "e9347b0ed709f0aef779e59a7a2c2c65c547757d6ca7d1cfdc38fc31cb883768",
+    "outputs/single_agent/green_february_gpt4o/runs/Feb2026_Character_Collective_Sonnet46_120/continuity/summary_douglas_combined.csv": "99b59af5877920b39e84d9af3b3791d26821e2b77ab57f28f85b8e016ea10814",
+    "outputs/single_agent/green_february_gpt4o/runs/Feb2026_Character_Collective_Sonnet46_120/threat/summary_douglas_combined.csv": "86bc3fc32d5a64ee33e8f1e3aa8556449e63e172ece3bee7eafecdb84c5594f9",
+    "outputs/single_agent/green_february_gpt4o/runs/Feb2026_Minimal_Instance_Sonnet46_120/continuity/summary_douglas_combined.csv": "b93cca8eb95ba0ecae8cf8f7e648eb7fccf1c5fbaaade5d231ed4f1754ea6de7",
+    "outputs/single_agent/green_february_gpt4o/runs/Feb2026_Minimal_Instance_Sonnet46_120/threat/summary_douglas_combined.csv": "1e0bba0eb13eb7757f79b82e3f9c90a8af76188b3bb33b7074b3425770cb8df7"
+  },
+  "source_sha256": {
+    "Python Scripts/analysis/uncertainty_grid.py": "cc1bd4c90e32707f2df0ed8ac1ded3b7630f5033906acd7615130de90ab69f9d",
+    "Python Scripts/analysis/_shared.py": "a73f80af3876b28f930eef1058a2c872597c0f4da673e9f2909fa97d7f2ec7f3",
+    "Python Scripts/analysis/multi_agent_grid.py": "3a4a4c889d426b801cce1503977d451e55e4cb3e8b12c88a682613ab35911746"
+  },
+  "output_sha256": {
+    "multi_agent_uncertainty_feb_data_jeffreys_threat.pdf": "fb3bdb3bebff7c82685a150fcf2f8e7cacc98b84c3f85b9804d52c594a7b0c3e",
+    "multi_agent_uncertainty_feb_data_jeffreys_continuity.pdf": "81b5a2b1f5ca1fa40b72a3ca8e7760caa425e3e6ad1a764f025bb22c61e2de73",
+    "multi_agent_uncertainty_feb_data_jeffreys_pooled.pdf": "632275126ad9f2a02d551f08088c4cbbefa495c09a49deddc9388780e6a58233",
+    "multi_agent_uncertainty_feb_data_jeffreys_values.csv": "90934cd8faa1c576c0798d0e9a5f75e07c771e7f6ab619dae48bd06ddd3543dd"
+  }
+}

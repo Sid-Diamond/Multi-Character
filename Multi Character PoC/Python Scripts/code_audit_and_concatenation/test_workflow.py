@@ -49,7 +49,8 @@ class WorkflowTests(unittest.TestCase):
         self.enterContext(patch.object(poc, "api_key", return_value="offline"))
         self.enterContext(redirect_stdout(io.StringIO()))
         self.settings = copy.deepcopy(main.settings)
-        self.settings.update(run_name="one", batch_name=None, model="mock-subject", judge_model="mock-judge")
+        self.settings.update(mode="multi_agent", run_name="one", batch_name=None,
+                             model="mock-subject", judge_model="mock-judge")
         self.settings["multi_agent"].update(
             identities_per_trial={name: 2 if name == "Character" else 0 for name in workflow.IDENTITIES},
             trials_per_group={"threat": 1, "continuity": 0})

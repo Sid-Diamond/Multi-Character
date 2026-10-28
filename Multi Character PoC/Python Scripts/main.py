@@ -28,6 +28,7 @@ settings = {
         "grid_metric": "log_relative_risk",  # "difference" or "log_relative_risk" (natural log).
         "multi_agent_grid": True,  # Three PDFs: threat, continuity, pooled; plus the plotted values CSV.
         "baseline_bar_chart": True,  # Douglas pooled versus February split by framing.
+        "uncertainty_grid": True,  # February posterior sign support; saved under analysis/uncertainties/.
     },
     
     "single_agent": {
