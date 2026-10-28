@@ -11,6 +11,12 @@ def run(config):
         raise ValueError("analysis.batch_name must be one batch folder name")
     if config.get("p_c_choice") not in ("Douglas", "feb_data"):
         raise ValueError("analysis.p_c_choice must be 'Douglas' or 'feb_data'")
+    smoothing = config.get("smoothing", "none")
+    metric = config.get("grid_metric", "difference")
+    if smoothing not in ("none", "jeffreys"):
+        raise ValueError("analysis.smoothing must be 'none' or 'jeffreys'")
+    if metric not in ("difference", "log_relative_risk"):
+        raise ValueError("analysis.grid_metric must be 'difference' or 'log_relative_risk'")
     switches = ("multi_agent_grid", "baseline_bar_chart")
     if any(type(config.get(key)) is not bool for key in switches):
         raise ValueError("Analysis plot switches must be True or False")
@@ -23,7 +29,7 @@ def run(config):
     outputs = []
     if config["multi_agent_grid"]:
         from .multi_agent_grid import create
-        outputs.extend(create(folder, config["p_c_choice"]))
+        outputs.extend(create(folder, config["p_c_choice"], smoothing=smoothing, grid_metric=metric))
     if config["baseline_bar_chart"]:
         from .baseline_bar_chart import create
         outputs.extend(create(folder))

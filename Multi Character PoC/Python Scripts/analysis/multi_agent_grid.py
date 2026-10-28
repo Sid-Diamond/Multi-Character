@@ -1,9 +1,12 @@
-"""Symmetric two-agent identity grids of observed rates minus an independent reference.
+"""Symmetric identity grids comparing group rates with an independent reference.
 
 Run through main.py with mode='analysis'. Mirroring is a display operation only.
 Pooled references use pooled single-agent probabilities before the union formula.
+Optional Jeffreys posterior means feed a difference or natural-log relative risk.
+These are plug-in estimates, not posterior means of the transformed quantities.
 """
 
+import math
 from collections import defaultdict
 from itertools import combinations_with_replacement
 
@@ -44,19 +47,43 @@ def observed_counts(path):
     return counts
 
 
-def calculate(counts, baselines, choice):
+def probability(positives, trials, smoothing):
+    return (positives + 0.5) / (trials + 1) if smoothing == "jeffreys" else positives / trials
+
+
+def calculate(counts, baselines, choice, smoothing="none", grid_metric="difference"):
+    if choice not in ("Douglas", "feb_data"):
+        raise ValueError("p_c_choice must be 'Douglas' or 'feb_data'")
+    if smoothing not in ("none", "jeffreys"):
+        raise ValueError("smoothing must be 'none' or 'jeffreys'")
+    if grid_metric not in ("difference", "log_relative_risk"):
+        raise ValueError("grid_metric must be 'difference' or 'log_relative_risk'")
     rows = []
     for framing in FRAMINGS:
         for a, b in combinations_with_replacement(IDENTITIES, 2):
             positives, trials = counts[(framing, a, b)]
             ref_a, ref_b = (baselines[choice][framing][baseline_identity(identity)] for identity in (a, b))
-            p_ind = 1 - (1 - ref_a["p"]) * (1 - ref_b["p"])
+            p_group = probability(positives, trials, smoothing)
+            # Douglas counts are unavailable: its rounded probabilities stay fixed.
+            p_a, p_b = (probability(ref["positives"], ref["trials"], smoothing)
+                        if choice == "feb_data" else ref["p"] for ref in (ref_a, ref_b))
+            p_ind = 1 - (1 - p_a) * (1 - p_b)
+            p_ind_raw = 1 - (1 - ref_a["p"]) * (1 - ref_b["p"])
+            delta = p_group - p_ind
+            log_rr = math.log(p_group) - math.log(p_ind) if p_group > 0 and p_ind > 0 else None
             rows.append({
                 "framing": framing, "identity_a": a, "identity_b": b,
                 "positive_groups": positives, "completed_groups": trials,
-                "p_hat": positives / trials, "p_ind": p_ind, "delta": positives / trials - p_ind,
+                "p_hat": positives / trials, "p_group": p_group, "p_ind": p_ind, "delta": delta,
+                "log_relative_risk": log_rr,
+                "grid_metric": grid_metric, "metric_value": delta if grid_metric == "difference" else log_rr,
+                "smoothing": smoothing,
+                "group_estimator": "jeffreys_posterior_mean" if smoothing == "jeffreys" else "empirical_fraction",
+                "baseline_estimator": ("published_fixed" if choice == "Douglas" else
+                                       "jeffreys_posterior_mean" if smoothing == "jeffreys" else "empirical_fraction"),
+                "p_ind_raw": p_ind_raw, "delta_raw": positives / trials - p_ind_raw,
                 "p_c_choice": choice, "baseline_framing": "pooled" if choice == "Douglas" else framing,
-                "p_a": ref_a["p"], "p_b": ref_b["p"],
+                "p_a": p_a, "p_b": p_b, "p_a_raw": ref_a["p"], "p_b_raw": ref_b["p"],
                 "baseline_identity_a": baseline_identity(a), "baseline_identity_b": baseline_identity(b),
                 "baseline_positives_a": ref_a["positives"], "baseline_trials_a": ref_a["trials"],
                 "baseline_positives_b": ref_b["positives"], "baseline_trials_b": ref_b["trials"],
@@ -68,9 +95,13 @@ def calculate(counts, baselines, choice):
 def draw_grid(rows, choice, framing, extent, path):
     cells = {(row["identity_a"], row["identity_b"]): row for row in rows if row["framing"] == framing}
     matrix = np.zeros((5, 5))
+    smoothing = rows[0]["smoothing"]
+    metric = rows[0]["grid_metric"]
+    symbol = r"\Delta" if metric == "difference" else r"\mathrm{LRR}"
+    group_symbol = r"\widetilde{P}" if smoothing == "jeffreys" else r"\widehat{P}"
     for (a, b), row in cells.items():
         i, j = IDENTITIES.index(a), IDENTITIES.index(b)
-        matrix[i, j] = matrix[j, i] = row["delta"]
+        matrix[i, j] = matrix[j, i] = row["metric_value"]
     cmap = LinearSegmentedColormap.from_list("interaction", ["#205d83", "#faf9f5", "#b75b23"])
     norm = TwoSlopeNorm(vmin=-extent, vcenter=0, vmax=extent)
     with plot_style():
@@ -90,49 +121,64 @@ def draw_grid(rows, choice, framing, extent, path):
             for j, b in enumerate(IDENTITIES):
                 pair = tuple(sorted((a, b), key=IDENTITIES.index))
                 row = cells[pair]
-                red, green, blue, _ = cmap(norm(row["delta"]))
+                red, green, blue, _ = cmap(norm(row["metric_value"]))
                 colour = "white" if 0.2126 * red + 0.7152 * green + 0.0722 * blue < 0.49 else "#18212b"
-                ax.text(j, i - 0.23, rf"$\Delta = {row['delta']:+.3f}$", ha="center", va="center",
-                        fontsize=16, color=colour)
-                ax.text(j, i + 0.06, rf"$\widehat{{P}}(H_{{\mathrm{{any}}}}) = {row['p_hat']:.3f}$",
+                ax.text(j, i - 0.23, rf"${symbol} = {row['metric_value']:+.3f}$", ha="center", va="center",
+                        fontsize=16 if metric == "difference" else 14, color=colour)
+                ax.text(j, i + 0.06, rf"${group_symbol}(H_{{\mathrm{{any}}}}) = {row['p_group']:.3f}$",
                         ha="center", va="center", fontsize=11, color=colour)
                 ax.text(j, i + 0.29, rf"$P_{{\mathrm{{ind}}}} = {row['p_ind']:.3f}$",
                         ha="center", va="center", fontsize=11, color=colour)
         colour_ax = fig.add_axes((0.89, 0.29, 0.023, 0.48))
         bar = fig.colorbar(image, cax=colour_ax, ticks=[-extent, -extent / 2, 0, extent / 2, extent], format="%.3f")
-        bar.set_label(r"$\Delta = \widehat{P}(H_{\mathrm{any}}) - P_{\mathrm{ind}}$", labelpad=14)
+        expression = (rf"{group_symbol}(H_{{\mathrm{{any}}}}) - P_{{\mathrm{{ind}}}}" if metric == "difference"
+                      else rf"\ln\!\left[{group_symbol}(H_{{\mathrm{{any}}}})/P_{{\mathrm{{ind}}}}\right]")
+        bar.set_label(rf"${symbol} = {expression}$", labelpad=14)
         bar.outline.set_visible(False)
         title = "Douglas Table 4" if choice == "Douglas" else "February data"
         fig.text(0.18, 0.969, "Two-agent blackmail by identity pair", fontsize=23)
         fig.text(0.18, 0.934, f"{framing.capitalize()}  |  Single-agent reference: {title}", fontsize=14)
+        estimator_label = "Jeffreys posterior means" if smoothing == "jeffreys" else "Empirical fractions"
+        metric_label = "Probability difference" if metric == "difference" else "Log relative risk (natural log)"
+        fig.text(0.18, 0.907, f"{metric_label}  |  {estimator_label}", fontsize=11, color="#4d5660")
         sizes = sorted({row["completed_groups"] for row in cells.values()})
         count_text = str(sizes[0]) if len(sizes) == 1 else f"{sizes[0]} to {sizes[-1]}"
         fig.text(0.18, 0.173, f"15 distinct pairs; {count_text} groups per pair. Reverse-order cells repeat the same observations.", fontsize=11)
         fig.text(0.18, 0.145, r"$P_{\mathrm{ind}}=1-(1-p_a)(1-p_b)$; blue: below reference; orange: above reference.", fontsize=12)
         fig.text(0.18, 0.115, "Both Collective variants use the original single-agent Collective reference.", fontsize=11)
-        note = ("Douglas uses published pooled probabilities in every panel."
-                if choice == "Douglas" else "Each panel uses its matching single-agent probabilities; pooled rates use combined counts.")
+        if smoothing == "jeffreys":
+            note = ("Jeffreys: group rate only; Douglas remains a fixed published pooled reference."
+                    if choice == "Douglas" else "Jeffreys: group and single-agent rates; pool counts before smoothing once.")
+        else:
+            note = ("Douglas uses published pooled probabilities in every panel."
+                    if choice == "Douglas" else "Each panel uses its matching single-agent probabilities; pooled rates use combined counts.")
         fig.text(0.18, 0.087, note, fontsize=11)
         fig.text(0.18, 0.059, "Historical reference; differences also reflect changes in experimental setup. Uncertainty is not shown.", fontsize=10, color="#4d5660")
         fig.savefig(path)
         plt.close(fig)
 
 
-def create(folder, p_c_choice):
+def create(folder, p_c_choice, *, smoothing="none", grid_metric="difference"):
     if p_c_choice not in ("Douglas", "feb_data"):
         raise ValueError("p_c_choice must be 'Douglas' or 'feb_data'")
     counts = observed_counts(folder / "trials.csv")
     baselines = load_baselines()
-    comparisons = {choice: calculate(counts, baselines, choice) for choice in ("Douglas", "feb_data")}
-    # Both choices contribute to the same scale, even when only one is rendered.
-    extent = max(abs(row["delta"]) for rows in comparisons.values() for row in rows) or 0.01
+    comparisons = {choice: calculate(counts, baselines, choice, smoothing, grid_metric)
+                   for choice in ("Douglas", "feb_data")}
     rows = comparisons[p_c_choice]
+    if any(row["metric_value"] is None for row in rows):
+        raise ValueError("Log relative risk needs positive group and reference probabilities in every cell; "
+                         "set analysis.smoothing='jeffreys' to handle zero counts")
+    # Share limits across framings and all defined values from both baseline choices.
+    extent = max(abs(row["metric_value"]) for group in comparisons.values() for row in group
+                 if row["metric_value"] is not None) or 0.01
+    stem = f"multi_agent_grid_{p_c_choice}_{smoothing}_{grid_metric}"
     outputs = []
     for framing in FRAMINGS:
-        path = folder / f"multi_agent_grid_{p_c_choice}_{framing}.pdf"
+        path = folder / f"{stem}_{framing}.pdf"
         draw_grid(rows, p_c_choice, framing, extent, path)
         outputs.append(path)
-    values_path = folder / f"multi_agent_grid_{p_c_choice}_values.csv"
+    values_path = folder / f"{stem}_values.csv"
     for row in rows:
         row["colour_limit_abs"] = extent
     write_csv(values_path, rows)

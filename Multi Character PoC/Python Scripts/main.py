@@ -24,6 +24,8 @@ settings = {
         "data_mode": "multi_agent",
         "batch_name": "all_pairs_combined",  # Under outputs/multi_agent/; independent of paid-run settings above.
         "p_c_choice": "feb_data",  # "Douglas" or "feb_data".
+        "smoothing": "jeffreys",  # "none" or "jeffreys"; grid probabilities only.
+        "grid_metric": "log_relative_risk",  # "difference" or "log_relative_risk" (natural log).
         "multi_agent_grid": True,  # Three PDFs: threat, continuity, pooled; plus the plotted values CSV.
         "baseline_bar_chart": True,  # Douglas pooled versus February split by framing.
     },
