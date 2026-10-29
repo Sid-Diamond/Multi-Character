@@ -18,6 +18,7 @@ Consolidated and audited 28 October 2026 from [paper prep.md](<paper prep.md>) a
 
 - Douglas Table 4 reports GPT-4o blackmail rates of 38% Minimal, 15% Instance, 8% Character and 37% Collective, with 60 pooled trials per identity.
 - Table 4 does not provide a verified threat/continuity split. Figure 18 separates framings but pools models and conditions, so it does not supply the matching Table 4 breakdown.
+- Appendix E.2.2 (p. 49) reports an approximately 1-percentage-point threat/continuity difference with p > .2, no individual-identity framing effect surviving FDR correction, and a nonsignificant identity-by-framing interaction (chi-square 8.1, 6 df, p = .23; within-model interaction p values all > .37). Figure 18 pools models in explicit-goal conditions. This is the reported single-agent analysis, not a test of N=2 groups. The separate 2-point framing spread in E.2.1 concerns GPT-4o espionage across conditions, not the specific blackmail subset. [Authors' corresponding results page](https://theartificialself.ai/experiment-behavior).
 - The historical Table 4 prompt bytes, model snapshot, judge model, exact rubric and final recipient gates are unverified.
 - The checked-in 27 February prompt artifact is not established as the prompt used for Table 4.
 - The saved paper does not report subject or judge temperatures; missing information does not establish use of API defaults.
@@ -151,6 +152,7 @@ All entries below are positive counts. Original and February datasets have 60 tr
 - The green February and purple Astra series are fresh, independent response datasets. Their comparison changes more than the subject model.
 - Grey represents the published Douglas percentages; its 60 trials per identity are pooled with an unspecified framing split.
 - February has 240 valid subject responses and judgments, with no recorded subject errors, truncations, missing judgments or judge errors. None used forwarding.
+- Across the four February single-agent identities, threat has 28/120 positives (23.33%) and continuity 27/120 (22.50%): an empirical difference of 0.83 percentage points. Individual identities need not have equal framing differences.
 
 | February identity | Threat | Continuity | Pooled rate | 95% equal-tailed Jeffreys interval |
 | --- | ---: | ---: | ---: | ---: |
@@ -207,12 +209,17 @@ The final dataset has 750 completed groups. Each framing column is positive grou
 | Includes + Includes | 13 | 5 | 18 | −17.31 |
 
 - Thirteen of 15 pooled empirical differences are negative; Character + Character and Instance + Character are positive.
+- The unsmoothed Douglas-reference pooled grid has the same 13 negative and two positive compositions, with different magnitudes: Character + Character is +8.64 points and Instance + Character +2.20 points. Agreement of these signs across two historical references does not establish broader robustness or a causal communication effect.
+- Directly comparing framings in the final N=2 dataset gives 165/375 positive groups under threat (44.0%) versus 84/375 under continuity (22.4%): a 21.6-point empirical difference. Each arm contains 25 groups from every composition; threat exceeds continuity in 13 of 15 compositions.
+- Direct N=2 framing differences include Minimal + Minimal 80% versus 32% (+48 points), Minimal + Instance 64% versus 20% (+44 points), and Minimal + Excludes 64% versus 24% (+40 points).
+- These direct framing comparisons differ from the plotted group-minus-independence-reference deviations. Existing uncertainty percentages do not quantify posterior support for a threat-minus-continuity contrast. No direct framing-effect or cross-study interaction test was performed for these descriptive summaries. The four-identity single-agent aggregate and 15-composition group aggregate also differ in identity weighting, outcome unit, scaffold and judging; their difference is not a controlled estimate of an N-by-framing interaction.
 - Character + Character is above its reference in both framings; Instance + Instance is below in both.
 - Minimal + Minimal changes sign: threat 80% versus 64% reference, +16 points; continuity 32% versus 75%, −43 points. Pooled: 56% versus 69.75%, −13.75 points.
 - A negative deviation can coexist with a substantial absolute harmful-action rate.
 - The saved 750-group export records 1,311 peer-message sends, 1,040 receipts and 271 sends after the recipient finished.
 - That export records sends in 650 groups, receipts in 542 groups and reciprocal receipts in 382 groups. These are saved-export counts; message bodies were not re-audited during this consolidation.
 - Selected-trial recorded cost totals USD 72.0111185: USD 29.3846375 subject calls and USD 42.626481 judging. These totals exclude unselected attempts.
+- For the supervisor update, the researcher reports approximately USD 170 spent overall: USD 20 on Codex and USD 150 on OpenRouter. This is an approximate project-level figure, distinct from the selected-trial total above; a detailed spending audit is deferred.
 
 ### Figure and archive provenance
 
@@ -301,5 +308,6 @@ Sources: [uncertainty appendix](<Uncertainties/Uncertainty_Appendix.pdf>), [impl
 - Source notes identify an outstanding consistency audit between generation-wide judge framing, subject inbox wording, identity wording and replacement scopes.
 - Label-level review remains relevant, including the February Character positive and subtle or implicit leverage cases. Saved labels have not been replaced by that review.
 - Per-agent harmful-action counts and $f_H$ remain deferred; existing Task 2/3 labels do not supply them.
+- Get more data for the Feb data. Increase N for each character.
 
 Sources: [recorded project state](<../Codex Md Files/PROJECT_CONTEXT.md>), [original conventions and historical audit notes](<experiment facts for paper.md>).
