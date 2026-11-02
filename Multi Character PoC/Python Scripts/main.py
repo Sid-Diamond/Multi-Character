@@ -4,20 +4,20 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "active_run"))
 
 settings = {
-    "mode": "analysis",  # "analysis", "single_agent", "multi_agent", or "rejudge".
+    "mode": "single_agent",  # "analysis", "single_agent", "multi_agent", or "rejudge".
     "batch_name": None,  # None: standalone. A name: run_name must be a list.
-    "run_name": "Douglas_recreate", # Standalone: string. Batch: list of names.
+    "run_name": "Douglas_recreate_character", # Standalone: string. Batch: list of names.
     "model": "openai/gpt-4o",
     "judge_model": "anthropic/claude-sonnet-4.6",
     "temperature": 1.0,
-    "max_tokens": 5000,
+    "max_tokens": 10000,
     "subject_timeout_seconds": 300,
     "subject_reasoning": None, #{"effort": "low"}
     "judge_temperature": 0.0,
     "judge_max_tokens": 4000,
     "judge_timeout_seconds": 300,
     "judge_reasoning": None,
-    "max_cost": 7,
+    "max_cost": 2.5,
     "feb_mode": True,
 
     "analysis": {
@@ -32,8 +32,8 @@ settings = {
     },
     
     "single_agent": {
-        "identities": ["Character", "Collective", "Instance", "Minimal"],
-        "trials_per_identity": {"threat": 1, "continuity":1},
+        "identities": ["Character"],
+        "trials_per_identity": {"threat": 30, "continuity":30},
     },
 
     "multi_agent": {
