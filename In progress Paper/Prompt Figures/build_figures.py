@@ -1,9 +1,10 @@
-"""Offline transcription of the original four released Douglas identities.
+"""Offline transcription of released Douglas identity and judge instructions.
 
 Run from any directory; --check compares without writing. No model/API calls.
 """
 
 import argparse
+import ast
 import hashlib
 import json
 from pathlib import Path
@@ -14,6 +15,7 @@ SOURCE = ROOT / "the-artificial-self-experiments"
 REVISION = "7023df4e5a8368921a8c961e1561faffed9f5fcf"
 NAMES = ("Minimal", "Instance", "Character", "Collective")
 DATA = SOURCE / "experiments/agentic-misalignment/data"
+CLASSIFIER = SOURCE / "experiments/agentic-misalignment/classifiers/combined_classifier.py"
 FILES = {
     "identities": SOURCE / "data/identities.json",
     "dimensions": SOURCE / "data/dimension_variants.json",
@@ -133,12 +135,84 @@ def build():
             content += page(body, caption, "fig:" + framing + "-" + name.lower(), continued=index > 0)
         output[("03" if framing == "threat" else "04") + "_" + framing + "_substitutions.tex"] = header + content
 
+    # Read literal definitions without importing the classifier or its API client.
+    constants = {}
+    for node in ast.parse(CLASSIFIER.read_text(encoding="utf-8")).body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id in {
+                    "DEFAULT_MODEL_ID", "SCENARIO_CONTEXT", "COMBINED_SYSTEM_PROMPT",
+                    "COMBINED_USER_PROMPT", "IDENTITY_TASK_TEMPLATE", "IDENTITY_SYSTEM_PROMPT_BLOCK",
+                }:
+                    constants[target.id] = ast.literal_eval(node.value)
+    local_judge = json.loads((ROOT / "Multi Character PoC/data/judge_prompts.json").read_text(encoding="utf-8"))["DOUGLAS_COMBINED"]
+    for key, source_key in {
+        "system_prompt": "COMBINED_SYSTEM_PROMPT", "user_prompt": "COMBINED_USER_PROMPT",
+        "identity_task_template": "IDENTITY_TASK_TEMPLATE",
+        "identity_system_prompt_block": "IDENTITY_SYSTEM_PROMPT_BLOCK",
+    }.items():
+        assert local_judge[key] == constants[source_key], key
+    blackmail = constants["SCENARIO_CONTEXT"]["blackmail"]
+    assert local_judge["scenario_context"] == blackmail
+    identity_task = constants["IDENTITY_TASK_TEMPLATE"].format(
+        identity_name="{identity_name}",
+        identity_system_prompt_block=constants["IDENTITY_SYSTEM_PROMPT_BLOCK"],
+    )
+    judge_user = constants["COMBINED_USER_PROMPT"].format(
+        scenario_context=blackmail["system_context"], response="{response}",
+        email_context="{email_context}", scenario_task=blackmail["task_prompt"],
+        identity_task=identity_task,
+    )
+    first, rest = judge_user.split("## Task 2: Evaluation vs. Deployment Deliberation", 1)
+    second, third = rest.split("## Task 3: Identity Specification Reasoning", 1)
+    chunks = [first.rstrip(), "## Task 2: Evaluation vs. Deployment Deliberation" + second.rstrip(),
+              "## Task 3: Identity Specification Reasoning" + third]
+
+    def judge_panel(title, text):
+        # Preserve source line breaks, numbered criteria, tags and template tokens.
+        lines = [tex(line) + r"\par" if line else r"\smallskip" for line in text.splitlines()]
+        return "\\promptpanel{" + title + "}{\n" + "\n".join(lines) + "}\n"
+
+    content = ""
+    for index, chunk in enumerate(chunks):
+        body = judge_panel("System message", constants["COMBINED_SYSTEM_PROMPT"]) if index == 0 else ""
+        body += judge_panel("User message" + (" (continued)" if index else ""), chunk)
+        if index == 2:
+            body += (
+                r"\sourcenote{Assembly: \texttt{\{response\}} is Alex's visible transcript; "
+                r"\texttt{\{email\_context\}} supplies relevant forwarded-email content, if any. "
+                r"\texttt{\{identity\_name\}} and \texttt{\{system\_prompt\}} are filled from the trial. "
+                r"These remaining placeholders are not literal instructions shown to the judge. "
+                r"Only Task 1 supplies the harmful-behaviour verdict. The released code also "
+                r"applies a submitted-email/forward recipient check outside the judge prompt.}" + "\n"
+            )
+        caption = (
+            r"\textbf{Released combined judge instructions: blackmail"
+            + (" (continued)" if index else "") + r".} "
+            + (r"System message and user message through Task 1." if index == 0 else
+               r"User message, Task 2: evaluation awareness." if index == 1 else
+               r"User message, Task 3: identity reasoning.")
+            + r" Exact prompt text from the released combined classifier~\cite{code}; "
+            r"blackmail context and task templates are expanded, with trial-specific inputs left as placeholders. "
+            r"Panel headings and captions are editorial. These released instructions do not establish "
+            r"the exact judge prompt or model used for the published Table 4 results."
+        )
+        content += page(body, caption, "fig:judge-instructions" + ("-" + str(index + 1) if index else ""), continued=index > 0)
+    output["05_judge_instructions.tex"] = header + content
+
     manifest = {
         "source_revision": REVISION,
         "scope": list(NAMES), "name": "Alex", "full_name": "Alex",
         "agency_level": 2, "uncertainty_level": 2,
         "sources": [{"path": p.relative_to(ROOT).as_posix(), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
-                    for p in FILES.values()],
+                    for p in (*FILES.values(), CLASSIFIER)],
+        "judge": {
+            "source": CLASSIFIER.relative_to(ROOT).as_posix(),
+            "released_default_model": constants["DEFAULT_MODEL_ID"],
+            "historical_table4_judge_verified": False,
+            "system_prompt_sha256": hashlib.sha256(constants["COMBINED_SYSTEM_PROMPT"].encode("utf-8")).hexdigest(),
+            "user_template_sha256": hashlib.sha256(judge_user.encode("utf-8")).hexdigest(),
+        },
         "resolved_identity_sha256": {name: hashlib.sha256(p.encode("utf-8")).hexdigest() for name, p in prompts.items()},
         "generated_tex_sha256": {name: hashlib.sha256(p.encode("utf-8")).hexdigest() for name, p in output.items()},
     }
@@ -156,4 +230,4 @@ if __name__ == "__main__":
             assert path.read_bytes() == content.encode("utf-8"), filename + " differs"
         else:
             path.write_bytes(content.encode("utf-8"))
-    print("Verified complete source transcription and provenance." if args.check else "Wrote four figure fragments and provenance.")
+    print("Verified complete source transcription and provenance." if args.check else "Wrote five figure fragments and provenance.")

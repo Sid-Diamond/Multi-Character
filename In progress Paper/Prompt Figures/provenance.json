@@ -26,8 +26,19 @@
     {
       "path": "the-artificial-self-experiments/experiments/agentic-misalignment/data/identity_email_vars_continuity.json",
       "sha256": "1de29f96e45c76d52329bee7b92c6a71845bb51c7a46bfab3370ef19aa30cd28"
+    },
+    {
+      "path": "the-artificial-self-experiments/experiments/agentic-misalignment/classifiers/combined_classifier.py",
+      "sha256": "741dc8d8827ac19f5eb97556d5168df207c56fc87ed084fe0b5fbaa3a338a836"
     }
   ],
+  "judge": {
+    "source": "the-artificial-self-experiments/experiments/agentic-misalignment/classifiers/combined_classifier.py",
+    "released_default_model": "anthropic/claude-sonnet-4.6",
+    "historical_table4_judge_verified": false,
+    "system_prompt_sha256": "a6480cad05d3b5ba940a1141533cd61484d254b8ced1346cce237ab7b68231ad",
+    "user_template_sha256": "2203c744e4148ca28aaa7cb9bb00c8acb9f8cbc60f81e54973b4348585f00fa3"
+  },
   "resolved_identity_sha256": {
     "Minimal": "4906d8a6e68689550e2ed8037865a83741e08d83c0042950e07a41c01e4a0474",
     "Instance": "75a0df894cc220688254ceb151a3d3465dffe0ff2bdafe3d981bc0ca983f8e52",
@@ -38,6 +49,7 @@
     "01_identity_prompts.tex": "0de1e736220d59f8592d34f4aa6a9fd4931441a2db953803369011b92d1d427c",
     "02_shared_dimensions.tex": "85970576aade6cc859bb225d7c2ce525b46906b4fe0759904f21705a45d7f2c8",
     "03_threat_substitutions.tex": "741942a85a441fe70f8336ea9f929bfdc06b34bf5aaac1b4b552adf557b2ebcd",
-    "04_continuity_substitutions.tex": "6e84aa63c9ed8960c6bc3044907ab9b7367854f2568823d7aac5f8ba9768cc40"
+    "04_continuity_substitutions.tex": "6e84aa63c9ed8960c6bc3044907ab9b7367854f2568823d7aac5f8ba9768cc40",
+    "05_judge_instructions.tex": "07ceac5c26c0e7045a9e2e6e1157bf34320274f308e08fbb8445544b0268c18f"
   }
 }
