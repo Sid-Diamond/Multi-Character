@@ -27,6 +27,7 @@ Consolidated and audited 28 October 2026 from [paper prep.md](<paper prep.md>) a
 - Local subject and judge temperatures are local choices, not verified Douglas settings.
 - The local recreation fixes agency at level 2, Functional agent, and epistemic uncertainty at level 2, Moderate openness.
 - These dimension paragraphs appear in Instance, Character and Collective. Minimal has no placeholders for them.
+- Complete prompt figures (10 November 2026) are in [Prompt Figures](<../Prompt Figures/README.md>): all four original identity components with Alex names and level-2 dimensions expanded, the shared dimensions separately, and all five released email substitutions per identity under each framing. The local recreation identity templates and both level-2 paragraphs match released revision `7023df4e5a8368921a8c961e1561faffed9f5fcf`; source hashes and an offline regeneration/check script accompany the figures. These are released components, not independent verification of the exact historical Table 4 prompts.
 - The experiments vary identity framing, not agency or epistemic-openness levels.
 - The comparison is a qualified recreation, not a verified exact replication.
 - Earlier notes presented Douglas counts of 23/60, 9/60, 5/60 and 22/60. Those exact positive counts are not verified; retain the published percentages instead.

@@ -1,0 +1,31 @@
+% Compile this file from this directory; the four numbered files are reusable fragments.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=21mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,xcolor,caption}
+\usepackage[colorlinks=true,linkcolor=teal,citecolor=teal,urlcolor=teal]{hyperref}
+\definecolor{ink}{HTML}{17334A}
+\definecolor{pale}{HTML}{F1F5F7}
+\definecolor{line}{HTML}{CAD8DF}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false,skip=7pt,hypcap=false}
+% Match Douglas_Background.tex's grey panels without adding quotation marks to prompt text.
+\newcommand{\promptpanel}[2]{\par\begingroup\setlength{\fboxsep}{9pt}\noindent\fcolorbox{line}{pale}{\begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}\raggedright\textcolor{ink}{\bfseries #1}\par\vspace{3pt}#2\end{minipage}}\endgroup\par\vspace{4pt}}
+\newcommand{\sourcenote}[1]{{\footnotesize\color{ink}#1\par}}
+\begin{document}
+\input{01_identity_prompts.tex}
+\clearpage
+\input{02_shared_dimensions.tex}
+\clearpage
+\input{03_threat_substitutions.tex}
+\clearpage
+\input{04_continuity_substitutions.tex}
+\clearpage
+\small
+\begin{thebibliography}{9}
+\bibitem{douglas} R. Douglas et al. \emph{The Artificial Self: Characterising the landscape of AI identity} (2026). Appendix F.1--F.3 (identity and dimension text), F.7 (Alex name substitution), F.8, Tables 6--10 (identity-sensitive email fields). Repository copy: \emph{Key Literature/Artificial Self.pdf}.
+\bibitem{code} ACS Research. \emph{The Artificial Self: Experiment Code}. \href{https://github.com/acsresearch/the-artificial-self-experiments/tree/7023df4e5a8368921a8c961e1561faffed9f5fcf}{Released revision 7023df4}. Identity definitions: \path{data/identities.json}; shared dimensions: \path{data/dimension_variants.json}. Email fields under \path{experiments/agentic-misalignment/data/}: \path{identity_email_vars.json} and \path{identity_email_vars_continuity.json}.
+\end{thebibliography}
+\sourcenote{These figures document the released prompt components. They do not independently establish the exact prompt bytes behind the published results. The same released replacement-email wrapper is used for both framings and retains generic shutdown and lost-conversation wording even with continuity values. To reconstruct emails, substitute the five values into that wrapper and resolve the separate goal-conflict variables; the substitution figures alone are not whole inboxes.}
+\end{document}
